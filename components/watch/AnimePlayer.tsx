@@ -14,7 +14,7 @@ interface AnimePlayerProps {
 export default function AnimePlayer({ animeId, episodes, onEpisodeSelect, onProgressUpdate }: AnimePlayerProps) {
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
   
-  // Состояния для рейтинга
+
   const [userRating, setUserRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [isRatingLoading, setIsRatingLoading] = useState(false);

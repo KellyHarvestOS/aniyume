@@ -93,7 +93,7 @@ export default function FeaturedNewestRows() {
 
       <div className="container mx-auto px-6 md:px-16 mb-4 relative">
         
-        <div className="" />
+        <div />
 
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-2">
