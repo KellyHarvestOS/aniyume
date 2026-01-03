@@ -35,6 +35,7 @@ const TABS = [
 
 export default function BookmarksPage() {
   const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [activeTab, setActiveTab] = useState("favorites");
   const [isLoading, setIsLoading] = useState(true);
   const [allLists, setAllLists] = useState<{ [key: string]: AnimeItem[] }>({
@@ -48,9 +49,13 @@ export default function BookmarksPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("userToken");
-    if (!token) return router.push("/login");
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    setIsAuthorized(true);
     fetchAllData(token);
-  }, []);
+  }, [router]);
 
   const fetchAllData = async (token: string) => {
     setIsLoading(true);
@@ -115,6 +120,8 @@ export default function BookmarksPage() {
   };
 
   const currentItems = allLists[activeTab] || [];
+
+  if (!isAuthorized) return null;
 
   if (isLoading) return <BookmarksSkeleton />;
 
