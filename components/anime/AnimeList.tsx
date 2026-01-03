@@ -14,6 +14,9 @@ interface AnimeData {
   type?: string;
 }
 
+const CACHE_KEY_PREFIX = 'aniyume_animelist_page_';
+const CACHE_DURATION = 1000 * 60 * 15;
+
 const AnimeList = ({ title }: { title: string }) => {
   const titleRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<AnimeData[]>([]);
@@ -23,13 +26,39 @@ const AnimeList = ({ title }: { title: string }) => {
 
   useEffect(() => {
     const fetchAnime = async () => {
+      const cacheKey = `${CACHE_KEY_PREFIX}${page}`;
+      const cached = sessionStorage.getItem(cacheKey);
+
+      if (cached) {
+        const { data: cachedData, total: cachedTotal, timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          setData(cachedData);
+          setTotal(cachedTotal);
+          setLoading(false);
+          if (page > 1) titleRef.current?.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      }
+
       try {
         setLoading(true);
         if (page > 1) titleRef.current?.scrollIntoView({ behavior: 'smooth' });
+        
         const res = await fetch(`/api/external/anime?page=${page}&sort=newest&per_page=10`);
         const json = await res.json();
-        setData(json.data || json);
-        setTotal(json.meta?.last_page || json.last_page || 10);
+        
+        const newData = json.data || json;
+        const newTotal = json.meta?.last_page || json.last_page || 10;
+
+        setData(newData);
+        setTotal(newTotal);
+
+        sessionStorage.setItem(cacheKey, JSON.stringify({
+          data: newData,
+          total: newTotal,
+          timestamp: Date.now()
+        }));
+
       } catch (e) {
         console.error(e);
       } finally {

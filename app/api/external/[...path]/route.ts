@@ -12,7 +12,7 @@ export async function handleProxy(
     const searchParams = req.nextUrl.search;
 
     const privateKeywords = [
-       "user",
+      "user",
       "status",
       "profile",
       "favorites",
@@ -78,11 +78,28 @@ export async function handleProxy(
       headers["Content-Type"] = "application/json";
     }
 
+    let revalidateTime = 0;
+
+    if (req.method === "GET" && !isPrivate) {
+      if (pathStr.includes("search")) {
+        revalidateTime = 300;
+      } else if (pathStr.includes("schedule")) {
+        revalidateTime = 1800;
+      } else {
+        revalidateTime = 3600;
+      }
+    }
+
     const options: RequestInit = {
       method: req.method,
       headers,
-      cache: "no-store",
     };
+
+    if (revalidateTime > 0) {
+      options.next = { revalidate: revalidateTime };
+    } else {
+      options.cache = "no-store";
+    }
 
     if (req.method !== "GET" && req.method !== "HEAD") {
       const body = await req.text();
@@ -99,7 +116,21 @@ export async function handleProxy(
       data = { message: text };
     }
 
-    return NextResponse.json(data, { status: response.status });
+    const nextResponse = NextResponse.json(data, { status: response.status });
+
+    if (revalidateTime > 0) {
+      nextResponse.headers.set(
+        "Cache-Control",
+        `public, s-maxage=${revalidateTime}, stale-while-revalidate=59`
+      );
+    } else {
+      nextResponse.headers.set(
+        "Cache-Control",
+        "no-store, no-cache, must-revalidate, proxy-revalidate"
+      );
+    }
+
+    return nextResponse;
   } catch (error) {
     return NextResponse.json(
       {

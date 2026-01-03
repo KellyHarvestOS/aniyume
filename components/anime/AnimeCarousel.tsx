@@ -18,10 +18,13 @@ const shuffleArray = (array: any[]) => {
   return [...array].sort(() => Math.random() - 0.5);
 };
 
+const CACHE_KEY = 'aniyume_featured_newest';
+const CACHE_DURATION = 1000 * 60 * 30;
+
 const TickerCard = ({ anime }: { anime: AnimeItem }) => (
   <div className="px-2 outline-none">
     <Link href={`/anime/${anime.id}`}>
-      <div className="relative aspect-video rounded-3xl md:rounded-2xl overflow-hidden cursor-pointer group border border-gray-200 dark:border-white/5 bg-gray-100 dark:bg-[#111111] shadow-xl dark:shadow-2xl transition-all duration-500 hover:border-[#39bcba]/30">
+      <div className="relative aspect-video rounded-md md:rounded-2xl overflow-hidden cursor-pointer group border border-gray-200 dark:border-white/5 bg-gray-100 dark:bg-[#111111] shadow-xl dark:shadow-2xl transition-all duration-500 hover:border-[#39bcba]/30">
         <img
           src={anime.poster_url}
           alt={anime.title}
@@ -44,13 +47,31 @@ export default function FeaturedNewestRows() {
 
   useEffect(() => {
     const fetchNewest = async () => {
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          setAllAnime(data);
+          setLoading(false);
+          return;
+        }
+      }
+
       try {
         const [p1, p2] = await Promise.all([
           fetch('/api/external/anime?sort=newest&page=1').then(r => r.json()),
           fetch('/api/external/anime?sort=newest&page=2').then(r => r.json()),
         ]);
         const combined = [...(p1.data || []), ...(p2.data || [])];
-        setAllAnime(shuffleArray(combined));
+        const shuffled = shuffleArray(combined);
+        
+        setAllAnime(shuffled);
+        
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+          data: shuffled,
+          timestamp: Date.now()
+        }));
+
       } catch (error) {
         console.error(error);
       } finally {
@@ -88,13 +109,10 @@ export default function FeaturedNewestRows() {
   if (loading) return <CarouselSkeleton />;
 
   return (
-    
     <div className="w-full bg-white dark:bg-[#111111] py-1 overflow-hidden flex flex-col gap-6 relative transition-colors duration-300">
 
       <div className="container mx-auto px-6 md:px-16 mb-4 relative">
-        
         <div />
-
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-1 w-12 bg-[#39bcba] rounded-full" />
