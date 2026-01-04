@@ -85,6 +85,18 @@
 
 ---
 
+Мы используем **Route Groups** в Next.js для максимально чистой организации навигации без лишних сегментов в URL.
+
+| Группа | Путь | Описание |
+| :--- | :--- | :--- |
+|  **(auth)** | `/login`, `/register` | Система авторизации и контроля доступа. |
+|  **(navigation)** | `/catalog`, `/popular`, `/bookmarks`, `/filter` , `/schedule`| Основные контентные хабы приложения. |
+|  **(info)** | `/about`, `/faq`, `/terms`, `/privacy` | Юридическая и справочная информация. |
+|  **profile** | `/profile`, `/edit`, `/comments` | Личный кабинет, настройки и активность пользователя. |
+|  **anime** | `/anime/[id]` | Динамические страницы просмотра с плеером. |
+
+---
+
 ## <img src="https://api.iconify.design/heroicons/cpu-chip-solid.svg?color=%2321D0B8" width="28" height="28" style="vertical-align: middle; margin-bottom: 4px;" alt="icon" /> Технический стек
 
 | Категория | Технологии |
