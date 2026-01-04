@@ -150,7 +150,7 @@ export default function SearchBar() {
       </form>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-full bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute top-full left-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           {results.length > 0 ? (
             <ul className="max-h-[400px] overflow-y-auto custom-scrollbar">
               {results.map((item) => (
@@ -172,7 +172,7 @@ export default function SearchBar() {
                         {item.title}
                       </span>
                       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {item.year && <span className="bg-gray-100 dark:bg-gray-800 px-1.5 rounded">{item.year}</span>}
+                        {item.year && <span className="bg-gray-100 dark:bg-[#111111] px-1.5 rounded">{item.year}</span>}
                         {item.type && <span className="uppercase text-[10px] border border-gray-200 dark:border-gray-700 px-1 rounded">{item.type}</span>}
                         {item.rating && <span className="ml-auto text-amber-500 font-bold flex items-center gap-1"><FaStar /> {item.rating}</span>}
                       </div>
