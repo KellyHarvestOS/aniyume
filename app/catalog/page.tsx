@@ -23,9 +23,6 @@ const FILTER_LABELS: Record<string, string> = {
   status: 'Статус',
   type: 'Тип',
   translator: 'Озвучка',
-  country: 'Страна',
-  season: 'Сезон',
-  ageRating: 'Возраст',
   sort: 'Сортировка',
 };
 
@@ -118,9 +115,9 @@ function CatalogContent() {
         </div>
 
         {activeFilters.length > 0 && (
-          <div className="container mx-auto px-4 md:px-8 py-3 flex flex-wrap gap-2 border-t border-gray-100">
+          <div className="container mx-auto px-4 md:px-8 py-3 flex flex-wrap gap-2 border-t border-gray-100 dark:border-gray-800">
             {activeFilters.map(([key, value]) => (
-              <div key={key} className="flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium border border-gray-200 dark:text-gray-200">
+              <div key={key} className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 text-gray-700 px-3 py-1 rounded-full text-xs font-medium border border-gray-200 dark:border-gray-600 dark:text-gray-200">
                 <span className="text-gray-400">{FILTER_LABELS[key] || key}:</span>
                 <span>{value}</span>
                 <button onClick={() => removeFilter(key)} className="text-gray-400 hover:text-red-500 ml-1"><FaTimes /></button>
@@ -140,7 +137,7 @@ function CatalogContent() {
           <>
             {animeData.length === 0 ? (
                 <div className="text-center py-20">
-                    <h2 className="text-2xl font-bold text-gray-400">Ничего не найдено 😔</h2>
+                    <h2 className="text-2xl font-bold text-gray-400">Ничего не найдено :(</h2>
                     <Link href={`/filter?${searchParams.toString()}`} className="mt-6 inline-block bg-[#21D0B8] text-white px-6 py-2 rounded-lg font-bold">Изменить фильтры</Link>
                 </div>
             ) : (
