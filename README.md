@@ -109,6 +109,30 @@
 | **Architecture** | Server Components + Client Hooks |
 | **API** | Custom API Proxy (Bypass CORS & Cloudflare) |
 
+##  Дерево проекта (File Tree)
+
+```bash
+aniyume/
+├──  app/                    # Ядро приложения (Next.js App Router)
+│   ├── (auth)/                # Вход и Регистрация
+│   ├── (info)/                # Инфо-страницы (FAQ, Privacy и т.д.)
+│   ├── (navigation)/          # Навигационные хабы (Каталог, Закладки)
+│   ├── anime/[id]/            #  Страница просмотра и детали аниме
+│   ├── profile/               #  ЛК пользователя и настройки
+│   ├── api/                   #  API эндпоинты (external integration)
+│   └── layout.tsx             # Глобальная обертка и провайдеры
+│
+├──  components/             # Модульная система компонентов
+│   ├──  layout/             # Header, Footer, Modals, Search
+│   ├──  watch/              # Плеер, Комментарии, Сайдбар просмотра
+│   ├──  anime/              # Карточки, Списки и Карусели
+│   ├──  profile/            # Статистика, Активность, Карточки юзера
+│   ├──  skeletons/          # Красивые загрузчики (Shimmer effects)
+│   └──  UI/                 # ThemeToggle, Dropdowns, Tooltips
+│
+└──  public/                 # Статические ассеты и иконки 
+```
+
 ---
 
 ## <img src="https://api.iconify.design/heroicons/rocket-launch-solid.svg?color=%2321D0B8" width="28" height="28" style="vertical-align: middle; margin-bottom: 4px;" alt="icon" /> Быстрый старт

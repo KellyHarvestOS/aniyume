@@ -1,11 +1,27 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { FaBold, FaItalic, FaQuoteRight, FaLock, FaSyncAlt, FaSmile, FaTrash, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
+import { FaBold, FaItalic, FaSyncAlt, FaSmile, FaTrash, FaEdit, FaSave, FaTimes, FaLock } from 'react-icons/fa';
 import Modal from '../layout/Modal';
 
-const EMOJIS = ['😊', '😂', '😍', '🤔', '😎', '😭', '😮', '🔥', '✨', '👍', '👎', '❤️', '😱', '🙌', '👀', '🎉', '🌟', '🍀', '🍕', '🚀'];
+const EMOJIS = ['😊', '😂', '😍', '🤔', '😎', '😭', '😮', '🔥', '✨', '👍', '👎', '❤️', '😱', '🙌', '👀'];
 const API = "http://164.90.185.95/storage/";
+
+
+const BAD_WORDS = ["нах", "хуй", "пизд", "ебат", "ебал", "бля", "сук", "хуе", "пидо", "гандон", "ублюд", "курва", "шалав", "ебан", "мудил", "дроч", "залуп", "пидр", "трах", "член", "ссан", "гавно", "гавно", "говно","пор", "конч", "зал"];
+
+const applyCensorship = (text: string) => {
+  if (!text) return "";
+  let censored = text;
+  BAD_WORDS.forEach(word => {
+    const regex = new RegExp(`(${word}[а-яё]*)`, 'gi');
+    censored = censored.replace(regex, (match) => {
+      if (match.length <= 2) return match;
+      return match.substring(0, 2) + "*".repeat(match.length - 2);
+    });
+  });
+  return censored;
+};
 
 export default function AnimeComments({ animeId }: { animeId: string | number }) {
   const [comments, setComments] = useState<any[]>([]);
@@ -50,13 +66,22 @@ export default function AnimeComments({ animeId }: { animeId: string | number })
   };
 
   const send = async () => {
-    const html = edRef.current?.innerHTML, txt = edRef.current?.innerText.trim() || "";
+    let html = edRef.current?.innerHTML.replace(/&nbsp;/g, ' ') || "";
+    html = applyCensorship(html);
+
+    const txt = edRef.current?.innerText.trim() || "";
     if (txt.length < 3) return alert('Минимум 3 символа');
     if (cp.input !== cp.text) return (alert('Капча!'), genCp());
 
     setUi(p => ({ ...p, sub: true }));
     call("/api/external/comments", "POST", { anime_id: +animeId, comment: html })
-      .then(j => { setComments([j.data, ...comments]); if(edRef.current) edRef.current.innerHTML = ''; setCp(c => ({ ...c, input: '' })); setUi(p => ({ ...p, len: 0 })); genCp(); })
+      .then(j => { 
+        setComments([j.data, ...comments]); 
+        if(edRef.current) edRef.current.innerHTML = ''; 
+        setCp(c => ({ ...c, input: '' })); 
+        setUi(p => ({ ...p, len: 0 })); 
+        genCp(); 
+      })
       .finally(() => setUi(p => ({ ...p, sub: false })));
   };
 
@@ -83,14 +108,20 @@ export default function AnimeComments({ animeId }: { animeId: string | number })
                 </div>}
               </div>
             </div>
-            <div ref={edRef} contentEditable onInput={() => setUi(p => ({ ...p, len: edRef.current?.innerText.length || 0 }))} className="p-4 h-32 overflow-y-auto outline-none text-sm dark:text-gray-200" />
+            <div ref={edRef} contentEditable onInput={() => setUi(p => ({ ...p, len: edRef.current?.innerText.length || 0 }))} className="p-4 h-32 overflow-y-auto outline-none text-sm dark:text-gray-200 wrap-break-word" />
           </div>
           <div className="text-right text-[10px] font-bold text-gray-400 my-2 uppercase">{ui.len} / 1000</div>
           <div className="flex flex-col sm:flex-row gap-4 mb-4"> 
             <input className="grow p-3 rounded-lg border-gray-400 dark:bg-[#111111] border dark:border-gray-700 text-sm outline-none" placeholder="Код" value={cp.input} onChange={e => setCp(c => ({ ...c, input: e.target.value }))} />
-           
             <div className="flex items-center gap-3">
-              <div className="bg-gray-200 border-gray-600 dark:bg-[#1a1a1a] px-6 py-2 rounded-lg font-black tracking-widest italic text-xl border dark:border-gray-700">{cp.text}</div>
+              <div 
+                className="bg-gray-200 border-gray-600 dark:bg-[#1a1a1a] px-6 py-2 rounded-lg font-black tracking-widest italic text-xl border dark:border-gray-700 select-none cursor-default"
+                onCopy={(e) => e.preventDefault()}
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
+              >
+                {cp.text}
+              </div>
               <button onClick={genCp} disabled={!cp.can} className={!cp.can ? 'text-gray-600' : 'text-[#39bcba]'}><FaSyncAlt /></button>
               {!cp.can && <span className="text-[9px] font-bold text-gray-400 uppercase">через {cp.t}с</span>}
             </div>
@@ -115,10 +146,16 @@ export default function AnimeComments({ animeId }: { animeId: string | number })
               </div>
               {ui.edit === c.id ? (
                 <div>
-                  <div ref={upRef} contentEditable dangerouslySetInnerHTML={{ __html: c.comment }} className="p-3 border dark:border-gray-700 rounded bg-gray-50 dark:bg-[#111111] outline-none text-sm mb-2" />
-                  <button onClick={() => call(`/api/external/comments/${c.id}`, "PUT", { comment: upRef.current?.innerHTML }).then(j => { setComments(prev => prev.map(x => x.id === c.id ? j.data : x)); setUi(p => ({ ...p, edit: null })); })} className="bg-[#39bcba] text-white px-4 py-1.5 rounded text-[10px] font-black uppercase flex items-center gap-2"><FaSave /> Ок</button>
+                  <div ref={upRef} contentEditable dangerouslySetInnerHTML={{ __html: c.comment }} className="p-3 border dark:border-gray-700 rounded bg-gray-50 dark:bg-[#111111] outline-none text-sm mb-2 wrap-break-word" />
+                  <button onClick={() => {
+                      let cleanedHtml = upRef.current?.innerHTML.replace(/&nbsp;/g, ' ') || "";
+                      cleanedHtml = applyCensorship(cleanedHtml);
+                      call(`/api/external/comments/${c.id}`, "PUT", { comment: cleanedHtml }).then(j => { setComments(prev => prev.map(x => x.id === c.id ? j.data : x)); setUi(p => ({ ...p, edit: null })); })
+                    }} className="bg-[#39bcba] text-white px-4 py-1.5 rounded text-[10px] font-black uppercase flex items-center gap-2"><FaSave /> Ок</button>
                 </div>
-              ) : <div className="text-sm dark:text-gray-400 prose dark:prose-invert" dangerouslySetInnerHTML={{ __html: c.comment }} />}
+              ) : (
+                <div className="text-sm dark:text-gray-400 prose dark:prose-invert wrap-break-word max-w-full" dangerouslySetInnerHTML={{ __html: applyCensorship(c.comment) }} />
+              )}
             </div>
           </div>
         ))}

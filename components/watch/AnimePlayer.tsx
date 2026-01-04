@@ -1,87 +1,67 @@
 "use client";
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import SeriesDropdown from '@/components/SeriesDropdown';
 import { Episode } from '@/types/anime';
-import { FaStar } from 'react-icons/fa'; 
+import { FaStar } from 'react-icons/fa';
+import { useWatchTracker } from '@/hooks/useWatchTracker';
 
 interface AnimePlayerProps {
   animeId: number;
   episodes: Episode[];
   onEpisodeSelect?: (episodeNumber: number) => void;
-  onProgressUpdate?: (episodeId: number, seconds: number, completed: boolean) => void;
 }
 
-export default function AnimePlayer({ animeId, episodes, onEpisodeSelect, onProgressUpdate }: AnimePlayerProps) {
+export default function AnimePlayer({ animeId, episodes, onEpisodeSelect }: AnimePlayerProps) {
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
-  
-
   const [userRating, setUserRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [isRatingLoading, setIsRatingLoading] = useState(false);
 
-  const watchedSeconds = useRef(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const token = typeof window !== 'undefined' ? localStorage.getItem('userToken') : null;
 
-useEffect(() => {
-  const fetchRating = async () => {
-    const token = localStorage.getItem('userToken');
-    if (!token || !animeId) return;
+  useWatchTracker({
+    episodeId: currentEpisode?.id,
+    token: token
+  });
 
-    try {
-      const res = await fetch(`/api/external/ratings/anime/${animeId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.rating) {
-          setUserRating(data.rating);  
+  useEffect(() => {
+    const fetchRating = async () => {
+      if (!token || !animeId) return;
+      try {
+        const res = await fetch(`/api/external/ratings/anime/${animeId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.rating) setUserRating(data.rating);
         }
+      } catch (err) {
+        console.error(err);
       }
+    };
+    fetchRating();
+  }, [animeId, token]);
+
+  const handleRate = async (value: number) => {
+    if (!token) return alert("Пожалуйста, войдите в аккаунт");
+    setIsRatingLoading(true);
+    try {
+      const res = await fetch('/api/external/ratings', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ anime_id: animeId, rating: value })
+      });
+      if (res.ok) setUserRating(value);
     } catch (err) {
-      console.error("Ошибка загрузки рейтинга:", err);
+      console.error(err);
+    } finally {
+      setIsRatingLoading(false);
     }
   };
-  fetchRating();
-}, [animeId]);
-
- const handleRate = async (value: number) => {
-  const token = localStorage.getItem('userToken');
-  if (!token) return alert("Пожалуйста, войдите в аккаунт");
-
-  console.log('Sending rating:', { anime_id: animeId, rating: value });
-
-  setIsRatingLoading(true);
-  try {
-    const res = await fetch('/api/external/ratings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        anime_id: animeId,
-        rating: value
-      })
-    });
-
-    console.log('Response status:', res.status);
-    const text = await res.clone().text();
-    console.log('Response text:', text);
-
-    if (res.ok) {
-      setUserRating(value);
-    } else {
-      const errorData = await res.json().catch(() => ({ message: text }));
-      console.error('Rating error response:', errorData);
-    }
-  } catch (err) {
-    console.error("Ошибка сохранения рейтинга:", err);
-  } finally {
-    setIsRatingLoading(false);
-  }
-};
-
 
   const uniqueEpisodes = useMemo(() => {
     const map = new Map<number, Episode>();
@@ -93,38 +73,13 @@ useEffect(() => {
     return Array.from(map.values()).sort((a, b) => a.episode_number - b.episode_number);
   }, [episodes]);
 
-  const syncProgress = () => {
-    if (currentEpisode && watchedSeconds.current > 0) {
-      if (onProgressUpdate) {
-        onProgressUpdate(currentEpisode.id, watchedSeconds.current, false);
-      }
-      watchedSeconds.current = 0; 
-    }
-  };
-
   useEffect(() => {
     if (uniqueEpisodes.length > 0 && !currentEpisode) {
       setCurrentEpisode(uniqueEpisodes[0]);
     }
   }, [uniqueEpisodes, currentEpisode]);
 
-  useEffect(() => {
-    if (currentEpisode) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      watchedSeconds.current = 0;
-      intervalRef.current = setInterval(() => {
-        watchedSeconds.current += 1;
-        if (watchedSeconds.current % 30 === 0) syncProgress();
-      }, 1000);
-    }
-    return () => {
-      syncProgress();
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [currentEpisode]);
-
   const handleEpisodeChange = (label: string) => {
-    syncProgress();
     const epNum = parseInt(label.replace(/\D/g, ''));
     const ep = uniqueEpisodes.find(e => e.episode_number === epNum);
     if (ep) {
@@ -142,12 +97,10 @@ useEffect(() => {
     <div id="player" className="container mx-auto px-4 md:px-12 py-10 dark:bg-[#111111]">
       <div className="mb-12">
         <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
-          
           <div className="flex items-center gap-6">
             <h2 className="text-2xl font-semibold text-black dark:text-gray-200">
               {currentEpisode ? `Серия ${currentEpisode.episode_number}` : 'Плеер'}
             </h2>
-
             <div className="flex items-center gap-1.5 bg-white dark:bg-[#1a1a1a] px-4 py-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -175,15 +128,13 @@ useEffect(() => {
               )}
             </div>
           </div>
-
-          <div className="w-full md:w-64 ">
+          <div className="w-full md:w-64">
             <SeriesDropdown
               series={uniqueEpisodes.map(ep => `Серия ${ep.episode_number}`)}
               onSelect={handleEpisodeChange}
             />
           </div>
         </div>
-
         <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl border border-gray-500 bg-black">
           {currentEpisode?.player_url ? (
             <iframe
