@@ -1,7 +1,7 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import LayoutClient from './layoutClient'
-import ScrollToTop from "@/components/layout/ScrollToTop";
+import ScrollToTop from "@/components/layout/FloatingActions";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({ subsets: ['latin'] })

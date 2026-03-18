@@ -15,6 +15,7 @@ interface SearchResult {
   type?: string;
 }
 
+
 function calculateLevenshteinDistance(str1: string, str2: string): number {
   const track = Array(str2.length + 1).fill(null).map(() =>
     Array(str1.length + 1).fill(null)

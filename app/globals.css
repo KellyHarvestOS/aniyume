@@ -4,82 +4,107 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
---background: #ffffff;
---foreground: #000000;
---primary: #00E2C4;
+    --background: #ffffff;
+    --foreground: #000000;
+    --primary: #00E2C4;
 }
 
 .dark {
---background: #111111;
---foreground: #ededed;
+    --background: #111111;
+    --foreground: #ededed;
 }
 
 @theme inline {
---color-background: var(--background);
---color-foreground: var(--foreground);
---color-primary: var(--primary);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-primary: var(--primary);
 }
 
 body {
-background-color: var(--background);
-color: var(--foreground);
-transition: background-color 0.3s ease, color 0.3s ease;
-background-size: cover;
-background-position: center;
-background-repeat: no-repeat;
-background-attachment: fixed;
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 .anime-card-item {
-position: relative;
-overflow: hidden;
-border-radius: 0.5rem;
-transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .anime-card-item:hover {
-transform: scale(1.05) translateY(5px);
-box-shadow: 0 20px 25px -5px rgba(0, 201, 176, 0.5),
-0 8px 10px -6px rgba(0, 201, 176, 0.5);
+    transform: scale(1.05) translateY(5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 201, 176, 0.5),
+        0 8px 10px -6px rgba(0, 201, 176, 0.5);
 }
 
 .anime-card-overlay {
-position: absolute;
-inset: 0;
-background-color: rgba(0, 119, 95, 0.12);
-transition: background-color 0.3s ease-in-out;
-display: flex;
-align-items: flex-end;
-padding: 0.75rem;
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 119, 95, 0.12);
+    transition: background-color 0.3s ease-in-out;
+    display: flex;
+    align-items: flex-end;
+    padding: 0.75rem;
 }
 
 .anime-card-item:hover .anime-card-overlay {
-background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .anime-card-title {
-color: white;
-font-size: 1rem;
-font-weight: 600;
-opacity: 0;
-transition: opacity 0.3s ease-in-out;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .anime-card-item:hover .anime-card-title {
-opacity: 1;
+    opacity: 1;
 }
 
 ::-webkit-scrollbar {
-width: 0px;
-background: transparent;
+    width: 0px;
+    background: transparent;
 }
 
 @keyframes fadeIn {
-from { opacity: 0; transform: translateY(-5px); }
-to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .animate-fadeIn {
-animation: fadeIn 0.15s ease-out;
+    animation: fadeIn 0.15s ease-out;
 }
- 
+
+@layer utilities {
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(46, 196, 182, 0.2);
+        border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(46, 196, 182, 0.5);
+    }
+}

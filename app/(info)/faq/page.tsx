@@ -1,4 +1,3 @@
-// app/faq/page.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -135,12 +134,10 @@ const faqData = [
   { icon: <BiUser />, question: "Как синхронизировать просмотр?", answer: "Войдите в аккаунт — данные синхронизируются автоматически." },
   { icon: <BiLock />, question: "Забыл пароль, что делать?", answer: "Напишите в поддержку для сброса доступа." },
   { icon: <BiCaptions />, question: "Есть ли субтитры?", answer: "Да, у большинства популярных тайтлов." },
-  { icon: <BiTv />, question: "Работает ли сайт на Smart TV?", answer: "Да, сайт адаптирован под ТВ-браузеры." },
   { icon: <BiTrash />, question: "Как удалить аккаунт?", answer: "Удаление доступно в настройках профиля." },
   { icon: <FaWandMagicSparkles />, question: "Как работает умный поиск?", answer: "Поиск учитывает альтернативные названия." },
   { icon: <BiShield />, question: "Это легально?", answer: "Сайт не хранит видео и использует открытые источники." },
   { icon: <BiLogoChrome />, question: "Какой браузер лучше?", answer: "Chrome, Firefox или Safari последних версий." },
-  { icon: <BiUserVoice />, question: "Почему нет рекламы?", answer: "Проект развивается без навязчивой рекламы." },
   { icon: <BiGlobe />, question: "Нужен ли VPN?", answer: "Обычно нет, но иногда помогает." },
   { icon: <BiBug />, question: "Нашел баг, куда писать?", answer: "Напишите в поддержку с описанием проблемы." },
   { icon: <BiPlay />, question: "Файл не найден в плеере", answer: "Попробуйте выбрать другую озвучку." },

@@ -168,7 +168,7 @@ const handleProgressUpdate = async (episodeId: number, seconds: number, complete
       animeId={anime.id} 
       episodes={allEpisodes} 
       onEpisodeSelect={handleEpisodeWatch}
-      onProgressUpdate={handleProgressUpdate} 
+ //     onProgressUpdate={handleProgressUpdate} 
     />
 
     <div className="container mx-auto px-4 md:px-12 pb-20">

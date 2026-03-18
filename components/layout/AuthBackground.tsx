@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { TiArrowBack } from 'react-icons/ti';
+import { TbArrowBack } from "react-icons/tb";
 
 interface AuthBackgroundProps {
   children: React.ReactNode;
@@ -118,9 +118,9 @@ export default function AuthBackground({ children }: AuthBackgroundProps) {
 
       <button
         onClick={() => router.back()}
-        className="fixed top-6 left-6 z-3 flex items-center gap-2 rounded-lg border-2 border-[#2EC4B6]/60 bg-white px-4 py-2 text-sm font-semibold text-[#2EC4B6] hover:bg-gray-100 hover:border-[#2EC4B6] shadow-lg shadow-teal-700 transition dark:bg-[#111111] dark:hover:bg-[#111111]/90"
+        className="fixed top-6 left-6 z-3 flex items-center gap-2 rounded-lg border-2 border-[#2EC4B6]/60 bg-white px-4 py-2 text-sm font-semibold text-[#2EC4B6] hover:bg-gray-100 hover:border-[#2EC4B6] transition dark:bg-[#111111] dark:hover:bg-[#111111]/90"
       >
-        <TiArrowBack className="text-2xl" />
+        <TbArrowBack className="text-2xl" />
         <span>Назад</span>
       </button>
 
