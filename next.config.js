@@ -19,12 +19,12 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-          
+
             value: `
               default-src 'self';
               script-src 'self' 'unsafe-eval' 'unsafe-inline';
               style-src 'self' 'unsafe-inline';
-              img-src 'self' data: https: http:;
+              img-src 'self' blob: data: https: http:;
               font-src 'self' https: data:;
               frame-src 'self' https: http:;
               connect-src 'self' http://164.90.185.95 https://covers-determination-compliance-outlets.trycloudflare.com;

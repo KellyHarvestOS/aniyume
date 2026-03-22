@@ -32,11 +32,11 @@ export default function ProfilePage() {
           fetch("/api/external/statistics/me/episodes-summary", { headers }),
         ]);
 
-        if (profileRes.status === 401) {
-          localStorage.removeItem("userToken");
-          router.push("/login");
-          return;
-        }
+        // if (profileRes.status === 401) {
+        //   localStorage.removeItem("userToken");
+        //   router.push("/login");
+        //   return;
+        // }
 
         const profileJson = await profileRes.json();
         const statsJson = await statsRes.json();
@@ -67,7 +67,8 @@ export default function ProfilePage() {
     favorites: data.counts?.favorites || 0,
     ratings: data.counts?.ratings || 0,
     comments: data.counts?.comments || 0,
-    watch_history: data.counts?.watch_history || 0
+    watch_history: data.counts?.watch_history || 0,
+    friends: data.counts?.friends || 0,
   };
 
   return (
@@ -89,8 +90,8 @@ export default function ProfilePage() {
               historyCount={counts.watch_history}
             />
 
-            <WatchDynamics 
-              dynamics={statsSummary?.episodes_per_day_last_10_days || []} 
+            <WatchDynamics
+              dynamics={statsSummary?.episodes_per_day_last_10_days || []}
             />
 
             {data.recently_watched && data.recently_watched.length > 0 && (

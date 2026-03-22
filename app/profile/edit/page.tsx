@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import EditProfileSkeleton from "@/components/skeletons/EditProfileSkeleton";
 import { FaPencilAlt, FaUser, FaQuoteLeft, FaInfoCircle, FaChevronLeft, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import ImageCropModal from "@/components/modals/ImageCropModal";
+import { AnimatePresence } from "framer-motion";
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -21,7 +23,10 @@ export default function EditProfilePage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-useEffect(() => {
+  const [tempImage, setTempImage] = useState<string | null>(null);
+  const [isCropOpen, setIsCropOpen] = useState(false);
+
+  useEffect(() => {
     const fetchCurrentData = async () => {
       try {
         const token = localStorage.getItem("userToken");
@@ -37,7 +42,7 @@ useEffect(() => {
             bio: user.bio || "",
             status_text: user.custom_status || user.status_text || "",
           });
-          
+
           const avatar = user.avatar || user.avatar_url;
           if (avatar) {
             const baseUrl = "http://164.90.185.95/storage/";
@@ -57,14 +62,27 @@ useEffect(() => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setSelectedFile(file);
       const reader = new FileReader();
-      reader.onloadend = () => setPreviewUrl(reader.result as string);
+      reader.onload = () => {
+        setTempImage(reader.result as string);
+        setIsCropOpen(true);
+      };
       reader.readAsDataURL(file);
     }
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleCropSave = (croppedBlob: Blob) => {
+    const croppedFile = new File([croppedBlob], "avatar.jpg", { type: "image/jpeg" });
+    setSelectedFile(croppedFile);
+
+    const previewUrl = URL.createObjectURL(croppedBlob);
+    setPreviewUrl(previewUrl);
+
+    setIsCropOpen(false);
+    setTempImage(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setMessage(null);
@@ -87,7 +105,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       if (!profileRes.ok) {
         const debugText = await profileRes.clone().text();
-        console.log("ОШИБКА PUT PROFILE:", debugText); 
+        console.log("ОШИБКА PUT PROFILE:", debugText);
         throw new Error("Ошибка обновления данных профиля");
       }
 
@@ -98,9 +116,9 @@ const handleSubmit = async (e: React.FormEvent) => {
 
         const avatarRes = await fetch("/api/external/profile/me/avatar", {
           method: "POST",
-          headers: { 
-            Authorization: `Bearer ${token}`, 
-            Accept: "application/json" 
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json"
           },
           body: avatarData,
         });
@@ -108,12 +126,12 @@ const handleSubmit = async (e: React.FormEvent) => {
         if (!avatarRes.ok) {
           const debugText = await avatarRes.clone().text();
           console.log("ОШИБКА POST AVATAR:", debugText);
-          
+
           const errData = await avatarRes.json().catch(() => ({}));
           throw new Error(errData.errors?.avatar?.[0] || "Ошибка загрузки аватара");
         } else {
           const successData = await avatarRes.json();
-          console.log("УСПЕХ AVATAR:", successData); 
+          console.log("УСПЕХ AVATAR:", successData);
         }
       }
 
@@ -132,10 +150,10 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   if (loading) return <EditProfileSkeleton />;
 
- return (
+  return (
 
     <div className="flex-1 w-full bg-white dark:bg-[#111111] flex flex-col transition-colors duration-300 overflow-hidden">
-      
+
       <div className="w-full border-b border-slate-300 dark:border-white/15 bg-slate-50/50 dark:bg-[#111111]/50 backdrop-blur-md px-6 py-3 flex items-center justify-between">
         <button
           onClick={() => router.back()}
@@ -147,22 +165,32 @@ const handleSubmit = async (e: React.FormEvent) => {
       </div>
 
       <div className="flex-1 flex overflow-hidden">
-        
+
         <div className="hidden lg:flex w-72 border-r border-slate-300 dark:border-white/15 p-10 flex-col gap-6 bg-slate-50/30 dark:bg-[#111111]">
-             <h1 className="text-4xl font-black text-[#2EC4B6] tracking-tighter italic">
-              Настройки 
-            </h1>
-            <h1 className="text-4xl font-black text-black dark:text-white  tracking-tighter italic -mt-5">
-              профиля
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-gray-400 font-medium leading-relaxed">
-              Настройте свой профиль так, чтобы он выделялся. Ваши данные обновятся мгновенно.
-            </p>
+          <h1 className="text-4xl font-black text-[#2EC4B6] tracking-tighter italic">
+            Настройки
+          </h1>
+          <h1 className="text-4xl font-black text-black dark:text-white  tracking-tighter italic -mt-5">
+            профиля
+          </h1>
+          <p className="text-xs text-slate-500 dark:text-gray-400 font-medium leading-relaxed">
+            Настройте свой профиль так, чтобы он выделялся. Ваши данные обновятся мгновенно.
+          </p>
         </div>
+
+        <AnimatePresence>
+          {isCropOpen && tempImage && (
+            <ImageCropModal
+              image={tempImage}
+              onCropComplete={handleCropSave}
+              onClose={() => setIsCropOpen(false)}
+            />
+          )}
+        </AnimatePresence>
 
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col relative overflow-y-auto custom-scrollbar">
           <div className="max-w-4xl w-full mx-auto p-6 md:p-12 space-y-12">
-            
+
             <div className="flex flex-col md:flex-row items-start md:items-center gap-8 pb-10 border-b border-slate-100 dark:border-white/5">
               <div className="relative group">
                 <div className="absolute -inset-2 bg-[#2EC4B6] rounded-full blur opacity-10 group-hover:opacity-30 transition duration-700"></div>
@@ -189,8 +217,8 @@ const handleSubmit = async (e: React.FormEvent) => {
               <div className="space-y-1">
                 <h3 className="text-2xl font-black text-slate-900 dark:text-white">Фото профиля</h3>
                 <p className="text-sm text-slate-500 dark:text-gray-400 max-w-sm">
-                  Используйте уникальное изображение. <br className="hidden md:block"/>
-                  Поддерживаются <span className="text-[#2EC4B6] font-bold">JPG, PNG, GIF</span>.
+                  Используйте уникальное изображение. <br className="hidden md:block" />
+                  Поддерживаются <span className="text-[#2EC4B6] font-bold">JPG • PNG</span>.
                 </p>
               </div>
             </div>
@@ -241,15 +269,15 @@ const handleSubmit = async (e: React.FormEvent) => {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-10 py-4 bg-linear-to-r from-[#2EC4B6] to-[#26a69a] text-white dark:text-black font-black uppercase tracking-tighter rounded-2xl shadow-lg shadow-[#2EC4B6]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                className="px-10 py-4 bg-linear-to-r from-[#2EC4B6] to-[#26a69a] text-white dark:text-black font-black uppercase tracking-tighter rounded-lg shadow-lg shadow-[#2EC4B6]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {saving ? "СОХРАНЕНИЕ..." : "Сохранить профиль"}
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => router.push("/profile")}
-                className="px-10 py-4 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-gray-400 font-bold uppercase tracking-tighter rounded-2xl hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
+                className="px-10 py-4 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-gray-400 font-bold uppercase tracking-tighter rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
               >
                 Отмена
               </button>

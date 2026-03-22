@@ -34,12 +34,12 @@ const CustomSelect: React.FC<FilterSelectProps> = ({ label, value, onChange, opt
       <span className="ml-1 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
         {label}
       </span>
-      
+
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center justify-between w-full h-12 px-4 rounded-2xl border-2 transition-all duration-200 text-sm font-medium
-          ${isOpen 
-            ? 'border-[#21D0B8] bg-white dark:bg-[#1a1a1a] ring-4 ring-[#21D0B8]/10' 
+          ${isOpen
+            ? 'border-[#21D0B8] bg-white dark:bg-[#1a1a1a] ring-4 ring-[#21D0B8]/10'
             : 'border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-[#161616] hover:border-gray-200 dark:hover:border-white/10'
           } text-gray-700 dark:text-gray-200`}
       >
@@ -125,10 +125,10 @@ function FilterPageContent() {
   }, []);
 
   const years = Array.from({ length: 46 }, (_, i) => ({ value: String(2025 - i), label: String(2025 - i) }));
-  
+
 
   const handleChange = (key: string, val: string) => setFilters(p => ({ ...p, [key]: val }));
-  
+
   const handleApply = () => {
     const p = new URLSearchParams();
     Object.entries(filters).forEach(([k, v]) => v && p.append(k, v));
@@ -137,13 +137,13 @@ function FilterPageContent() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#111111] pb-20">
-      <header className="sticky top-0 z-60 bg-white/80 dark:bg-[#111111] backdrop-blur-xl border-b border-gray-100 dark:border-white/5">
-        <div className="container mx-auto px-6 py-5 flex items-center gap-4">
-          <button onClick={() => router.back()} className="p-2.5 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-colors text-gray-500"><FaArrowLeft /></button>
-          <h1 className="text-xl font-black tracking-tight dark:text-white uppercase">Фильтры</h1>
+      <header className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-40 backdrop-blur-xl">
+        <div className="container mx-auto px-6 pt-8">
+          <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
+            Настройка <span className="text-[#21D0B8]">Фильтров</span>
+          </h1>
         </div>
       </header>
-
       <main className="container mx-auto px-6 py-10 max-w-6xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
           <CustomSelect label="Жанры" value={filters.genre} onChange={v => handleChange('genre', v)} options={genres.map(g => ({ value: g.slug, label: g.name }))} />
@@ -155,7 +155,7 @@ function FilterPageContent() {
         </div>
 
         <div className="mt-16 flex flex-col sm:flex-row gap-4 items-center justify-center pt-10 border-t border-gray-100 dark:border-white/5">
-          <button onClick={() => setFilters({ genre:'', translator:'', year:'', season:'', status:'', type:'', sort:'newest', ageRating:'', country:'' })} className="w-full sm:w-auto px-10 h-14 rounded-2xl text-sm font-bold text-gray-400 hover:text-red-500 transition-colors">Сбросить всё</button>
+          <button onClick={() => setFilters({ genre: '', translator: '', year: '', season: '', status: '', type: '', sort: 'newest', ageRating: '', country: '' })} className="w-full sm:w-auto px-10 h-14 rounded-2xl text-sm font-bold text-gray-400 hover:text-red-500 transition-colors">Сбросить всё</button>
           <button onClick={handleApply} className="w-full sm:w-auto px-16 h-14 rounded-2xl bg-[#21D0B8] text-white font-bold shadow-2xl shadow-[#21D0B8]/30 hover:scale-[1.02] active:scale-95 transition-all">Применить фильтры</button>
         </div>
       </main>

@@ -24,9 +24,8 @@ export default function ThemeToggle() {
 
   return (
     <label
-      className={`border-2 border-gray-900 dark:border-gray-300 w-10 h-10 rounded-full grid place-items-center cursor-pointer transition-colors duration-300 ${
-        isDark ? 'bg-[#232323]' : 'bg-white'
-      }`}
+      className={`border-2 border-gray-900 mt-3 dark:border-gray-300 w-10 h-10 rounded-full grid place-items-center cursor-pointer transition-colors duration-300 ${isDark ? 'bg-[#232323]' : 'bg-white'
+        }`}
     >
       <input
         type="checkbox"
@@ -36,9 +35,8 @@ export default function ThemeToggle() {
       />
 
       <div
-        className={`col-start-1 row-start-1 transition-transform duration-500 ${
-          isDark ? 'delay-0 rotate-360 scale-0' : 'delay-200 scale-100'
-        }`}
+        className={`col-start-1 row-start-1 transition-transform duration-500 ${isDark ? 'delay-0 rotate-360 scale-0' : 'delay-200 scale-100'
+          }`}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -57,9 +55,8 @@ export default function ThemeToggle() {
       </div>
 
       <div
-        className={`col-start-1 row-start-1 transition-transform duration-500 ${
-          isDark ? 'delay-200 scale-100 rotate-360' : 'scale-0'
-        }`}
+        className={`col-start-1 row-start-1 transition-transform duration-500 ${isDark ? 'delay-200 scale-100 rotate-360' : 'scale-0'
+          }`}
       >
         <HiSun size={28} className="text-gray-200" />
       </div>

@@ -77,11 +77,10 @@ export default function SchedulePage() {
             <button
               key={index}
               onClick={() => scrollToDay(index)}
-              className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 relative group ${
-                isToday
+              className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 relative group ${isToday
                   ? 'bg-[#21D0B8] text-white shadow-[0_0_15px_#21D0B8] scale-110'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 hover:bg-[#21D0B8] hover:text-white'
-              }`}
+                }`}
             >
               {day.short}
               <span className="absolute right-12 bg-gray-900 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
@@ -95,10 +94,10 @@ export default function SchedulePage() {
         })}
       </div>
 
-      <div className="bg-white/80 dark:bg-[#111111]/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30 shadow-sm">
-        <div className="container mx-auto px-4 md:px-8 py-6 flex items-center gap-4">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-gray-200 tracking-tight">
-            Расписание новых серий
+      <div className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-40 backdrop-blur-xl">
+        <div className="container mx-auto px-6 pt-8">
+          <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
+            Расписание <span className="text-[#21D0B8]">новых серий</span>
           </h1>
         </div>
       </div>
@@ -128,20 +127,18 @@ export default function SchedulePage() {
               <div
                 key={index}
                 id={`day-${index}`}
-                className={`rounded-3xl transition-all duration-500 ${
-                  isToday
+                className={`rounded-3xl transition-all duration-500 ${isToday
                     ? 'bg-white dark:bg-[#0d0d0d] p-8 shadow-[0_10px_40px_-10px_rgba(33,208,184,0.15)] border border-[#21D0B8]/40 relative overflow-hidden'
                     : 'p-2'
-                }`}
+                  }`}
               >
                 {isToday && (
                   <div className="absolute top-0 right-0 w-64 h-64 bg-[#21D0B8]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
                 )}
 
                 <div className="flex items-center gap-4 mb-8 relative z-10">
-                  <h2 className={`text-3xl font-bold tracking-tight ${
-                    isToday ? 'text-gray-900 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400'
-                  }`}>
+                  <h2 className={`text-3xl font-bold tracking-tight ${isToday ? 'text-gray-900 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400'
+                    }`}>
                     {day.full}
                   </h2>
                   {isToday && (

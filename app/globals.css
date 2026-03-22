@@ -108,3 +108,118 @@ body {
         background: rgba(46, 196, 182, 0.5);
     }
 }
+
+.lava-container {
+    filter: url('#goo');
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #1cbea8;
+}
+
+.blob {
+    position: absolute;
+    background: #00F2FE;
+    border-radius: 50%;
+    filter: blur(10px);
+    animation: move 12s infinite alternate ease-in-out;
+}
+
+@keyframes move {
+    from {
+        transform: translate(-20%, -20%) scale(1);
+    }
+
+    to {
+        transform: translate(120%, 120%) scale(1.5);
+    }
+}
+
+.blob:nth-child(1) {
+    width: 70px;
+    height: 70px;
+    background: #01b6d6;
+    animation-duration: 5s;
+    animation-delay: -1s;
+    left: 20%;
+    top: 10%;
+
+
+
+
+
+}
+
+.blob:nth-child(2) {
+    width: 80px;
+    height: 80px;
+    background: #2EC4B6;
+    animation-duration: 4s;
+    animation-delay: -2s;
+    left: 10%;
+    top: 20%;
+}
+
+.blob:nth-child(3) {
+    width: 100px;
+    height: 100px;
+    background: #36d9c6;
+    animation-duration: 9s;
+    animation-delay: -4s;
+    right: 10%;
+    bottom: 10%;
+}
+
+.blob:nth-child(4) {
+    width: 60px;
+    height: 60px;
+    background: #06b2d8;
+    animation-duration: 10s;
+    left: 50%;
+    top: 50%;
+}
+
+.premium-lava-btn {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+
+.premium-lava-btn span {
+    position: relative;
+    z-index: 10;
+    pointer-events: none;
+}
+
+@keyframes energy-flow {
+    0% {
+        stop-color: #2EC4B6;
+        stop-opacity: 0.6;
+    }
+
+    50% {
+        stop-color: #00F2FE;
+        stop-opacity: 1;
+    }
+
+    100% {
+        stop-color: #2EC4B6;
+        stop-opacity: 0.6;
+    }
+}
+
+.lightning-svg {
+    filter: drop-shadow(0 0 10px rgba(46, 196, 182, 0.8));
+}
+
+.premium-gradient-text {
+    background: linear-gradient(to right, #ffffff, #2EC4B6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}

@@ -75,19 +75,19 @@ const CommentCard = ({ c, onDelete, getPosterUrl }: { c: UserComment, onDelete: 
       </div>
 
       <div className="relative p-5">
-        <div 
+        <div
           ref={contentRef}
           className={`prose dark:prose-invert max-w-none text-sm leading-relaxed text-slate-600 dark:text-gray-300 overflow-hidden transition-all duration-500 ${!isExpanded && isLong ? 'max-h-[120px]' : 'max-h-[1000px]'}`}
           dangerouslySetInnerHTML={{ __html: c.comment || '' }}
         />
-        
+
         {!isExpanded && isLong && (
           <div className="absolute bottom-0 left-0 w-full h-12 bg-linear-to-t from-slate-50 dark:from-[#161616] to-transparent" />
         )}
       </div>
 
       {isLong && (
-        <button 
+        <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="w-full py-3 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-tighter text-[#39bcba] hover:bg-[#39bcba]/5 transition-colors border-t border-slate-200 dark:border-white/5"
         >
@@ -145,15 +145,20 @@ export default function MyCommentsPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#111111] text-slate-900 dark:text-gray-100 pb-24 transition-colors">
-      <header className="border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#111111]">
-        <div className="max-w-7xl mx-auto px-6 py-8 flex items-center gap-6">
-          <div className="p-4 rounded-2xl bg-[#39bcba]/10"><FaRegCommentDots className="text-[#39bcba] text-3xl" /></div>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 pt-5 mb-16 relative z-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-gray-100 dark:border-white/5 pb-10">
+
           <div>
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase">Мои комментарии</h1>
-            <p className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-[#39bcba]">Всего сообщений: {comments.length}</p>
+            <h1 className="text-5xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white leading-none">
+              Мои <span className="text-[#39bcba]">Комментарии</span>
+            </h1>
+            <p className="mt-3 text-gray-400 font-bold uppercase tracking-[0.5em] text-[10px] ml-1">
+              Всего • Сообщений • {comments.length}
+            </p>
           </div>
+
         </div>
-      </header>
+      </div>
 
       <main className="max-w-7xl mx-auto px-6 mt-12">
         {comments.length === 0 ? (
@@ -167,11 +172,11 @@ export default function MyCommentsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {comments.map((c) => (
-              <CommentCard 
-                key={c.id} 
-                c={c} 
-                onDelete={handleDelete} 
-                getPosterUrl={getPosterUrl} 
+              <CommentCard
+                key={c.id}
+                c={c}
+                onDelete={handleDelete}
+                getPosterUrl={getPosterUrl}
               />
             ))}
           </div>

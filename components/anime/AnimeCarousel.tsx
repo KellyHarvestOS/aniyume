@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import CarouselSkeleton from '@/components/skeletons/CarouselSkeleton';
 
-import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 interface AnimeItem {
@@ -64,9 +64,9 @@ export default function FeaturedNewestRows() {
         ]);
         const combined = [...(p1.data || []), ...(p2.data || [])];
         const shuffled = shuffleArray(combined);
-        
+
         setAllAnime(shuffled);
-        
+
         sessionStorage.setItem(CACHE_KEY, JSON.stringify({
           data: shuffled,
           timestamp: Date.now()
@@ -111,22 +111,22 @@ export default function FeaturedNewestRows() {
   return (
     <div className="w-full bg-white dark:bg-[#111111] py-1 overflow-hidden flex flex-col gap-6 relative transition-colors duration-300">
 
-      <div className="container mx-auto px-6 md:px-16 mb-4 relative">
+      <div className="container mx-auto px-6 md:px-16 mb-4 mt-3 relative">
         <div />
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-1 w-12 bg-[#39bcba] rounded-full" />
             <span className="text-[10px] font-black text-[#39bcba] uppercase tracking-[0.4em]">
-             ВаШ сайт AniYume
+              ВаШ сайт AniYume
             </span>
           </div>
-          
+
           <h2 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white uppercase tracking-tighter leading-none">
             Новинки <span className="text-gray-500 dark:text-gray-600">сезона</span>
           </h2>
-          
+
           <p className="mt-4 text-gray-500 dark:text-gray-400 text-sm md:text-base font-medium max-w-md leading-relaxed">
-            Самые ожидаемые релизы этого года уже доступны на AniYume. 
+            Самые ожидаемые релизы этого года уже доступны на AniYume.
             Смотрите первыми в высоком качестве.
           </p>
         </div>

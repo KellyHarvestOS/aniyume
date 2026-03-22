@@ -52,10 +52,10 @@ export default function PopularPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#111111] pb-20 transition-colors">
-      <div className="bg-white dark:bg-[#111111] border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30 shadow-sm">
-        <div className="container mx-auto px-4 md:px-8 pt-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-200 mb-6">
-            Популярное
+      <div className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-40 backdrop-blur-xl">
+        <div className="container mx-auto px-6 pt-8">
+          <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
+            <span className="text-[#020505]">Популярное</span>
           </h1>
 
           <div className="flex gap-8 overflow-x-auto no-scrollbar">
@@ -63,11 +63,10 @@ export default function PopularPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`pb-4 text-sm font-bold uppercase tracking-wide whitespace-nowrap border-b-2 transition-colors duration-300 ${
-                  activeTab === tab.id
-                    ? 'border-[#21D0B8] text-[#21D0B8]'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
-                }`}
+                className={`pb-4 text-sm font-bold uppercase tracking-wide whitespace-nowrap border-b-2 transition-colors duration-300 ${activeTab === tab.id
+                  ? 'border-[#21D0B8] text-[#21D0B8]'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
+                  }`}
               >
                 {tab.label}
               </button>
@@ -100,9 +99,8 @@ export default function PopularPage() {
                   key={anime.id}
                   className="group flex flex-col md:flex-row items-start md:items-center p-6 gap-6 hover:bg-[#21D0B8]/5 dark:hover:bg-[#21D0B8]/10 transition-colors relative"
                 >
-                  <div className={`hidden md:flex shrink-0 w-12 text-3xl font-black italic ${
-                    index < 3 ? 'text-[#21D0B8]' : 'text-gray-300 dark:text-gray-600'
-                  }`}>
+                  <div className={`hidden md:flex shrink-0 w-12 text-3xl font-black italic ${index < 3 ? 'text-[#21D0B8]' : 'text-gray-300 dark:text-gray-600'
+                    }`}>
                     {index + 1}
                   </div>
 

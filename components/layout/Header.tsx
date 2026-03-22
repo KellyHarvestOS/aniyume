@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { FaUserPlus, FaUserCircle } from 'react-icons/fa';
 import { HiAdjustmentsHorizontal, HiMiniBookmark } from "react-icons/hi2";
-import { CgMenuRightAlt, CgMenuRight} from "react-icons/cg";
+import { CgMenuRightAlt, CgMenuRight } from "react-icons/cg";
 
 import { IoCalendarNumberSharp } from "react-icons/io5";
 import { FaRankingStar } from "react-icons/fa6";
@@ -13,6 +14,7 @@ import ThemeToggle from './ThemeToggle';
 import SearchBar from './SearchBar';
 
 export default function Header() {
+  const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -37,7 +39,7 @@ export default function Header() {
         const data = await res.json();
         setUser(data.user || data);
       }
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -108,19 +110,23 @@ export default function Header() {
         <div className="flex items-center gap-2 sm:gap-6">
           <nav className="hidden lg:flex items-center gap-6">
             <ul className="flex items-center gap-6">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="group flex items-center gap-2 text-sm font-semibold text-gray-500 dark:text-gray-400 transition-colors hover:text-[#39bcba]"
-                  >
-                    <span className="text-xl group-hover:scale-110 transition-transform">
-                      {link.icon}
-                    </span>
-                    <span className="hidden xl:inline">{link.label}</span>
-                  </Link>
-                </li>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className={`group flex items-center gap-2 text-sm font-semibold transition-colors hover:text-[#39bcba] ${isActive ? 'text-[#39bcba]' : 'text-gray-500 dark:text-gray-400'
+                        }`}
+                    >
+                      <span className={`text-xl transition-transform group-hover:scale-110 ${isActive ? 'scale-110' : ''}`}>
+                        {link.icon}
+                      </span>
+                      <span className="hidden xl:inline">{link.label}</span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
 
@@ -131,10 +137,11 @@ export default function Header() {
                   <img
                     src={avatarUrl}
                     alt="Profile"
-                    className="w-9 h-9 rounded-full object-cover border-2 border-[#39bcba] shadow-sm"
+                    className={`w-9 h-9 rounded-full object-cover border-2 shadow-sm ${pathname === '/profile' ? 'border-[#39bcba]' : 'border-transparent'}`}
+                    style={{ borderColor: pathname === '/profile' ? '#39bcba' : '' }}
                   />
                 ) : (
-                  <div className="w-9 h-9 rounded-full bg-[#39bcba] flex items-center justify-center text-white text-sm font-bold">
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold ${pathname === '/profile' ? 'bg-[#39bcba]' : 'bg-gray-400'}`}>
                     {user?.name ? user.name[0].toUpperCase() : <FaUserCircle size={32} />}
                   </div>
                 )}
@@ -143,7 +150,7 @@ export default function Header() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/login"
-                  className="hidden sm:inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+                  className={`hidden sm:inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition-all ${pathname === '/login' ? 'text-[#39bcba]' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
                 >
                   <span>Вход</span>
                 </Link>
@@ -168,11 +175,10 @@ export default function Header() {
       </div>
 
       <div
-        className={`absolute top-full left-0 w-full bg-white dark:bg-[#111111] border-b border-gray-200 dark:border-[#232323] transition-all duration-300 transform lg:hidden ${
-          isMenuOpen
-            ? 'translate-y-0 opacity-100 visible'
-            : '-translate-y-4 opacity-0 invisible pointer-events-none'
-        }`}
+        className={`absolute top-full left-0 w-full bg-white dark:bg-[#111111] border-b border-gray-200 dark:border-[#232323] transition-all duration-300 transform lg:hidden ${isMenuOpen
+          ? 'translate-y-0 opacity-100 visible'
+          : '-translate-y-4 opacity-0 invisible pointer-events-none'
+          }`}
       >
         <div className="p-4 space-y-6">
           <div className="block lg:hidden">
@@ -181,20 +187,24 @@ export default function Header() {
 
           <nav>
             <ul className="grid grid-cols-2 gap-4">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-transparent hover:border-[#39bcba] transition-all"
-                  >
-                    <span className="text-2xl text-[#39bcba]">{link.icon}</span>
-                    <span className="text-sm font-bold dark:text-gray-200">
-                      {link.label}
-                    </span>
-                  </Link>
-                </li>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border transition-all ${isActive ? 'border-[#39bcba]' : 'border-transparent'
+                        } hover:border-[#39bcba]`}
+                    >
+                      <span className={`text-2xl ${isActive ? 'text-[#39bcba]' : 'text-[#39bcba]'}`}>{link.icon}</span>
+                      <span className={`text-sm font-bold ${isActive ? 'text-[#39bcba]' : 'dark:text-gray-200'}`}>
+                        {link.label}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
 
