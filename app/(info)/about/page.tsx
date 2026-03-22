@@ -32,27 +32,24 @@ export default function AboutPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
-       <div className="mb-10">
-  <img
-    src="/images/logo0.png"
-    alt="Aniyume"
-    className="w-[360px] md:w-[440px] h-auto object-contain animate-soft dark:hidden"
-  />
+        <div className="mb-10">
+          <img
+            src="/images/logo0.png"
+            alt="Aniyume"
+            className="w-[360px] md:w-[440px] h-auto object-contain animate-soft dark:hidden"
+          />
 
-  <img
-    src="/images/logo01.png"  
-    alt="Aniyume"
-    className="hidden w-[360px] md:w-[440px] h-auto object-contain animate-soft dark:block"
-  />
-</div>
+          <img
+            src="/images/logo01.png"
+            alt="Aniyume"
+            className="hidden w-[360px] md:w-[440px] h-auto object-contain animate-soft dark:block"
+          />
+        </div>
 
         <div className="text-center mb-20">
           <h1 className="text-xl md:text-2xl font-light text-gray-600 dark:text-gray-300 tracking-wide">
             Смотри аниме так, как удобно тебе
           </h1>
-          <div className="mt-3 text-[#21D0B8] font-semibold tracking-widest uppercase text-sm">
-            Бесплатно • Без рекламы • С любовью
-          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-20">

@@ -94,7 +94,7 @@ export default function SchedulePage() {
         })}
       </div>
 
-      <div className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-40 backdrop-blur-xl">
+      <div className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-10 backdrop-blur-xl">
         <div className="container mx-auto px-6 pt-8">
           <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
             Расписание <span className="text-[#21D0B8]">новых серий</span>

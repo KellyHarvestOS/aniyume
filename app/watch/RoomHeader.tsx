@@ -13,22 +13,22 @@ interface HeaderProps {
 
 export const RoomHeader = ({ roomId, onCopy, copied, onExit }: HeaderProps) => {
     return (
-        <header className="h-16 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-50 transition-colors">
+        <header className="h-20 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-50 transition-colors">
             <div className="flex items-center gap-2 sm:gap-4">
                 <Link href="/" onClick={onExit} className="shrink-0 transition-opacity hover:opacity-80">
                     <Image
                         src="/images/logo0.png"
                         alt="AniYume"
-                        width={100}
-                        height={50}
-                        className="h-10 sm:h-14 w-auto dark:hidden"
+                        width={80}
+                        height={40}
+                        className="h-8 sm:h-14 w-auto dark:hidden"
                     />
                     <Image
                         src="/images/logo01.png"
                         alt="AniYume"
-                        width={100}
-                        height={50}
-                        className="h-10 sm:h-14 w-auto hidden dark:block"
+                        width={80}
+                        height={40}
+                        className="h-8 sm:h-14 w-auto hidden dark:block"
                     />
                 </Link>
 
@@ -38,7 +38,6 @@ export const RoomHeader = ({ roomId, onCopy, copied, onExit }: HeaderProps) => {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-4">
-                {/* ID Комнаты */}
                 <div className="flex items-center gap-1.5 sm:gap-2 bg-gray-50 dark:bg-white/5 px-2.5 sm:px-4 py-1.5 rounded-lg border border-gray-200 dark:border-white/5 transition-all">
                     <span className="hidden md:inline text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-tighter">
                         Room:

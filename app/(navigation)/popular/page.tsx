@@ -55,7 +55,7 @@ export default function PopularPage() {
       <div className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-40 backdrop-blur-xl">
         <div className="container mx-auto px-6 pt-8">
           <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
-            <span className="text-[#020505]">Популярное</span>
+            <span className="text-[#020505] dark:text-[#f4f4f4]">Популярное</span>
           </h1>
 
           <div className="flex gap-8 overflow-x-auto no-scrollbar">
@@ -76,7 +76,7 @@ export default function PopularPage() {
       </div>
 
       <div className="container mx-auto px-4 md:px-8 py-8">
-        <div className="bg-white dark:bg-[#0d0d0d] rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+        <div className="bg-white dark:bg-[#151515] rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
           {isLoading ? (
             <div className="divide-y divide-gray-100 dark:divide-gray-800">
               {Array.from({ length: 10 }).map((_, i) => (

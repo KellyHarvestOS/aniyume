@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation'; // Импортируем хук для определения текущего пути
 import {
   FaTelegram,
   FaYoutube,
@@ -29,20 +30,20 @@ export default function Footer() {
     <footer className="relative overflow-hidden bg-white pt-28 dark:bg-[#121212]">
       <div className="relative mx-auto max-w-7xl px-4 md:px-6">
         <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 text-center lg:text-left">
-          
+
           <div className="max-w-xl flex flex-col items-center lg:items-start">
             <Link href="/" className="inline-block transition-opacity hover:opacity-80">
               <Image
-                src="/images/logo0.png" 
+                src="/images/logo0.png"
                 alt="AniYume"
-                width={480}          
+                width={480}
                 height={180}
                 className="h-20 sm:h-30 w-auto dark:hidden"
               />
               <Image
                 src="/images/logo01.png"
                 alt="AniYume"
-                width={480}          
+                width={480}
                 height={180}
                 className="hidden h-20 sm:h-30 w-auto dark:block"
               />
@@ -56,7 +57,7 @@ export default function Footer() {
 
           <div className="relative w-[280px] sm:w-[420px] shrink-0">
             <Image
-              src="/images/44.png" 
+              src="/images/44.png"
               alt="AniYume mascot"
               width={900}
               height={400}
@@ -64,7 +65,7 @@ export default function Footer() {
               priority
             />
             <Image
-              src="/images/55.png" 
+              src="/images/55.png"
               alt="AniYume mascot"
               width={900}
               height={400}
@@ -78,7 +79,7 @@ export default function Footer() {
           <Block title="Навигация">
             <FooterLink href="/popular" icon={HiFire}>Популярное</FooterLink>
             <FooterLink href="/schedule" icon={IoCalendarNumberSharp}>Расписание</FooterLink>
-            <FooterLink href="/filter" icon={HiAdjustmentsHorizontal}>Каталог</FooterLink>
+            <FooterLink href="/filter" icon={HiAdjustmentsHorizontal}>Фильтр</FooterLink>
             <FooterLink href="/bookmarks" icon={HiMiniBookmark}>Закладки</FooterLink>
           </Block>
 
@@ -102,7 +103,7 @@ export default function Footer() {
 
           <Block title="Мы в соцсетях">
             <div className="grid grid-cols-4 gap-3 justify-items-center lg:justify-items-start">
-             <SocialCard href="https://discord.gg/PYMXhXcR5Y" icon={FaDiscord} label="Discord" hoverClass="hover:bg-[#5865F2] hover:text-white" />
+              <SocialCard href="https://discord.gg/PYMXhXcR5Y" icon={FaDiscord} label="Discord" hoverClass="hover:bg-[#5865F2] hover:text-white" />
               <SocialCard href="https://t.me/aniYume_group" icon={FaTelegram} label="Telegram" hoverClass="hover:bg-[#2ca0de] hover:text-white" />
               <SocialCard href="https://www.youtube.com/" icon={FaYoutube} label="YouTube" hoverClass="hover:bg-[#FF0000] hover:text-white" />
               <SocialCard href="https://x.com/?lang=ru" icon={FaXTwitter} label="Twitter" hoverClass="hover:bg-black hover:text-white" />
@@ -130,12 +131,18 @@ function Block({ title, children }: { title: string; children: React.ReactNode }
 }
 
 function FooterLink({ href, icon: Icon, children }: FooterLinkProps) {
+  const pathname = usePathname();
+  const isActive = pathname === href;
+
   return (
     <Link
       href={href}
-      className="group flex items-center gap-4 text-base text-slate-600 transition hover:translate-x-2 hover:text-slate-900 dark:text-gray-400 dark:hover:text-gray-100"
+      className={`group flex items-center gap-4 text-base transition-all duration-300 ${isActive
+        ? 'text-[#2EC4B6] translate-x-2'
+        : 'text-slate-600 hover:translate-x-2 hover:text-slate-900 dark:text-gray-400 dark:hover:text-gray-100'
+        }`}
     >
-      <Icon className="text-xl text-slate-400 transition group-hover:text-[#2EC4B6]" />
+      <Icon className={`text-xl transition-colors ${isActive ? 'text-[#2EC4B6]' : 'text-slate-400 group-hover:text-[#2EC4B6]'}`} />
       {children}
     </Link>
   );

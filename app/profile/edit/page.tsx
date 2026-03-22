@@ -166,7 +166,7 @@ export default function EditProfilePage() {
 
       <div className="flex-1 flex overflow-hidden">
 
-        <div className="hidden lg:flex w-72 border-r border-slate-300 dark:border-white/15 p-10 flex-col gap-6 bg-slate-50/30 dark:bg-[#111111]">
+        <div className="hidden lg:flex w-72 border-r border-b border-slate-300 dark:border-white/15 p-10 flex-col gap-6 bg-slate-50/30 dark:bg-[#111111]">
           <h1 className="text-4xl font-black text-[#2EC4B6] tracking-tighter italic">
             Настройки
           </h1>
@@ -188,10 +188,9 @@ export default function EditProfilePage() {
           )}
         </AnimatePresence>
 
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col relative overflow-y-auto custom-scrollbar">
-          <div className="max-w-4xl w-full mx-auto p-6 md:p-12 space-y-12">
-
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-8 pb-10 border-b border-slate-100 dark:border-white/5">
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col relative overflow-y-auto custom-scrollbar border-b border-slate-300 dark:border-white/15">
+          <div className="max-w-4xl w-full mx-auto p-6 md:p-12 space-y-12 ">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-8 pb-10 border-b  border-slate-100 dark:border-white/5">
               <div className="relative group">
                 <div className="absolute -inset-2 bg-[#2EC4B6] rounded-full blur opacity-10 group-hover:opacity-30 transition duration-700"></div>
                 <div className="relative w-32 h-32 rounded-full overflow-hidden ring-4 ring-[#2EC4B6] shadow-xl">
