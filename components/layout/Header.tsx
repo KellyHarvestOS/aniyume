@@ -80,7 +80,7 @@ export default function Header() {
     <header className="sticky top-0 w-full border-b border-gray-200 dark:border-[#232323] bg-white dark:bg-[#111111] text-foreground z-100 transition-all">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
-          <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
+          <Link href="/" className="shrink-0 transition-opacity">
             <Image
               src="/images/logo0.png"
               alt="Aniyume Logo"

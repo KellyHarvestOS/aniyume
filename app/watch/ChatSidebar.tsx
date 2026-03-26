@@ -8,7 +8,7 @@ export const ChatSidebar = ({ roomId }: { roomId: string }) => {
 
     return (
         <div className="w-full lg:w-[380px]">
-            <div className="bg-white dark:bg-[#111111] rounded-3xl border border-gray-200 dark:border-gray-800 flex flex-col overflow-hidden h-[500px]">
+            <div className="bg-white dark:bg-[#111111] rounded-3xl border border-gray-200 dark:border-gray-800 flex flex-col overflow-hidden h-[520px]">
                 <div className="p-2 flex gap-1 bg-gray-50 dark:bg-[#0d0d0d] m-4 rounded-2xl border border-gray-100 dark:border-gray-800 shrink-0">
                     {['chat', 'settings'].map((tab) => (
                         <button
@@ -27,12 +27,6 @@ export const ChatSidebar = ({ roomId }: { roomId: string }) => {
                 <div className="flex-1 px-4 space-y-4 overflow-y-auto no-scrollbar custom-scrollbar">
                     {activeTab === 'chat' ? (
                         <>
-                            <div className="bg-[#21D0B8]/5 border border-[#21D0B8]/10 rounded-2xl p-4 flex gap-3 mt-2">
-                                <FaInfoCircle className="text-[#21D0B8] shrink-0 mt-1" />
-                                <p className="text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed font-bold italic">
-                                    Код для друзей: <span className="text-[#21D0B8] select-all">{roomId}</span>
-                                </p>
-                            </div>
 
                             <div className="space-y-4 pb-4">
                                 <div className="text-center py-20 text-gray-300 dark:text-gray-700 text-[10px] font-black uppercase tracking-[0.3em]">
