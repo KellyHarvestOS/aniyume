@@ -32,7 +32,7 @@ export default function Footer() {
         <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 text-center lg:text-left">
 
           <div className="max-w-xl flex flex-col items-center lg:items-start">
-            <Link href="/" className="inline-block transition-opacity hover:opacity-80">
+            <Link href="/" className="inline-block transition-opacity">
               <Image
                 src="/images/logo0.png"
                 alt="AniYume"
