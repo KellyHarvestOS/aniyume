@@ -2,13 +2,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { FaBold, FaItalic, FaSyncAlt, FaSmile, FaTrash, FaEdit, FaSave, FaTimes, FaLock } from 'react-icons/fa';
-import Modal from '../layout/Modal';
+import Modal from '../modals/Modal';
 
 const EMOJIS = ['😊', '😂', '😍', '🤔', '😎', '😭', '😮', '🔥', '✨', '👍', '👎', '❤️', '😱', '🙌', '👀'];
 const API = "http://164.90.185.95/storage/";
 
 
-const BAD_WORDS = ["нах", "хуй", "пизд", "ебат", "ебал", "бля", "сук", "хуе", "пидо", "гандон", "ублюд", "курва", "шалав", "ебан", "мудил", "дроч", "залуп", "пидр", "трах", "член", "ссан", "гавно", "гавно", "говно","пор", "конч", "залу"];
+const BAD_WORDS = ["нах", "хуй", "пизд", "ебат", "ебал", "бля", "сук", "хуе", "пидо", "гандон", "ублюд", "курва", "шалав", "ебан", "мудил", "дроч", "залуп", "пидр", "трах", "член", "ссан", "гавно", "гавно", "говно", "пор", "конч", "залу"];
 
 const applyCensorship = (text: string) => {
   if (!text) return "";
@@ -28,7 +28,7 @@ export default function AnimeComments({ animeId }: { animeId: string | number })
   const [user, setUser] = useState({ name: null, avatar: null, ok: false, loading: true });
   const [cp, setCp] = useState({ input: '', text: '', t: 0, can: true });
   const [ui, setUi] = useState({ emo: false, len: 0, sub: false, m: false, del: null as any, edit: null as any });
-  
+
   const edRef = useRef<HTMLDivElement>(null);
   const upRef = useRef<HTMLDivElement>(null);
 
@@ -75,12 +75,12 @@ export default function AnimeComments({ animeId }: { animeId: string | number })
 
     setUi(p => ({ ...p, sub: true }));
     call("/api/external/comments", "POST", { anime_id: +animeId, comment: html })
-      .then(j => { 
-        setComments([j.data, ...comments]); 
-        if(edRef.current) edRef.current.innerHTML = ''; 
-        setCp(c => ({ ...c, input: '' })); 
-        setUi(p => ({ ...p, len: 0 })); 
-        genCp(); 
+      .then(j => {
+        setComments([j.data, ...comments]);
+        if (edRef.current) edRef.current.innerHTML = '';
+        setCp(c => ({ ...c, input: '' }));
+        setUi(p => ({ ...p, len: 0 }));
+        genCp();
       })
       .finally(() => setUi(p => ({ ...p, sub: false })));
   };
@@ -99,10 +99,10 @@ export default function AnimeComments({ animeId }: { animeId: string | number })
           </div>
           <div className="border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-[#111111]">
             <div className="flex p-2 gap-1 border-gray-300 bg-gray-50/60 dark:bg-[#1a1a1a] border-b dark:border-gray-800">
-              <Btn icon={<FaBold size={12}/>} onClick={() => exec('bold')} />
-              <Btn icon={<FaItalic size={12}/>} onClick={() => exec('italic')} />
+              <Btn icon={<FaBold size={12} />} onClick={() => exec('bold')} />
+              <Btn icon={<FaItalic size={12} />} onClick={() => exec('italic')} />
               <div className="relative">
-                <Btn icon={<FaSmile size={14}/>} onClick={() => setUi(p => ({ ...p, emo: !p.emo }))} active={ui.emo} />
+                <Btn icon={<FaSmile size={14} />} onClick={() => setUi(p => ({ ...p, emo: !p.emo }))} active={ui.emo} />
                 {ui.emo && <div className="absolute top-full left-0 mt-2 p-2 bg-white dark:bg-[#111111] border dark:border-gray-700 rounded-lg shadow-xl z-50 grid grid-cols-5 w-44">
                   {EMOJIS.map(e => <button key={e} onClick={() => { exec('insertText', e); setUi(p => ({ ...p, emo: false })); }} className="hover:scale-110 p-1">{e}</button>)}
                 </div>}
@@ -111,10 +111,10 @@ export default function AnimeComments({ animeId }: { animeId: string | number })
             <div ref={edRef} contentEditable onInput={() => setUi(p => ({ ...p, len: edRef.current?.innerText.length || 0 }))} className="p-4 h-32 overflow-y-auto outline-none text-sm dark:text-gray-200 wrap-break-word" />
           </div>
           <div className="text-right text-[10px] font-bold text-gray-400 my-2 uppercase">{ui.len} / 1000</div>
-          <div className="flex flex-col sm:flex-row gap-4 mb-4"> 
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <input className="grow p-3 rounded-lg border-gray-400 dark:bg-[#111111] border dark:border-gray-700 text-sm outline-none" placeholder="Код" value={cp.input} onChange={e => setCp(c => ({ ...c, input: e.target.value }))} />
             <div className="flex items-center gap-3">
-              <div 
+              <div
                 className="bg-gray-200 border-gray-600 dark:bg-[#1a1a1a] px-6 py-2 rounded-lg font-black tracking-widest italic text-xl border dark:border-gray-700 select-none cursor-default"
                 onCopy={(e) => e.preventDefault()}
                 onContextMenu={(e) => e.preventDefault()}
@@ -139,8 +139,8 @@ export default function AnimeComments({ animeId }: { animeId: string | number })
                 <div className="flex items-center gap-2 text-sm font-black dark:text-gray-200">{c.user.name} <span className="text-[10px] text-gray-400 uppercase">{new Date(c.created_at).toLocaleDateString()}</span></div>
                 {user.ok && user.name === c.user.name && (
                   <div className="flex gap-2 text-gray-400">
-                    <button onClick={() => setUi(p => ({ ...p, edit: ui.edit === c.id ? null : c.id }))} className='hover:text-teal-400'>{ui.edit === c.id ? <FaTimes/> : <FaEdit/>}</button>
-                    <button onClick={() => setUi(p => ({ ...p, del: c.id }))} className="hover:text-red-500"><FaTrash/></button>
+                    <button onClick={() => setUi(p => ({ ...p, edit: ui.edit === c.id ? null : c.id }))} className='hover:text-teal-400'>{ui.edit === c.id ? <FaTimes /> : <FaEdit />}</button>
+                    <button onClick={() => setUi(p => ({ ...p, del: c.id }))} className="hover:text-red-500"><FaTrash /></button>
                   </div>
                 )}
               </div>
@@ -148,10 +148,10 @@ export default function AnimeComments({ animeId }: { animeId: string | number })
                 <div>
                   <div ref={upRef} contentEditable dangerouslySetInnerHTML={{ __html: c.comment }} className="p-3 border dark:border-gray-700 rounded bg-gray-50 dark:bg-[#111111] outline-none text-sm mb-2 wrap-break-word" />
                   <button onClick={() => {
-                      let cleanedHtml = upRef.current?.innerHTML.replace(/&nbsp;/g, ' ') || "";
-                      cleanedHtml = applyCensorship(cleanedHtml);
-                      call(`/api/external/comments/${c.id}`, "PUT", { comment: cleanedHtml }).then(j => { setComments(prev => prev.map(x => x.id === c.id ? j.data : x)); setUi(p => ({ ...p, edit: null })); })
-                    }} className="bg-[#39bcba] text-white px-4 py-1.5 rounded text-[10px] font-black uppercase flex items-center gap-2"><FaSave /> Ок</button>
+                    let cleanedHtml = upRef.current?.innerHTML.replace(/&nbsp;/g, ' ') || "";
+                    cleanedHtml = applyCensorship(cleanedHtml);
+                    call(`/api/external/comments/${c.id}`, "PUT", { comment: cleanedHtml }).then(j => { setComments(prev => prev.map(x => x.id === c.id ? j.data : x)); setUi(p => ({ ...p, edit: null })); })
+                  }} className="bg-[#39bcba] text-white px-4 py-1.5 rounded text-[10px] font-black uppercase flex items-center gap-2"><FaSave /> Ок</button>
                 </div>
               ) : (
                 <div className="text-sm dark:text-gray-400 prose dark:prose-invert wrap-break-word max-w-full" dangerouslySetInnerHTML={{ __html: applyCensorship(c.comment) }} />
@@ -171,7 +171,7 @@ const Btn = ({ icon, onClick, active }: any) => (
 
 const Avatar = ({ name, src, size }: any) => (
   src ? <img src={src} className={`w-${size} h-${size} rounded-full object-cover border-2 border-[#39bcba]`} alt="" />
-      : <div className={`w-${size} h-${size} rounded-full bg-[#39bcba] flex items-center justify-center text-white font-bold`}>{name?.[0].toUpperCase()}</div>
+    : <div className={`w-${size} h-${size} rounded-full bg-[#39bcba] flex items-center justify-center text-white font-bold`}>{name?.[0].toUpperCase()}</div>
 );
 
 const Prompt = () => (

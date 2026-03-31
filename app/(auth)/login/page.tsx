@@ -3,20 +3,23 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FaEnvelope, FaLock, FaUserPlus, FaSignInAlt } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaSignInAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
 import AuthBackground from '@/components/layout/AuthBackground';
-import Modal from '@/components/layout/Modal';
+import Modal from '@/components/modals/ErrorModal';
 
 const LoginPage = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const [modal, setModal] = useState({
     isOpen: false,
     title: '',
     message: '',
-    isSuccess: false,
+    type: 'success' as 'success' | 'danger',
+    onConfirm: () => { },
   });
 
   useEffect(() => {
@@ -31,11 +34,14 @@ const LoginPage = () => {
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const closeModal = () => {
-    setModal((prev) => ({ ...prev, isOpen: false }));
-    if (modal.isSuccess) {
-      router.push('/');
-    }
+  const openAlert = (title: string, message: string, type: 'success' | 'danger', action?: () => void) => {
+    setModal({
+      isOpen: true,
+      title,
+      message,
+      type,
+      onConfirm: action || (() => { }),
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,18 +58,14 @@ const LoginPage = () => {
       const responseData = await res.json();
 
       if (!res.ok) {
-        throw new Error(responseData.message || 'Ошибка входа');
+        throw new Error(responseData.message || 'Неверный логин или пароль');
       }
 
-      const token =
-        responseData.data?.token ||
-        responseData.token ||
-        responseData.access_token;
-
+      const token = responseData.data?.token || responseData.token || responseData.access_token;
       const user = responseData.data?.user || responseData.user;
 
       if (!token) {
-        throw new Error('Нет токена в ответе сервера');
+        throw new Error('Ошибка авторизации: токен отсутствует');
       }
 
       localStorage.setItem('userToken', token);
@@ -71,19 +73,11 @@ const LoginPage = () => {
         localStorage.setItem('userData', JSON.stringify(user));
       }
 
-      setModal({
-        isOpen: true,
-        title: 'Успешно!',
-        message: 'Вы успешно вошли в систему. Сейчас вы будете перенаправлены.',
-        isSuccess: true,
+      openAlert('С возвращением!', 'Вы успешно вошли в систему AniYume.', 'success', () => {
+        router.push('/');
       });
     } catch (error: any) {
-      setModal({
-        isOpen: true,
-        title: 'Ошибка',
-        message: error.message,
-        isSuccess: false,
-      });
+      openAlert('Ошибка входа', error.message, 'danger');
     } finally {
       setLoading(false);
     }
@@ -91,87 +85,93 @@ const LoginPage = () => {
 
   return (
     <AuthBackground>
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="w-full max-w-md rounded-2xl border border-[#2EC4B6]/40 dark:border-gray-800 bg-white dark:bg-[#161616] p-10 shadow-xl backdrop-blur-sm transition-colors">
-          <h1 className="mb-4 flex items-center justify-center gap-2 text-center text-4xl font-extrabold text-[#2EC4B6]">
-            <FaSignInAlt /> Вход
-          </h1>
-
-          <p className="mb-6 text-center text-sm font-medium text-[#2EC4B6]">
-            Добро пожаловать! Введите данные для входа.
-          </p>
-
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            <div>
-              <label
-                htmlFor="email"
-                className="mb-2 block text-sm font-semibold text-[#2EC4B6]"
-              >
-                Email
-              </label>
-              <div className="relative">
-                <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-[#2EC4B6]" />
-                <input
-                  type="email"
-                  id="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="email@example.com"
-                  className="w-full rounded-lg border border-[#2EC4B6]/60 bg-white py-2 pl-10 pr-4 text-gray-700 outline-none transition focus:ring-2 focus:ring-[#2EC4B6] dark:border-gray-700 dark:bg-[#111111] dark:text-gray-200"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="mb-2 block text-sm font-semibold text-[#2EC4B6]"
-              >
-                Пароль
-              </label>
-              <div className="relative">
-                <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#2EC4B6]" />
-                <input
-                  type="password"
-                  id="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  className="w-full rounded-lg border border-[#2EC4B6]/60 bg-white py-2 pl-10 pr-4 text-gray-700 outline-none transition focus:ring-2 focus:ring-[#2EC4B6] dark:border-gray-700 dark:bg-[#111111] dark:text-gray-200"
-                  required
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#2EC4B6] py-3 font-bold text-white shadow-md transition hover:bg-[#259B92] hover:shadow-lg disabled:opacity-50"
-            >
-              {loading ? 'Вход...' : 'Войти'}
-            </button>
-
-            <div className="flex flex-col items-center pt-2 text-center">
-              <FaUserPlus className="mb-2 text-[#2EC4B6]" />
-              <Link
-                href="/register"
-                className="text-sm font-semibold text-[#2EC4B6] transition hover:text-[#259B92]"
-              >
-                Нет аккаунта? Зарегистрироваться
-              </Link>
-            </div>
-          </form>
-        </div>
-      </div>
-
       <Modal
         isOpen={modal.isOpen}
-        onClose={closeModal}
-        onConfirm={closeModal}
         title={modal.title}
         message={modal.message}
+        type={modal.type}
+        confirmText="Понятно"
+        cancelText="Закрыть"
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        onConfirm={modal.onConfirm}
       />
+
+      <div className="w-full max-w-md rounded-xl border border-[#2EC4B6]/40 dark:border-white/5 bg-white/10 dark:bg-[#0f0f0f]/40 p-10 shadow-2xl backdrop-blur-sm transition-colors">
+        <h1 className="mb-2 flex items-center justify-center gap-3 text-center text-4xl font-black uppercase italic tracking-tighter text-[#2EC4B6]">
+          <FaSignInAlt className="text-3xl" /> Вход
+        </h1>
+
+        <p className="mb-8 text-center text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">
+          Авторизация в системе AniYume
+        </p>
+
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="email" className="mb-2 ml-1 block text-[11px] font-black uppercase tracking-widest text-[#2EC4B6]">
+              Email Адрес
+            </label>
+            <div className="relative group">
+              <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2EC4B6] transition-colors" />
+              <input
+                type="email"
+                id="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="EMAIL@EXAMPLE.COM"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 text-sm font-bold text-gray-700 outline-none transition focus:ring-2 focus:ring-[#2EC4B6]/50 dark:border-white/5 dark:bg-[#111111] dark:text-gray-200"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="password" className="mb-2 ml-1 block text-[11px] font-black uppercase tracking-widest text-[#2EC4B6]">
+              Пароль аккаунта
+            </label>
+            <div className="relative group">
+              <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2EC4B6] transition-colors" />
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-12 text-sm font-bold text-gray-700 outline-none transition focus:ring-2 focus:ring-[#2EC4B6]/50 dark:border-white/5 dark:bg-[#111111] dark:text-gray-200"
+                required
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#2EC4B6] transition-colors focus:outline-none"
+              >
+                {showPassword ? (
+                  <FaEyeSlash className="text-lg" />
+                ) : (
+                  <FaEye className="text-lg" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-[#2EC4B6] py-4 text-xs font-black uppercase italic tracking-[0.2em] text-white shadow-lg shadow-[#2EC4B6]/20 transition-all hover:bg-[#259B92] active:scale-95 disabled:opacity-50"
+          >
+            {loading ? 'ОБРАБОТКА...' : 'ВОЙТИ В ПРОФИЛЬ'}
+          </button>
+
+          <div className="flex flex-col items-center pt-4 text-center">
+            <Link
+              href="/register"
+              className="text-[11px] font-black uppercase tracking-widest text-gray-400 transition-colors hover:text-[#2EC4B6]"
+            >
+              Нет аккаунта? <span className="text-[#2EC4B6] underline">Зарегистрироваться</span>
+            </Link>
+          </div>
+        </form>
+      </div>
     </AuthBackground>
   );
 };

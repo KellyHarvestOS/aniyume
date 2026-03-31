@@ -16,16 +16,16 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchAllData = async () => {
       try {
+        // ВРЕМЕНО ----------------------------------------------
         const token = localStorage.getItem("userToken");
-        if (!token) {
-          router.push("/login");
-          return;
-        }
 
-        const headers = {
-          Authorization: `Bearer ${token}`,
+        const headers: any = {
           Accept: "application/json",
         };
+
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
 
         const [profileRes, statsRes] = await Promise.all([
           fetch("/api/external/profile/me", { headers }),
