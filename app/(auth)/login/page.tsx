@@ -96,7 +96,7 @@ const LoginPage = () => {
         onConfirm={modal.onConfirm}
       />
 
-      <div className="w-full max-w-md rounded-xl border border-[#2EC4B6]/40 dark:border-white/5 bg-white/10 dark:bg-[#0f0f0f]/40 p-10 shadow-2xl backdrop-blur-sm transition-colors">
+      <div className="w-full max-w-md rounded-xl border border-[#2EC4B6]/30 dark:border-gray-800 bg-white/10 dark:bg-[#0f0f0f]/40 p-10 shadow-2xl backdrop-blur-sm transition-colors">
         <h1 className="mb-2 flex items-center justify-center gap-3 text-center text-4xl font-black uppercase italic tracking-tighter text-[#2EC4B6]">
           <FaSignInAlt className="text-3xl" /> Вход
         </h1>

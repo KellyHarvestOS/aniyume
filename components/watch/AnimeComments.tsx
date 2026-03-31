@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { FaBold, FaItalic, FaSyncAlt, FaSmile, FaTrash, FaEdit, FaSave, FaTimes, FaLock } from 'react-icons/fa';
-import Modal from '../modals/Modal';
+import Modal from '@/components/modals/ErrorModal';
 
 const EMOJIS = ['😊', '😂', '😍', '🤔', '😎', '😭', '😮', '🔥', '✨', '👍', '👎', '❤️', '😱', '🙌', '👀'];
 const API = "http://164.90.185.95/storage/";
