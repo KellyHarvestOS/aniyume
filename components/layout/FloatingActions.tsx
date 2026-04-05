@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
-import { BiSupport } from 'react-icons/bi';
+import { LuBot } from "react-icons/lu";
 import ChatModal from '@/components/modals/ChatModal';
 import { AnimatePresence } from 'framer-motion';
 
@@ -36,7 +36,7 @@ export default function FloatingActions() {
         <button
           onClick={scrollToTop}
           className={`p-3 rounded-full shadow-lg transition-all duration-300 transform flex items-center justify-center
-            bg-[#2EC4B6] text-white 
+            bg-linear-to-r from-[#2EC4B6] to-[#1B9AAA] text-white 
             border-[3px] border-white 
             ring-2 ring-[#2EC4B6]
             hover:scale-110 hover:shadow-[#2EC4B6]/40 hover:shadow-xl
@@ -50,15 +50,15 @@ export default function FloatingActions() {
         <button
           onClick={() => setIsChatOpen(!isChatOpen)}
           className={`p-3 rounded-full shadow-lg transition-all duration-300 transform flex items-center justify-center
-            bg-[#2EC4B6] text-white 
+            bg-linear-to-r from-[#2EC4B6] to-[#1B9AAA] text-white 
             border-[3px] border-white 
             ring-2 ring-[#2EC4B6]
             hover:scale-110 hover:shadow-[#2EC4B6]/40 hover:shadow-xl
             dark:border-gray-700
-            ${isChatOpen ? 'rotate-90 shadow-inner' : ''} 
+            ${isChatOpen ? 'rotate-10 shadow-inner' : ''} 
           `}
         >
-          <BiSupport className="w-6 h-6 dark:text-gray-800" />
+          <LuBot className="w-6 h-6 dark:text-gray-800" />
         </button>
       </div>
 

@@ -13,6 +13,7 @@ interface ProfileCardProps {
     custom_status: string | null;
     bio?: string | null;
     created_at: string;
+    is_premium?: boolean;
   };
   counts: {
     favorites: number;
@@ -60,11 +61,20 @@ export const ProfileCard = ({
       </svg>
 
       <div className="relative w-32 h-32 mx-auto mb-4">
+        {user.is_premium && (
+          <div className="absolute -top-0.2 -right-0.5 z-20 flex items-center justify-center bg-linear-to-tr from-teal-200 via-teal-700 to-teal-200 p-1.5 rounded-full border-2 border-white dark:border-[#161616] shadow-lg shadow-teal-500/40 animate-bounce transition-transform">
+            <RiVipCrownFill className="text-white text-sm" />
+          </div>
+        )}
+
         {user.avatar ? (
           <img
             src={avatarUrl!}
             alt="avatar"
-            className="w-full h-full rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg"
+            className={`w-full h-full rounded-full object-cover border-4 shadow-lg ${user.is_premium
+              ? "border-teal-500 shadow-teal-500/20"
+              : "border-white dark:border-gray-800"
+              }`}
           />
         ) : (
           <div className="w-full h-full rounded-full bg-linear-to-br from-[#2EC4B6] to-teal-600 flex items-center justify-center text-white text-5xl font-bold shadow-lg border-4 border-white dark:border-black/80">
@@ -72,12 +82,9 @@ export const ProfileCard = ({
           </div>
         )}
 
-        <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-4 border-white dark:border-black/70 rounded-full" />
+        <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-4 border-white dark:border-black/70 rounded-full z-10" />
       </div>
 
-      <h1 className="text-2xl font-black text-gray-800 dark:text-gray-200">
-        {user.name}
-      </h1>
 
       <p className="text-sm text-[#2EC4B6] font-bold mt-1 italic">
         {user.custom_status || "Cтатус отсутствует"}
@@ -90,18 +97,14 @@ export const ProfileCard = ({
       )}
 
       <div className="grid grid-cols-2 gap-2 my-6">
-
         <Link
           href="/bookmarks"
           className="bg-slate-50 dark:bg-[#161616] p-2 rounded-lg border border-slate-100 dark:border-gray-800 hover:border-[#2EC4B6] transition group"
         >
           <p className="font-bold text-[#2EC4B6]">{counts.favorites}</p>
-
           <div className="flex items-center justify-center gap-1 mt-1 text-center">
             <Heart size={12} className="text-slate-400 group-hover:text-[#2EC4B6] transition" />
-            <p className="text-[10px] text-slate-400 uppercase group-hover:text-[#2EC4B6]">
-              Избранное
-            </p>
+            <p className="text-[10px] text-slate-400 uppercase group-hover:text-[#2EC4B6]">Избранное</p>
           </div>
         </Link>
 
@@ -110,12 +113,9 @@ export const ProfileCard = ({
           className="bg-slate-50 dark:bg-[#161616] p-2 rounded-lg border border-slate-100 dark:border-gray-800 hover:border-[#2EC4B6] transition group"
         >
           <p className="font-bold text-[#2EC4B6]">{counts.ratings}</p>
-
           <div className="flex items-center justify-center gap-1 mt-1 text-center">
             <Star size={12} className="text-slate-400 group-hover:text-[#2EC4B6] transition" />
-            <p className="text-[10px] text-slate-400 uppercase group-hover:text-[#2EC4B6]">
-              Оценки
-            </p>
+            <p className="text-[10px] text-slate-400 uppercase group-hover:text-[#2EC4B6]">Оценки</p>
           </div>
         </Link>
 
@@ -124,12 +124,9 @@ export const ProfileCard = ({
           className="bg-slate-50 dark:bg-[#161616] p-2 rounded-lg border border-slate-100 dark:border-gray-800 hover:border-[#2EC4B6] transition group"
         >
           <p className="font-bold text-[#2EC4B6]">{counts.comments || 0}</p>
-
           <div className="flex items-center justify-center gap-1 mt-1 text-center">
             <MessageCircle size={12} className="text-slate-400 group-hover:text-[#2EC4B6] transition" />
-            <p className="text-[10px] text-slate-400 uppercase group-hover:text-[#2EC4B6]">
-              Комментарии
-            </p>
+            <p className="text-[10px] text-slate-400 uppercase group-hover:text-[#2EC4B6]">Комменты</p>
           </div>
         </Link>
 
@@ -138,15 +135,11 @@ export const ProfileCard = ({
           className="bg-slate-50 dark:bg-[#161616] p-2 rounded-lg border border-slate-100 dark:border-gray-800 hover:border-[#2EC4B6] transition group"
         >
           <p className="font-bold text-[#2EC4B6]">{counts.friends || 0}</p>
-
           <div className="flex items-center justify-center gap-1 mt-1 text-center">
             <Users size={12} className="text-slate-400 group-hover:text-[#2EC4B6] transition" />
-            <p className="text-[10px] text-slate-400 uppercase group-hover:text-[#2EC4B6]">
-              Друзья
-            </p>
+            <p className="text-[10px] text-slate-400 uppercase group-hover:text-[#2EC4B6]">Друзья</p>
           </div>
         </Link>
-
       </div>
 
       <p className="text-[10px] text-slate-400 mb-4">
@@ -160,20 +153,22 @@ export const ProfileCard = ({
         </button>
       </Link>
 
-      <Link href="/premium" className="block mt-3">
-        <button className="premium-lava-btn w-full h-10 rounded-xl font-black shadow-lg shadow-[#2EC4B6]/40 hover:scale-[1.03] active:scale-[0.97] transition-all">
-          <div className="lava-container">
-            <div className="blob"></div>
-            <div className="blob"></div>
-            <div className="blob"></div>
-            <div className="blob"></div>
-          </div>
-          <span className="flex items-center justify-center gap-2 text-white dark:text-gray-900 uppercase tracking-widest text-xs drop-shadow-md">
-            <RiVipCrownFill className="text-lg" />
-            КУПИТЬ PREMIUM
-          </span>
-        </button>
-      </Link>
+      {!user.is_premium && (
+        <Link href="/premium" className="block mt-3">
+          <button className="premium-lava-btn w-full h-10 rounded-xl font-black shadow-lg shadow-[#2EC4B6]/40 hover:scale-[1.03] active:scale-[0.97] transition-all">
+            <div className="lava-container">
+              <div className="blob"></div>
+              <div className="blob"></div>
+              <div className="blob"></div>
+              <div className="blob"></div>
+            </div>
+            <span className="flex items-center justify-center gap-2 text-white dark:text-gray-900 uppercase tracking-widest text-xs drop-shadow-md">
+              <RiVipCrownFill className="text-lg" />
+              КУПИТЬ PREMIUM
+            </span>
+          </button>
+        </Link>
+      )}
 
       <button
         onClick={onLogout}

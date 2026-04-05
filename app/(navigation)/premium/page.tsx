@@ -2,9 +2,14 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { FaCheck, FaTimes, FaShieldAlt, FaRocket, FaStar, FaMagic, FaArrowLeft } from "react-icons/fa";
+import { FaCheck, FaTimes, FaMagic, FaArrowLeft, FaShieldAlt } from "react-icons/fa";
+import { BsFillPeopleFill } from "react-icons/bs";
+import { HiGif } from "react-icons/hi2";
 import { RiVipCrownFill } from "react-icons/ri";
+import { ImBlocked } from "react-icons/im";
+import { HiCursorClick } from "react-icons/hi";
 import Link from "next/link";
+
 
 export default function PremiumAuthPage() {
     const containerVariants = {
@@ -114,18 +119,10 @@ export default function PremiumAuthPage() {
                         </div>
 
                         <ul className="space-y-6">
-                            {["Full HD 1080p", "Стандартный плеер", "Общий каталог", "Рекламные блоки"].map((item, i) => (
+                            {["Full HD 1080p", "Стандартный плеер", "Общий каталог", "Стандартный стиль сайта", "Обычный никнейм"].map((item, i) => (
                                 <li key={i} className="flex items-center gap-4 text-slate-600 dark:text-slate-300 font-bold text-base">
                                     <div className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-500">
                                         <FaCheck className="text-sm" />
-                                    </div>
-                                    {item}
-                                </li>
-                            ))}
-                            {["Без GIF-аватарок", "Обычный никнейм"].map((item, i) => (
-                                <li key={i} className="flex items-center gap-4 text-slate-400 dark:text-slate-600 font-medium text-base line-through">
-                                    <div className="p-2 rounded-full bg-transparent text-slate-300 dark:text-slate-700">
-                                        <FaTimes className="text-sm" />
                                     </div>
                                     {item}
                                 </li>
@@ -185,17 +182,19 @@ export default function PremiumAuthPage() {
                                 className="space-y-6"
                             >
                                 {[
-                                    { icon: <FaRocket />, t: "GIF Аватарки", d: "Живой профиль" },
-                                    { icon: <FaShieldAlt />, t: "Особая роль", d: "Уникальный цвет ника" },
-                                    { icon: <FaStar />, t: "Без рекламы", d: "Только чистый контент" },
+                                    { icon: <HiGif />, t: "GIF Аватарки", d: "Живой профиль" },
+                                    { icon: <BsFillPeopleFill />, t: "Совместный просмотр", d: "Смотрите вместе с друзьями" },
                                     { icon: <FaMagic />, t: "Свои Темы", d: "Персональный стиль сайта" },
+                                    { icon: <HiCursorClick />, t: "Уникальные курсоры мыши", d: "Выделяйся в каждом клике" },
+                                    { icon: <FaShieldAlt />, t: "Приоритетная поддержка", d: "Помощь в первую очередь" },
+
                                 ].map((item, i) => (
                                     <motion.li
                                         key={i}
                                         variants={itemVariants}
                                         className="flex items-center gap-5 group"
                                     >
-                                        <div className="shrink-0 p-3 rounded-full bg-white/10 text-[#a7ffeb] shadow-lg group-hover:bg-[#a7ffeb] group-hover:text-[#168a7f] transition-all duration-300">
+                                        <div className="shrink-0 p-3 rounded-full bg-white/10 text-[#fdfefe] shadow-lg group-hover:bg-[#f1f1f1] group-hover:text-[#16758a] transition-all duration-300">
                                             <div className="text-xl">
                                                 {item.icon}
                                             </div>

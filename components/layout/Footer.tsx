@@ -84,7 +84,6 @@ export default function Footer() {
           </Block>
 
           <Block title="Информация">
-            <FooterLink href="/about" icon={FaInfoCircle}>О проекте</FooterLink>
             <FooterLink href="/privacy" icon={FaShieldAlt}>Приватность</FooterLink>
             <FooterLink href="/terms" icon={FaBalanceScale}>Условия</FooterLink>
             <FooterLink href="/faq" icon={FaQuestionCircle}>FAQ</FooterLink>

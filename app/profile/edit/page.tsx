@@ -62,6 +62,27 @@ export default function EditProfilePage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      const isGif = file.type === 'image/gif';
+      const isPremium = localStorage.getItem("isPremium") === "true";
+
+      if (isGif) {
+        if (!isPremium) {
+          setMessage({
+            type: "error",
+            text: "Анимированные аватарки доступны только с Premium!"
+          });
+
+          if (fileInputRef.current) fileInputRef.current.value = "";
+          return;
+        } else {
+          setSelectedFile(file);
+          const reader = new FileReader();
+          reader.onloadend = () => setPreviewUrl(reader.result as string);
+          reader.readAsDataURL(file);
+          return;
+        }
+      }
+
       const reader = new FileReader();
       reader.onload = () => {
         setTempImage(reader.result as string);

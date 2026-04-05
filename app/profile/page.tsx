@@ -13,15 +13,16 @@ export default function ProfilePage() {
   const [statsSummary, setStatsSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const [localPremium, setLocalPremium] = useState(false);
+
   useEffect(() => {
+    const premiumStatus = localStorage.getItem("isPremium") === "true";
+    setLocalPremium(premiumStatus);
+
     const fetchAllData = async () => {
       try {
-        // ВРЕМЕНО ----------------------------------------------
         const token = localStorage.getItem("userToken");
-
-        const headers: any = {
-          Accept: "application/json",
-        };
+        const headers: any = { Accept: "application/json" };
 
         if (token) {
           headers.Authorization = `Bearer ${token}`;
@@ -31,12 +32,6 @@ export default function ProfilePage() {
           fetch("/api/external/profile/me", { headers }),
           fetch("/api/external/statistics/me/episodes-summary", { headers }),
         ]);
-
-        // if (profileRes.status === 401) {
-        //   localStorage.removeItem("userToken");
-        //   router.push("/login");
-        //   return;
-        // }
 
         const profileJson = await profileRes.json();
         const statsJson = await statsRes.json();
@@ -55,6 +50,7 @@ export default function ProfilePage() {
 
   const handleLogout = () => {
     localStorage.removeItem("userToken");
+
     window.dispatchEvent(new Event("authChange"));
     router.push("/");
   };
@@ -62,7 +58,11 @@ export default function ProfilePage() {
   if (loading) return <ProfileSkeleton />;
   if (!data) return null;
 
-  const user = data.user || data;
+  const user = {
+    ...(data.user || data),
+    is_premium: localPremium
+  };
+
   const counts = {
     favorites: data.counts?.favorites || 0,
     ratings: data.counts?.ratings || 0,
