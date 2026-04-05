@@ -96,7 +96,7 @@ export default function BookmarksPage() {
   const handleRemove = async (e: React.MouseEvent, animeId: string | number) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     const token = localStorage.getItem("userToken");
     if (!token) return;
 
@@ -107,8 +107,8 @@ export default function BookmarksPage() {
 
     try {
       const url = activeTab === "favorites"
-          ? `/api/external/favorites/${animeId}`
-          : `/api/external/my-anime-list/${animeId}`;
+        ? `/api/external/favorites/${animeId}`
+        : `/api/external/my-anime-list/${animeId}`;
 
       await fetch(url, {
         method: "DELETE",
@@ -130,7 +130,7 @@ export default function BookmarksPage() {
       <div className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-40 backdrop-blur-xl">
         <div className="container mx-auto px-6 pt-8">
           <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
-            Мои <span className="text-[#21D0B8]">Списки</span>
+            Мои <span className="text-[#2ebaba]">Списки</span>
           </h1>
 
           <div className="flex gap-6 overflow-x-auto no-scrollbar">
@@ -138,11 +138,10 @@ export default function BookmarksPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`pb-4 text-xs font-black uppercase tracking-[0.2em] whitespace-nowrap border-b-2 transition-all flex items-center gap-2 ${
-                  activeTab === tab.id
+                className={`pb-4 text-xs font-black uppercase tracking-[0.2em] whitespace-nowrap border-b-2 transition-all flex items-center gap-2 ${activeTab === tab.id
                     ? "border-[#21D0B8] text-[#21D0B8]"
                     : "border-transparent text-gray-400 dark:text-white/40 hover:text-gray-900 dark:hover:text-white"
-                }`}
+                  }`}
               >
                 {tab.icon}
                 {tab.label}

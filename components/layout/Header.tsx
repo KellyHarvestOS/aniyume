@@ -116,13 +116,26 @@ export default function Header() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className={`group flex items-center gap-2 text-sm font-semibold transition-colors hover:text-[#39bcba] ${isActive ? 'text-[#39bcba]' : 'text-gray-500 dark:text-gray-400'
+                      className={`group flex items-center gap-2 text-sm font-semibold transition-all ${isActive
+                          ? 'translate-x-1'
+                          : 'text-gray-500 dark:text-gray-400 hover:translate-x-1'
                         }`}
                     >
-                      <span className={`text-xl transition-transform group-hover:scale-110 ${isActive ? 'scale-110' : ''}`}>
+                      <span
+                        className={`text-xl transition-transform group-hover:scale-110 ${isActive ? 'scale-110 text-[#2EC4B6]' : 'text-gray-400 group-hover:text-[#2EC4B6]'
+                          }`}
+                      >
                         {link.icon}
                       </span>
-                      <span className="hidden xl:inline">{link.label}</span>
+
+                      <span
+                        className={`hidden xl:inline ${isActive
+                            ? 'text-brand'
+                            : 'text-gray-500 dark:text-gray-400 group-hover:text-brand'
+                          }`}
+                      >
+                        {link.label}
+                      </span>
                     </Link>
                   </li>
                 );

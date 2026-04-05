@@ -64,7 +64,7 @@ export default function PopularPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`pb-4 text-sm font-bold uppercase tracking-wide whitespace-nowrap border-b-2 transition-colors duration-300 ${activeTab === tab.id
-                  ? 'border-[#21D0B8] text-[#21D0B8]'
+                  ? 'border-[#21D0B8] text-brand'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
               >
@@ -99,7 +99,7 @@ export default function PopularPage() {
                   key={anime.id}
                   className="group flex flex-col md:flex-row items-start md:items-center p-6 gap-6 hover:bg-[#21D0B8]/5 dark:hover:bg-[#21D0B8]/10 transition-colors relative"
                 >
-                  <div className={`hidden md:flex shrink-0 w-12 text-3xl font-black italic ${index < 3 ? 'text-[#21D0B8]' : 'text-gray-300 dark:text-gray-600'
+                  <div className={`hidden md:flex shrink-0 w-12 text-3xl font-black italic ${index < 3 ? 'text-brand' : 'text-gray-300 dark:text-gray-600'
                     }`}>
                     {index + 1}
                   </div>
@@ -119,6 +119,7 @@ export default function PopularPage() {
                       <h3 className="text-xl font-bold text-gray-900 dark:text-gray-200 group-hover:text-[#21D0B8] transition-colors line-clamp-1">
                         {anime.title}
                       </h3>
+
                       <button className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-1">
                         <FaEllipsisV />
                       </button>

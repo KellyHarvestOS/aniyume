@@ -36,7 +36,7 @@ export default function FloatingActions() {
         <button
           onClick={scrollToTop}
           className={`p-3 rounded-full shadow-lg transition-all duration-300 transform flex items-center justify-center
-            bg-linear-to-r from-[#2EC4B6] to-[#1B9AAA] text-white 
+            bg-brand text-white 
             border-[3px] border-white 
             ring-2 ring-[#2EC4B6]
             hover:scale-110 hover:shadow-[#2EC4B6]/40 hover:shadow-xl
@@ -50,7 +50,7 @@ export default function FloatingActions() {
         <button
           onClick={() => setIsChatOpen(!isChatOpen)}
           className={`p-3 rounded-full shadow-lg transition-all duration-300 transform flex items-center justify-center
-            bg-linear-to-r from-[#2EC4B6] to-[#1B9AAA] text-white 
+            bg-brand text-white 
             border-[3px] border-white 
             ring-2 ring-[#2EC4B6]
             hover:scale-110 hover:shadow-[#2EC4B6]/40 hover:shadow-xl

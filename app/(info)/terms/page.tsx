@@ -55,7 +55,7 @@ export default function TermsPage() {
 
           <h1 className="text-4xl md:text-5xl font-extrabold mt-8 tracking-tight text-gray-900 dark:text-gray-200 leading-tight">
             Условия <br />
-            <span className="text-[#21D0B8]">Использования</span>
+            <span className="text-brand">Использования</span>
           </h1>
 
           <p className="text-gray-400 dark:text-gray-500 text-base mt-4 font-medium max-w-xs mx-auto">

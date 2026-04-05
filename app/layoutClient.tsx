@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import CookieConsent from '../components/layout/CookieConsent';
@@ -10,7 +11,27 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
 
   const noLayoutPages = ['/login', '/register', '/premium', '/watch'];
   const hideLayout = noLayoutPages.includes(pathname);
-  const hideCarousel = pathname.startsWith('/anime/');
+
+  useEffect(() => {
+    const checkPremium = () => {
+      const isPremium = localStorage.getItem('isPremium') === 'true';
+      if (isPremium) {
+        document.documentElement.classList.add('is-premium');
+      } else {
+        document.documentElement.classList.remove('is-premium');
+      }
+    };
+
+    checkPremium();
+
+    window.addEventListener('storage', checkPremium);
+    window.addEventListener('premiumUpdate', checkPremium);
+
+    return () => {
+      window.removeEventListener('storage', checkPremium);
+      window.removeEventListener('premiumUpdate', checkPremium);
+    };
+  }, []);
 
   return (
     <div className="bg-background text-foreground min-h-screen transition-colors duration-300">

@@ -115,8 +115,8 @@ export default function FeaturedNewestRows() {
         <div />
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-2">
-            <div className="h-1 w-12 bg-[#39bcba] rounded-full" />
-            <span className="text-[10px] font-black text-[#39bcba] uppercase tracking-[0.4em]">
+            <div className="h-1 w-12 bg-brand rounded-full" />
+            <span className="text-[10px] font-black text-brand uppercase tracking-[0.4em]">
               ВаШ сайт AniYume
             </span>
           </div>

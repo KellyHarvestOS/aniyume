@@ -11,7 +11,7 @@ export const metadata = {
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen w-full bg-white dark:bg-[#111111] text-gray-900 dark:text-gray-200 flex flex-col items-center justify-center py-12 px-4 overflow-hidden relative transition-colors">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#21D0B8] rounded-full blur-[120px] opacity-[0.03] dark:opacity-[0.06] -z-10 pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand rounded-full blur-[120px] opacity-[0.03] dark:opacity-[0.06] -z-10 pointer-events-none" />
 
       <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-3 gap-8 items-center relative z-10">
         <div className="space-y-6 order-2 lg:order-1">
@@ -19,7 +19,7 @@ export default function PrivacyPage() {
             <p>
               Для входа мы храним <span className="font-bold text-gray-900 dark:text-gray-200">Логин</span> и{' '}
               <span className="font-bold text-gray-900 dark:text-gray-200">Пароль</span>. Пароли шифруются в{' '}
-              <span className="text-[#21D0B8] font-semibold">Hash</span> — мы их не видим.
+              <span className="text-brand font-semibold">Hash</span> — мы их не видим.
             </p>
           </PolicyCard>
 
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
 
           <h1 className="text-3xl md:text-4xl font-extrabold mt-6 tracking-tight text-gray-900 dark:text-gray-200 leading-tight">
             Политика <br />
-            <span className="text-[#21D0B8]">Безопасности</span>
+            <span className="text-brand">Безопасности</span>
           </h1>
           <p className="text-gray-400 dark:text-gray-500 text-sm mt-3 font-medium max-w-xs mx-auto">
             Ваши данные под защитой. <br />

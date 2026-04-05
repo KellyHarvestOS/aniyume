@@ -93,7 +93,7 @@ export default function Footer() {
             <p className="text-slate-600 dark:text-gray-400">Наша команда отвечает ежедневно</p>
             <a
               href="mailto:support@aniyume.com"
-              className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-6 py-4 font-semibold text-white transition hover:bg-[#2EC4B6] dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-[#39bcba]"
+              className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-6 py-4 font-semibold text-white transition hover-bg-brand"
             >
               support@aniyume.com
             </a>
@@ -137,12 +137,25 @@ function FooterLink({ href, icon: Icon, children }: FooterLinkProps) {
     <Link
       href={href}
       className={`group flex items-center gap-4 text-base transition-all duration-300 ${isActive
-        ? 'text-[#2EC4B6] translate-x-2'
-        : 'text-slate-600 hover:translate-x-2 hover:text-slate-900 dark:text-gray-400 dark:hover:text-gray-100'
+        ? 'translate-x-2'
+        : 'text-slate-600 hover:translate-x-2 dark:text-gray-400'
         }`}
     >
-      <Icon className={`text-xl transition-colors ${isActive ? 'text-[#2EC4B6]' : 'text-slate-400 group-hover:text-[#2EC4B6]'}`} />
-      {children}
+      <Icon
+        className={`text-xl transition-colors ${isActive
+          ? 'text-[#2EC4B6]'
+          : 'text-slate-400 group-hover:text-[#2EC4B6]'
+          }`}
+      />
+
+      <span
+        className={`inline-block ${isActive
+          ? 'text-brand'
+          : 'text-slate-600 dark:text-gray-400 group-hover:text-[#2EC4B6]'
+          }`}
+      >
+        {children}
+      </span>
     </Link>
   );
 }

@@ -43,10 +43,10 @@ const AnimeList = ({ title }: { title: string }) => {
       try {
         setLoading(true);
         if (page > 1) titleRef.current?.scrollIntoView({ behavior: 'smooth' });
-        
+
         const res = await fetch(`/api/external/anime?page=${page}&sort=newest&per_page=10`);
         const json = await res.json();
-        
+
         const newData = json.data || json;
         const newTotal = json.meta?.last_page || json.last_page || 10;
 
@@ -71,7 +71,7 @@ const AnimeList = ({ title }: { title: string }) => {
   const renderPages = () => {
     const nums = [];
     const pushBtn = (p: number) => nums.push(
-      <button key={p} onClick={() => setPage(p)} className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${page === p ? "bg-[#21D0B8] text-white shadow-lg scale-110" : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-zinc-800"}`}>{p}</button>
+      <button key={p} onClick={() => setPage(p)} className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${page === p ? "bg-brand text-white shadow-lg scale-110" : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-zinc-800"}`}>{p}</button>
     );
 
     pushBtn(1);
@@ -87,11 +87,11 @@ const AnimeList = ({ title }: { title: string }) => {
       <div className="border-t-2 border-slate-100 pt-10 dark:border-zinc-800 mb-10" />
       <div ref={titleRef} className="flex flex-col items-center mb-10">
         <h2 className="text-3xl sm:text-6xl font-black text-gray-800 dark:text-gray-100 tracking-tighter uppercase">{title}</h2>
-        <div className="w-24 sm:w-48 h-1.5 bg-[#21D0B8] rounded-full mt-3" />
+        <div className="w-24 sm:w-48 h-1.5 bg-brand rounded-full mt-3" />
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 justify-items-center">
-        {loading 
+        {loading
           ? Array.from({ length: 10 }).map((_, i) => <AnimeCardSkeleton key={i} />)
           : data.map(item => <AnimeCard key={item.id} {...item} />)
         }

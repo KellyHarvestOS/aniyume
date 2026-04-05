@@ -223,3 +223,134 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+
+@keyframes chromatic {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 400% 50%;
+    }
+}
+
+.bg-brand {
+    background-color: #39bcba;
+    transition: all 0.3s ease;
+}
+
+.is-premium .bg-brand {
+    background: linear-gradient(90deg,
+            #2EC4B6,
+            #2bcfc2,
+            #26c0b9,
+            #1fb8b4,
+            #18b0af,
+            #11a8aa,
+            #0ba7bf,
+            #13b0af,
+            #1fadac,
+            #2EC4B6,
+            #2bcfc2,
+            #26c0b9,
+            #1fb8b4,
+            #18b0af,
+            #11a8aa,
+            #2EC4B6);
+    background-size: 400% 100%;
+    animation: chromatic 15s linear infinite;
+}
+
+.hover-bg-brand:hover {
+    background-color: #2f9795;
+}
+
+.is-premium .hover-bg-brand:hover {
+    filter: brightness(1.08);
+}
+
+.text-brand {
+    color: #39bcba;
+}
+
+.is-premium .text-brand {
+    background: linear-gradient(90deg,
+            #1dc3b2,
+            #22aca1,
+            #26c0b9,
+            #1fb8b4,
+            #18b0af,
+            #11a8aa,
+            #0bb6bf,
+            #13b0af,
+            #20bdbd,
+            #2EC4B6,
+            #20a399,
+            #26c0b9,
+            #1fb8b4,
+            #18b0af,
+            #11a8aa,
+            #26a699);
+    background-size: 400% 100%;
+    animation: chromatic 15s linear infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-weight: bold;
+    display: inline-block;
+    will-change: background-position;
+}
+
+.border-brand {
+    border-color: #39bcba;
+}
+
+.is-premium .border-brand {
+    border: 2px solid transparent;
+    border-image: linear-gradient(90deg,
+            #2EC4B6,
+            #2bcfc2,
+            #26c0b9,
+            #1fb8b4,
+            #18b0af,
+            #11a8aa,
+            #2EC4B6) 1;
+}
+
+.is-premium .border-brand {
+    position: relative;
+    border-radius: 12px;
+    padding: 2px;
+    background: linear-gradient(45deg,
+            #2EC4B6,
+            #2bcfc2,
+            #26c0b9,
+            #1fb8b4,
+            #18b0af,
+            #11a8aa,
+            #0ba7bf,
+            #13b0af,
+            #1fadac,
+            #2EC4B6);
+    background-size: 300% 300%;
+    animation: chromatic 10s linear infinite;
+}
+
+.is-premium .border-brand>* {
+    background: white;
+    border-radius: 10px;
+}
+
+.is-premium .hover-bg-brand:hover {
+    background: linear-gradient(90deg,
+            #2EC4B6,
+            #26c0b9,
+            #1fb8b4,
+            #18b0af,
+            #11a8aa,
+            #2EC4B6);
+    background-size: 200% 100%;
+    animation: chromatic 10s linear infinite;
+}
+

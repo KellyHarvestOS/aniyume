@@ -36,10 +36,10 @@ export default function FAQPage() {
 
   return (
     <div className="min-h-screen w-full bg-[#F9FAFB] dark:bg-[#111111] text-gray-900 dark:text-gray-200 pt-10 pb-20 px-4 relative overflow-hidden transition-colors">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-[#21D0B8] rounded-full blur-[160px] opacity-[0.04] dark:opacity-[0.07] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-brand rounded-full blur-[160px] opacity-[0.04] dark:opacity-[0.07] pointer-events-none" />
 
       <h1 className="text-4xl md:text-6xl text-center mb-6 relative z-10 font-extrabold tracking-tight text-gray-900 dark:text-gray-200">
-        Центр <span className="text-[#21D0B8]">Поддержки</span>
+        Центр <span className="text-brand">Поддержки</span>
       </h1>
 
       <p className="text-gray-500 dark:text-gray-400 text-lg md:text-xl font-medium max-w-2xl mx-auto mb-10 text-center">
@@ -79,22 +79,20 @@ export default function FAQPage() {
                     {item.question}
                   </h3>
                   <span
-                    className={`transition-transform duration-300 ${
-                      openIndex === index
-                        ? 'rotate-180 text-[#21D0B8]'
+                    className={`transition-transform duration-300 ${openIndex === index
+                        ? 'rotate-180 text-brand'
                         : 'text-gray-300 dark:text-gray-600'
-                    }`}
+                      }`}
                   >
                     {openIndex === index ? <BiMinus size={14} /> : <BiPlus size={14} />}
                   </span>
                 </div>
 
                 <div
-                  className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
-                    openIndex === index
+                  className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${openIndex === index
                       ? 'grid-rows-[1fr] opacity-100 mt-3'
                       : 'grid-rows-[0fr] opacity-0 mt-0'
-                  }`}
+                    }`}
                 >
                   <div className="overflow-hidden">
                     <p className="text-gray-500 dark:text-gray-400 text-base leading-relaxed font-medium">

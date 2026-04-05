@@ -78,7 +78,7 @@ export default function SchedulePage() {
               key={index}
               onClick={() => scrollToDay(index)}
               className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 relative group ${isToday
-                  ? 'bg-[#21D0B8] text-white shadow-[0_0_15px_#21D0B8] scale-110'
+                  ? 'bg-brand text-white shadow-[0_0_15px_#21D0B8] scale-110'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 hover:bg-[#21D0B8] hover:text-white'
                 }`}
             >
@@ -97,7 +97,7 @@ export default function SchedulePage() {
       <div className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-10 backdrop-blur-xl">
         <div className="container mx-auto px-6 pt-8">
           <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
-            Расписание <span className="text-[#21D0B8]">новых серий</span>
+            Расписание <span className="text-[#2ebaba]">новых серий</span>
           </h1>
         </div>
       </div>

@@ -87,7 +87,7 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
               {description ? description.replace(/<[^>]*>?/gm, '') : 'Нет описания...'}
             </p>
 
-            <button className="w-full bg-[#21D0B8] hover:bg-[#1bb5a0] text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg active:scale-95
+            <button className="w-full bg-brand hover:bg-brand/90 text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg active:scale-95
             dark:text-gray-800">
               <FaPlay className="text-xs dark:text-gray-800" /> Смотреть
             </button>
