@@ -86,7 +86,7 @@ export const ProfileCard = ({
       </div>
 
 
-      <p className="text-sm text-[#2EC4B6] font-bold mt-1 italic">
+      <p className="text-sm text-brand w-40 font-bold mt-1 italic">
         {user.custom_status || "Cтатус отсутствует"}
       </p>
 
@@ -147,7 +147,7 @@ export const ProfileCard = ({
       </p>
 
       <Link href="/profile/edit">
-        <button className="w-full flex items-center justify-center gap-2 bg-[#2EC4B6] text-white dark:text-gray-900 py-3 rounded-xl font-bold shadow hover:bg-teal-600 transition">
+        <button className="w-full flex items-center justify-center gap-2 bg-brand text-white dark:text-gray-900 py-3 rounded-xl font-bold shadow hover:bg-teal-600 transition">
           <FaEdit className="text-lg" />
           Редактировать
         </button>
