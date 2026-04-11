@@ -250,7 +250,6 @@ body {
     border: none;
 }
 
-/* 2. ТЕКСТ И ИКОНКИ (.text-brand) */
 .text-brand {
     color: var(--brand-main);
     fill: var(--brand-main);

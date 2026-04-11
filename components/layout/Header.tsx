@@ -7,7 +7,6 @@ import { usePathname } from 'next/navigation';
 import { FaUserPlus, FaUserCircle } from 'react-icons/fa';
 import { HiAdjustmentsHorizontal, HiMiniBookmark } from "react-icons/hi2";
 import { CgMenuRightAlt, CgMenuRight } from "react-icons/cg";
-
 import { IoCalendarNumberSharp } from "react-icons/io5";
 import { FaRankingStar } from "react-icons/fa6";
 import ThemeToggle from './ThemeToggle';
@@ -18,6 +17,12 @@ export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Новое состояние для динамических путей логотипа
+  const [logoPaths, setLogoPaths] = useState({
+    light: '/images/logo0.png',
+    dark: '/images/logo01.png'
+  });
 
   const fetchUser = async () => {
     const token = localStorage.getItem('userToken');
@@ -57,11 +62,22 @@ export default function Header() {
       const isPremium = localStorage.getItem("isPremium") === "true";
       const themeType = localStorage.getItem("profile_theme_type");
       const themeValue = localStorage.getItem("profile_theme_value");
+      const savedLogoKey = localStorage.getItem("profile_logo_key");
 
       if (isPremium) {
         document.documentElement.classList.add('is-premium');
+        
+        // Если есть премиум и ключ логотипа, меняем пути
+        if (savedLogoKey) {
+          setLogoPaths({
+            light: `/images/LogoStyle/${savedLogoKey}Dark.png`,
+            dark: `/images/LogoStyle/${savedLogoKey}White.png`
+          });
+        }
       } else {
         document.documentElement.classList.remove('is-premium');
+        // Сброс на стандартные лого
+        setLogoPaths({ light: '/images/logo0.png', dark: '/images/logo01.png' });
       }
 
       if (isPremium && themeValue) {
@@ -109,28 +125,28 @@ export default function Header() {
     { href: '/bookmarks', label: 'Закладки', icon: <HiMiniBookmark /> },
   ];
 
-
-
   return (
     <header className="sticky top-0 w-full border-b border-gray-200 dark:border-[#232323] bg-white dark:bg-[#111111] text-foreground z-100 transition-all">
       <div className="w-full flex h-20 items-center justify-between px-4 md:px-6 lg:px-8">
         <div className="flex items-center gap-4">
           <Link href="/" className="shrink-0 transition-opacity">
             <Image
-              src="/images/logo0.png"
+              src={logoPaths.dark}
               alt="Aniyume Logo"
               width={160}
               height={50}
               className="h-10 md:h-14 w-auto object-contain dark:hidden"
               priority
+              key={`dark-${logoPaths.dark}`}
             />
             <Image
-              src="/images/logo01.png"
+              src={logoPaths.light}
               alt="Aniyume Logo"
               width={160}
               height={50}
               className="hidden h-10 md:h-14 w-auto object-contain dark:block"
               priority
+              key={`light-${logoPaths.light}`}
             />
           </Link>
           <div >

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -24,6 +24,33 @@ interface FooterLinkProps {
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const [logoPaths, setLogoPaths] = useState({
+    light: '/images/logo0.png',
+    dark: '/images/logo01.png'
+  });
+
+  const applyTheme = useCallback(() => {
+    const isPremium = localStorage.getItem("isPremium") === "true";
+    const savedLogoKey = localStorage.getItem("profile_logo_key");
+
+    if (isPremium && savedLogoKey) {
+      setLogoPaths({
+        light: `/images/LogoStyle/${savedLogoKey}Dark.png`,
+        dark: `/images/LogoStyle/${savedLogoKey}White.png`
+      });
+    } else {
+      setLogoPaths({
+        light: '/images/logo0.png',
+        dark: '/images/logo01.png'
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    applyTheme();
+    window.addEventListener('storage', applyTheme);
+    return () => window.removeEventListener('storage', applyTheme);
+  }, [applyTheme]);
 
   return (
     <footer className="relative overflow-hidden bg-white pt-28 dark:bg-[#121212]">
@@ -33,18 +60,20 @@ export default function Footer() {
           <div className="max-w-xl flex flex-col items-center lg:items-start">
             <Link href="/" className="inline-block transition-opacity">
               <Image
-                src="/images/logo0.png"
+                src={logoPaths.dark}
                 alt="AniYume"
                 width={480}
                 height={180}
-                className="h-20 sm:h-30 w-auto dark:hidden"
+                className="h-20 sm:h-30 w-auto dark:hidden object-contain"
+                key={`footer-dark-${logoPaths.dark}`}
               />
               <Image
-                src="/images/logo01.png"
+                src={logoPaths.light}
                 alt="AniYume"
                 width={480}
                 height={180}
-                className="hidden h-20 sm:h-30 w-auto dark:block"
+                className="hidden h-20 sm:h-30 w-auto dark:block object-contain"
+                key={`footer-light-${logoPaths.light}`}
               />
             </Link>
 
@@ -158,6 +187,7 @@ function FooterLink({ href, icon: Icon, children }: FooterLinkProps) {
     </Link>
   );
 }
+
 function SocialCard({ href, icon: Icon, label, hoverClass }: { href: string; icon: React.ElementType; label: string; hoverClass: string }) {
   return (
     <a

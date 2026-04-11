@@ -82,7 +82,7 @@ export const ProfileCard = ({
                 }`}
             />
           ) : (
-            <div className="w-full h-full rounded-full bg-brand flex items-center justify-center text-white text-5xl font-bold shadow-lg border-4! border-white! dark:border-black/80">
+            <div className="w-full h-full rounded-full bg-brand flex items-center justify-center text-white text-5xl font-bold shadow-lg border-4! border-white! dark:border-black/80!">
               {user.name ? user.name[0].toUpperCase() : "?"}
             </div>
           )}
