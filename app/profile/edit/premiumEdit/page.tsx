@@ -154,7 +154,7 @@ export default function PremiumEditPage() {
                                 style={themeType === 'solid' ? { backgroundColor: profileValue } : {}}
                             />
                             <div className="p-8 relative">
-                                <div className="w-24 h-24 rounded-[1rem] border-4 border-white dark:border-zinc-900 absolute -top-12 left-8 bg-zinc-200 dark:bg-zinc-00 shadow-lg" />
+                                <div className="w-24 h-24 rounded-[1rem] border-4 border-white dark:border-zinc-900 absolute -top-12 left-8 bg-zinc-200 dark:bg-zinc-800 shadow-lg" />
                                 <div className="mt-14 space-y-4">
                                     <div className="h-5 w-40 bg-slate-100 dark:bg-white/5 rounded-lg" />
                                     <div className="h-3 w-56 bg-slate-50 dark:bg-white/5 rounded-lg" />
