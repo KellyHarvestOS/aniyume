@@ -78,7 +78,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 w-full border-b border-gray-200 dark:border-[#232323] bg-white dark:bg-[#111111] text-foreground z-100 transition-all">
-      <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="w-full flex h-20 items-center justify-between px-4 md:px-6 lg:px-8">
         <div className="flex items-center gap-4">
           <Link href="/" className="shrink-0 transition-opacity">
             <Image
@@ -117,8 +117,8 @@ export default function Header() {
                     <Link
                       href={link.href}
                       className={`group flex items-center gap-2 text-sm font-semibold transition-all ${isActive
-                          ? 'translate-x-1'
-                          : 'text-gray-500 dark:text-gray-400 hover:translate-x-1'
+                        ? 'translate-x-1'
+                        : 'text-gray-500 dark:text-gray-400 hover:translate-x-1'
                         }`}
                     >
                       <span
@@ -130,8 +130,8 @@ export default function Header() {
 
                       <span
                         className={`hidden xl:inline ${isActive
-                            ? 'text-brand'
-                            : 'text-gray-500 dark:text-gray-400 group-hover:text-brand'
+                          ? 'text-brand'
+                          : 'text-gray-500 dark:text-gray-400 group-hover:text-brand'
                           }`}
                       >
                         {link.label}

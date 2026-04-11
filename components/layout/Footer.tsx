@@ -28,7 +28,7 @@ export default function Footer() {
 
   return (
     <footer className="relative overflow-hidden bg-white pt-28 dark:bg-[#121212]">
-      <div className="relative mx-auto max-w-7xl px-4 md:px-6">
+      <div className="w-full px-4 md:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 text-center lg:text-left">
 
           <div className="max-w-xl flex flex-col items-center lg:items-start">
