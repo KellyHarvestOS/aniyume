@@ -150,7 +150,7 @@ export default function MyCommentsPage() {
 
           <div>
             <h1 className="text-5xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white leading-none">
-              Мои <span className="text-[#39bcba]">Комментарии</span>
+              Мои <span className="text-brand w-[25rem]">Комментарии</span>
             </h1>
             <p className="mt-3 text-gray-400 font-bold uppercase tracking-[0.5em] text-[10px] ml-1">
               Всего • Сообщений • {comments.length}
@@ -167,7 +167,7 @@ export default function MyCommentsPage() {
               <FaSearch className="text-3xl text-slate-300 dark:text-gray-700" />
             </div>
             <h2 className="text-xl font-black mb-6 uppercase tracking-tight">Список пуст</h2>
-            <Link href="/catalog" className="px-10 py-4 rounded-xl bg-[#39bcba] text-white font-black uppercase text-xs tracking-widest hover:scale-105 transition-all shadow-lg shadow-[#39bcba]/20">Перейти в каталог</Link>
+            <Link href="/catalog" className="px-10 py-4 rounded-xl bg-brand text-white font-black uppercase text-xs tracking-widest hover:scale-105 transition-all shadow-lg shadow-brand/20">Перейти в каталог</Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

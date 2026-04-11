@@ -53,6 +53,39 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
+    const applyTheme = () => {
+      const isPremium = localStorage.getItem("isPremium") === "true";
+      const themeType = localStorage.getItem("profile_theme_type");
+      const themeValue = localStorage.getItem("profile_theme_value");
+
+      if (isPremium) {
+        document.documentElement.classList.add('is-premium');
+      } else {
+        document.documentElement.classList.remove('is-premium');
+      }
+
+      if (isPremium && themeValue) {
+        const root = document.documentElement;
+        if (themeType === 'gradient') {
+          const hexColors = themeValue.match(/#[a-fA-F0-9]{6}/g);
+          if (hexColors && hexColors.length >= 2) {
+            root.style.setProperty('--brand-gradient', `linear-gradient(90deg, ${hexColors[0]}, ${hexColors[1]})`);
+            root.style.setProperty('--brand-main', hexColors[0]);
+          }
+        } else {
+          root.style.setProperty('--brand-gradient', themeValue);
+          root.style.setProperty('--brand-main', themeValue);
+        }
+      }
+    };
+
+    applyTheme();
+
+    window.addEventListener('storage', applyTheme);
+    return () => window.removeEventListener('storage', applyTheme);
+  }, []);
+
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) setIsMenuOpen(false);
     };
@@ -75,6 +108,8 @@ export default function Header() {
     { href: '/filter', label: 'Фильтр', icon: <HiAdjustmentsHorizontal /> },
     { href: '/bookmarks', label: 'Закладки', icon: <HiMiniBookmark /> },
   ];
+
+
 
   return (
     <header className="sticky top-0 w-full border-b border-gray-200 dark:border-[#232323] bg-white dark:bg-[#111111] text-foreground z-100 transition-all">
@@ -122,7 +157,9 @@ export default function Header() {
                         }`}
                     >
                       <span
-                        className={`text-xl transition-transform group-hover:scale-110 ${isActive ? 'scale-110 text-[#2EC4B6]' : 'text-gray-400 group-hover:text-[#2EC4B6]'
+                        className={`text-xl inline-flex items-center transition-transform group-hover:scale-110 ${isActive
+                          ? 'scale-110 text-brand'
+                          : 'text-gray-400 group-hover:text-brand'
                           }`}
                       >
                         {link.icon}
@@ -131,7 +168,7 @@ export default function Header() {
                       <span
                         className={`hidden xl:inline ${isActive
                           ? 'text-brand'
-                          : 'text-gray-500 dark:text-gray-400 group-hover:text-brand'
+                          : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200'
                           }`}
                       >
                         {link.label}
@@ -150,11 +187,11 @@ export default function Header() {
                   <img
                     src={avatarUrl}
                     alt="Profile"
-                    className={`w-9 h-9 rounded-full object-cover border-2 shadow-sm ${pathname === '/profile' ? 'border-[#39bcba]' : 'border-transparent'}`}
-                    style={{ borderColor: pathname === '/profile' ? '#39bcba' : '' }}
+                    className={`w-9 h-9 rounded-full object-cover border-2 shadow-sm ${pathname === '/profile' ? 'border-brand' : 'border-transparent'}`}
+                    style={{ borderColor: pathname === '/profile' ? 'var(--brand-main)' : '' }}
                   />
                 ) : (
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold ${pathname === '/profile' ? 'bg-[#39bcba]' : 'bg-gray-400'}`}>
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold ${pathname === '/profile' ? 'bg-brand' : 'bg-gray-400'}`}>
                     {user?.name ? user.name[0].toUpperCase() : <FaUserCircle size={32} />}
                   </div>
                 )}
@@ -163,13 +200,13 @@ export default function Header() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/login"
-                  className={`hidden sm:inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition-all ${pathname === '/login' ? 'text-[#39bcba]' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                  className={`hidden sm:inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition-all ${pathname === '/login' ? 'text-brand' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
                 >
                   <span>Вход</span>
                 </Link>
                 <Link
                   href="/register"
-                  className="flex items-center gap-2 rounded-xl bg-[#39bcba] px-4 py-2 sm:px-5 sm:py-2.5 text-sm font-bold text-white shadow-lg shadow-[#39bcba]/20 hover:bg-[#2f9795] transition-all active:scale-95"
+                  className="flex items-center gap-2 rounded-xl bg-brand px-4 py-2 sm:px-5 sm:py-2.5 text-sm font-bold text-white shadow-lg shadow-brand/20 hover:bg-brand-hover transition-all active:scale-95"
                 >
                   <FaUserPlus className="hidden sm:inline" />
                   <span>Регистрация</span>
@@ -207,11 +244,11 @@ export default function Header() {
                     <Link
                       href={link.href}
                       onClick={() => setIsMenuOpen(false)}
-                      className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border transition-all ${isActive ? 'border-[#39bcba]' : 'border-transparent'
-                        } hover:border-[#39bcba]`}
+                      className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border transition-all ${isActive ? 'border-brand' : 'border-transparent'
+                        } hover:border-brand`}
                     >
-                      <span className={`text-2xl ${isActive ? 'text-[#39bcba]' : 'text-[#39bcba]'}`}>{link.icon}</span>
-                      <span className={`text-sm font-bold ${isActive ? 'text-[#39bcba]' : 'dark:text-gray-200'}`}>
+                      <span className={`text-2xl ${isActive ? 'text-brand' : 'text-brand'}`}>{link.icon}</span>
+                      <span className={`text-sm font-bold ${isActive ? 'text-brand' : 'dark:text-gray-200'}`}>
                         {link.label}
                       </span>
                     </Link>

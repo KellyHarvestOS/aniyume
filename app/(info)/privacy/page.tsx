@@ -33,7 +33,7 @@ export default function PrivacyPage() {
 
         <div className="flex flex-col items-center text-center order-1 lg:order-2 mb-8 lg:mb-0">
           <div className="relative w-[280px] h-[280px] md:w-[350px] md:h-[350px] animate-float">
-            <div className="absolute inset-0 bg-linear-to-t from-[#21D0B8]/10 to-transparent rounded-full blur-2xl transform scale-90 translate-y-4" />
+            <div className="absolute inset-0 bg-gray-100/10 to-transparent rounded-full blur-2xl transform scale-90 translate-y-4" />
             <Image
               src="/images/s44.png"
               alt="Security Mascot"
@@ -74,10 +74,10 @@ export default function PrivacyPage() {
         <Link
           href="https://t.me/kellyharvest"
           target="_blank"
-          className="group relative inline-flex items-center gap-3 px-8 py-3 bg-white dark:bg-[#161616] text-gray-900 dark:text-gray-200 border border-gray-200 dark:border-gray-800 rounded-full font-bold shadow-lg hover:shadow-[#21D0B8]/20 hover:border-[#21D0B8] hover:text-[#21D0B8] transition-all duration-300 overflow-hidden"
+          className="group relative inline-flex items-center gap-3 px-8 py-3 bg-white dark:bg-[#161616] text-gray-900 dark:text-gray-200 border border-gray-200 dark:border-gray-800 rounded-full font-bold  hover:border-brand hover:text-white dark:hover:text-dark transition-all duration-300 overflow-hidden"
         >
           <span className="relative z-10">Связаться с разработчиком</span>
-          <div className="absolute inset-0 bg-[#21D0B8]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute inset-0 bg-brand opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </Link>
       </div>
 
@@ -107,7 +107,7 @@ function PolicyCard({ icon, title, children, align }: PolicyCardProps) {
   return (
     <div
       className={`
-        relative bg-white dark:bg-[#161616] border border-gray-100 dark:border-gray-800 p-10 rounded-2xl shadow-sm hover:shadow-xl hover:border-[#21D0B8]/30 transition-all duration-300 group
+        relative bg-white dark:bg-[#161616] border border-gray-100 dark:border-gray-800 p-10 rounded-2xl shadow-sm hover:shadow-xl hover:border-brand transition-all duration-300 group
         flex flex-col gap-3
         lg:items-${isRightAligned ? 'end' : 'start'} 
         lg:text-${isRightAligned ? 'right' : 'left'}
@@ -115,11 +115,10 @@ function PolicyCard({ icon, title, children, align }: PolicyCardProps) {
       `}
     >
       <div
-        className={`flex items-center gap-3 ${
-          isRightAligned ? 'lg:flex-row-reverse' : 'lg:flex-row'
-        } flex-row`}
+        className={`flex items-center gap-3 ${isRightAligned ? 'lg:flex-row-reverse' : 'lg:flex-row'
+          } flex-row`}
       >
-        <div className="p-3 rounded-xl bg-[#21D0B8]/10 text-[#21D0B8] group-hover:bg-[#21D0B8] group-hover:text-white transition-colors duration-300">
+        <div className="p-3 rounded-xl bg-[#21D0B8]/10 text-brand group-hover:bg-brand group-hover:text-white transition-colors duration-300">
           <span className="text-xl">{icon}</span>
         </div>
         <h3 className="font-bold text-lg text-gray-800 dark:text-gray-200">

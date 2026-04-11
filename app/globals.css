@@ -234,122 +234,277 @@ body {
     }
 }
 
+:root {
+    --brand-main: #39bcba;
+    --brand-gradient: linear-gradient(90deg, #2EC4B6, #2193b0);
+}
+
 .bg-brand {
-    background-color: #39bcba;
+    background-color: var(--brand-main);
     transition: all 0.3s ease;
 }
 
 .is-premium .bg-brand {
-    background: linear-gradient(90deg,
-            #2EC4B6,
-            #2bcfc2,
-            #26c0b9,
-            #1fb8b4,
-            #18b0af,
-            #11a8aa,
-            #0ba7bf,
-            #15c7c7,
-            #23c2c2,
-            #2EC4B6,
-            #2bcfc2,
-            #26c0b9,
-            #1fb8b4,
-            #18b0af,
-            #11a8aa,
-            #2EC4B6);
-    background-size: 400% 100%;
-    animation: chromatic 15s linear infinite;
+    background: var(--brand-gradient) !important;
+    background-size: cover;
+    border: none;
 }
 
-.hover-bg-brand:hover {
-    background-color: #2f9795;
-}
-
-.is-premium .hover-bg-brand:hover {
-    filter: brightness(1.08);
-}
-
+/* 2. ТЕКСТ И ИКОНКИ (.text-brand) */
 .text-brand {
-    color: #39bcba;
+    color: var(--brand-main);
+    fill: var(--brand-main);
+    transition: all 0.3s ease;
 }
 
 .is-premium .text-brand {
-    background: linear-gradient(90deg,
-            #1dc3b2,
-            #22aca1,
-            #26c0b9,
-            #1fb8b4,
-            #18b0af,
-            #11a8aa,
-            #0bb6bf,
-            #13b0af,
-            #20bdbd,
-            #2EC4B6,
-            #20a399,
-            #26c0b9,
-            #1fb8b4,
-            #18b0af,
-            #11a8aa,
-            #26a699);
-    background-size: 400% 100%;
-    animation: chromatic 15s linear infinite;
+    background: var(--brand-gradient);
     -webkit-background-clip: text;
     background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    font-weight: bold;
-    display: inline-block;
-    will-change: background-position;
+    display: inline-flex;
+    align-items: center;
+}
+
+@supports (-webkit-background-clip: text) {
+    .is-premium .text-brand {
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+    }
+}
+
+.is-premium .text-brand svg {
+    -webkit-text-fill-color: var(--brand-main);
+    color: var(--brand-main);
+    fill: var(--brand-main);
 }
 
 .border-brand {
-    border-color: #39bcba;
+    border: 2px solid var(--brand-main);
 }
 
 .is-premium .border-brand {
-    border: 2px solid transparent;
-    border-image: linear-gradient(90deg,
-            #2EC4B6,
-            #2bcfc2,
-            #26c0b9,
-            #1fb8b4,
-            #18b0af,
-            #11a8aa,
-            #2EC4B6) 1;
+    border: 2px solid transparent !important;
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    background-image: linear-gradient(white, white), var(--brand-gradient);
 }
 
-.is-premium .border-brand {
-    position: relative;
-    border-radius: 12px;
-    padding: 2px;
-    background: linear-gradient(45deg,
-            #2EC4B6,
-            #2bcfc2,
-            #26c0b9,
-            #1fb8b4,
-            #18b0af,
-            #11a8aa,
-            #0ba7bf,
-            #13b0af,
-            #1fadac,
-            #2EC4B6);
-    background-size: 300% 300%;
-    animation: chromatic 10s linear infinite;
+.dark .is-premium .border-brand {
+    background-image: linear-gradient(#111, #111), var(--brand-gradient);
 }
 
-.is-premium .border-brand>* {
-    background: white;
-    border-radius: 10px;
+.hover-bg-brand:hover {
+    filter: brightness(0.9);
+    opacity: 0.9;
 }
 
-.is-premium .hover-bg-brand:hover {
-    background: linear-gradient(90deg,
-            #2EC4B6,
-            #26c0b9,
-            #1fb8b4,
-            #18b0af,
-            #11a8aa,
-            #2EC4B6);
-    background-size: 200% 100%;
-    animation: chromatic 10s linear infinite;
+.border-brand-simple {
+    border-color: var(--brand-main) !important;
+}
+
+.is-premium .border-brand-simple {
+    border-color: var(--brand-main) !important;
+
+}
+
+
+.icon-brand {
+    color: var(--brand-main) !important;
+    fill: var(--brand-main) !important;
+    transition: all 0.3s ease;
+}
+
+
+.icon-brand[stroke] {
+    stroke: var(--brand-main) !important;
+}
+
+
+.is-premium .text-brand svg,
+.is-premium .text-brand i {
+
+    -webkit-text-fill-color: var(--brand-main) !important;
+    color: var(--brand-main) !important;
+    fill: var(--brand-main) !important;
+
+
+    background: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+
+    display: inline-block;
+    vertical-align: middle;
+}
+
+
+.group:hover .group-hover\:text-brand svg {
+    color: var(--brand-main) !important;
+    fill: var(--brand-main) !important;
+}
+
+.group:hover .group-hover\:icon-brand {
+    color: var(--brand-main) !important;
+    fill: var(--brand-main) !important;
+    stroke: var(--brand-main) !important;
+}
+
+.icon-brand {
+    background: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: initial !important;
+}
+
+.group:hover .group-hover\:text-brand {
+    color: var(--brand-main) !important;
+
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    background-clip: border-box !important;
+}
+
+.group:hover .group-hover\:text-brand-gradient {
+    background: var(--brand-gradient) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+
+.bg-brand-gradient {
+    background: var(--brand-gradient) !important;
+    color: white !important;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.bg-brand-gradient:hover {
+    filter: brightness(1.1);
+    transform: scale(1.05);
+}
+
+
+.bg-brand-gradient svg {
+    -webkit-text-fill-color: white !important;
+    color: white !important;
+    fill: white !important;
+}
+
+.shadow-brand-glow {
+    box-shadow: 0 0 15px var(--brand-main);
+}
+
+.is-premium .hover\:bg-brand:hover {
+    background: var(--brand-gradient) !important;
+    border: none !important;
+}
+
+.shadow-brand-soft {}
+
+.bg-brand-dim {
+    background-color: var(--brand-main);
+}
+
+.border-brand-dim {
+    border-color: var(--brand-main);
+}
+
+.hover\:border-brand:hover {
+    border-color: var(--brand-main) !important;
+}
+
+.is-premium .hover\:border-brand:hover {
+    border-color: var(--brand-main) !important;
+    box-shadow: 0 0 5px -2px var(--brand-main);
+}
+
+.hover\:text-brand:hover {
+    color: var(--brand-main) !important;
+}
+
+.hover\:text-brand:hover svg {
+    fill: var(--brand-main) !important;
+}
+
+.focus\:ring-brand:focus {
+    --tw-ring-color: var(--brand-main) !important;
+    ring-color: var(--brand-main) !important;
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow, 0 0 #0000), 0 0 0 2px var(--brand-main) !important;
+}
+
+.focus\:ring-brand\/50:focus {
+
+    --brand-half: color-mix(in srgb, var(--brand-main), transparent 50%);
+
+
+    --tw-ring-color: var(--brand-half) !important;
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow, 0 0 #0000), 0 0 0 2px var(--tw-ring-color) !important;
+
+
+    border-color: var(--brand-main) !important;
+}
+
+
+label .text-brand {
+    color: var(--brand-main) !important;
+}
+
+.focus\:border-brand:focus {
+    border-color: var(--brand-main) !important;
+
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-main), transparent 90%) !important;
+
+
+    outline: none;
+}
+
+.focus-within\:border-brand:focus-within {
+    border-color: var(--brand-main) !important;
+}
+
+
+.group:focus-within .group-focus-within\:text-brand {
+    color: var(--brand-main) !important;
+}
+
+.ring-brand\/5 {
+    --brand-soft: color-mix(in srgb, var(--brand-main), transparent 95%);
+    --tw-ring-color: var(--brand-soft) !important;
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow, 0 0 #0000), 0 0 0 4px var(--tw-ring-color) !important;
+}
+
+.is-premium .hover\:text-white:hover {
+    -webkit-text-fill-color: white !important;
+    color: white !important;
+    background-clip: border-box !important;
+    background: var(--brand-gradient) !important;
+}
+
+
+.focus-within\:border-brand\/50:focus-within {
+    border-color: color-mix(in srgb, var(--brand-main), transparent 50%) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand-main), transparent 90%);
+}
+
+.hover\:shadow-brand\/50:hover {
+    box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--brand-main), transparent 50%);
+}
+
+
+
+.bg-brand\/10 {
+    background-color: color-mix(in srgb, var(--brand-main), transparent 90%) !important;
+}
+
+.group:hover .group-hover\:bg-brand {
+    background: var(--brand-gradient) !important;
+    background-color: var(--brand-main) !important;
+}
+
+
+.group:hover .group-hover\:text-white {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
 }

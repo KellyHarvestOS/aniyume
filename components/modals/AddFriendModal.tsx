@@ -38,7 +38,7 @@ export default function AddFriendModal({ isOpen, onClose }: AddFriendModalProps)
                             <div className="flex justify-between items-start mb-8">
                                 <div>
                                     <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100 tracking-tight">
-                                        ДОБАВИТЬ <span className="text-[#21D0B8]">ДРУГА</span>
+                                        ДОБАВИТЬ <span className="text-brand">ДРУГА</span>
                                     </h2>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-2 uppercase tracking-widest">
                                         Поиск по уникальному ID
@@ -48,7 +48,7 @@ export default function AddFriendModal({ isOpen, onClose }: AddFriendModalProps)
                                 <button
                                     onClick={onClose}
                                     className="p-2 rounded-full bg-gray-100 dark:bg-white/5 
-                                               text-gray-500 hover:text-[#21D0B8] 
+                                               text-gray-500 hover:text-brand 
                                                transition-all duration-300 hover:rotate-90"
                                 >
                                     <IoClose size={24} />
@@ -59,9 +59,9 @@ export default function AddFriendModal({ isOpen, onClose }: AddFriendModalProps)
                                 <div className="group relative flex items-center bg-gray-50 dark:bg-[#0d0d0d] 
                                                 border border-gray-200 dark:border-gray-800 
                                                 rounded-2xl px-5 py-4 transition-all duration-300
-                                                focus-within:border-[#21D0B8]/50 focus-within:ring-4 ring-[#21D0B8]/5">
+                                                focus-within:border-brand focus-within:ring-4 ring-brand/5">
                                     <IoPersonAddSharp
-                                        className="text-gray-400 group-focus-within:text-[#21D0B8] transition-colors"
+                                        className="text-gray-400 group-focus-within:text-brand transition-colors"
                                         size={22}
                                     />
                                     <input
@@ -76,9 +76,9 @@ export default function AddFriendModal({ isOpen, onClose }: AddFriendModalProps)
                             </div>
 
                             <button className="relative w-full group overflow-hidden h-[60px] rounded-2xl 
-                                               bg-[#21D0B8] text-white font-bold text-lg
-                                               shadow-lg shadow-[#21D0B8]/20
-                                               hover:shadow-[#21D0B8]/40 transition-all duration-300
+                                               bg-brand text-white font-bold text-lg
+                                               shadow-lg shadow-brand/20
+                                               hover:shadow-brand/40 transition-all duration-300
                                                active:scale-[0.98]">
                                 <span className="relative z-10 flex items-center justify-center gap-2">
                                     Отправить запрос

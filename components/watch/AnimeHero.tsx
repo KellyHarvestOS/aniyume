@@ -49,7 +49,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
           border-radius: 4px;
         }
         .left-scrollbar::-webkit-scrollbar-thumb {
-          background-color: #2dd4bf;
+          background-color: var(--brand-main);
           border-radius: 4px;
         }
       `}} />
@@ -80,7 +80,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
               <li>• {anime.status}</li>
             </ul>
             <div className="flex items-center gap-1 ml-2">
-              <FaStar className="text-teal-400 text-sm" />
+              <FaStar className="text-brand text-sm" />
               <span className="ml-1 text-gray-800 dark:text-gray-200 font-semibold">
                 {anime.rating} ({anime.popularity ? `${(anime.popularity / 1000).toFixed(0)}K` : '0'})
               </span>
@@ -103,7 +103,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
           <div className="flex items-center gap-4 mb-8">
             <button
               onClick={() => document.getElementById('player')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-teal-400 hover:bg-teal-500 text-black dark:text-[#111111] text-lg font-bold py-3 px-8 rounded flex items-center gap-3 transition transform hover:scale-105 shadow-lg"
+              className="bg-brand hover:bg-brand-hover text-black dark:text-[#111111] text-lg font-bold py-3 px-8 rounded flex items-center gap-3 transition transform hover:scale-105 shadow-lg"
             >
               <FaPlay className="text-sm" /> СМОТРЕТЬ
             </button>
@@ -150,7 +150,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
               {isLongDescription && (
                 <button
                   onClick={handleToggleDescription}
-                  className="mt-2 text-teal-500 hover:text-teal-400 dark:text-teal-400 dark:hover:text-teal-300 text-xs font-bold uppercase tracking-wider transition-colors"
+                  className="mt-2 text-brand hover:text-brand-hover dark:text-brand dark:hover:text-brand-hover text-xs font-bold uppercase tracking-wider transition-colors"
                 >
                   {isExpanded ? 'Свернуть описание' : 'Читать далее...'}
                 </button>

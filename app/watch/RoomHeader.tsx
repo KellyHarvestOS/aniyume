@@ -42,7 +42,7 @@ export const RoomHeader = ({ roomId, onCopy, copied, onExit }: HeaderProps) => {
                     <span className="hidden md:inline text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-tighter">
                         Room:
                     </span>
-                    <span className="text-xs sm:text-sm font-mono font-bold text-[#21D0B8] tracking-wider tabular-nums">
+                    <span className="text-xs sm:text-sm font-mono font-bold text-brand tracking-wider tabular-nums">
                         {roomId}
                     </span>
                     <button

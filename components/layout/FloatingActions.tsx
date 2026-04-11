@@ -38,8 +38,8 @@ export default function FloatingActions() {
           className={`p-3 rounded-full shadow-lg transition-all duration-300 transform flex items-center justify-center
             bg-brand text-white 
             border-[3px] border-white 
-            ring-2 ring-[#2EC4B6]
-            hover:scale-110 hover:shadow-[#2EC4B6]/40 hover:shadow-xl
+            ring-2 ring-white dark:ring-black
+            hover:scale-110 hover:shadow-brand hover:shadow-xl
             dark:border-gray-700
             ${isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-0 pointer-events-none'}
           `}
@@ -52,8 +52,8 @@ export default function FloatingActions() {
           className={`p-3 rounded-full shadow-lg transition-all duration-300 transform flex items-center justify-center
             bg-brand text-white 
             border-[3px] border-white 
-            ring-2 ring-[#2EC4B6]
-            hover:scale-110 hover:shadow-[#2EC4B6]/40 hover:shadow-xl
+            ring-2 ring-white dark:ring-black
+            hover:scale-110 hover:shadow-brand hover:shadow-xl
             dark:border-gray-700
             ${isChatOpen ? 'rotate-10 shadow-inner' : ''} 
           `}

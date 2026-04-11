@@ -10,7 +10,7 @@ export function RoomInfo({ roomId }: { roomId: string }) {
                     КОМНАТА #{roomId}
                 </h2>
 
-                <p className="mt-4 block w-full text-lg font-bold text-[#2fd0c3]">
+                <p className="mt-4 block w-full text-lg font-bold text-brand ">
                     • Ожидание начала трансляции...
                 </p>
             </div>

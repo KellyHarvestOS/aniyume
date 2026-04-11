@@ -79,13 +79,13 @@ export default function RatingsPage() {
         <div className="max-w-[1920px] mx-auto px-6 h-20 flex items-center gap-6">
           <button
             onClick={() => router.back()}
-            className="w-10 h-10 flex items-center justify-center bg-black/5 dark:bg-white/5 hover:bg-[#2EC4B6] rounded-full transition-all group"
+            className="w-10 h-10 flex items-center justify-center bg-black/5 dark:bg-white/5 hover:bg-brand rounded-full transition-all group"
           >
             <FaChevronLeft className="group-hover:scale-110 transition-transform" />
           </button>
           <div>
             <h1 className="text-2xl font-black uppercase tracking-tighter italic">
-              Мои <span className="text-[#2EC4B6]">Оценки</span>
+              Мои <span className="text-brand w-[7rem]">Оценки</span>
             </h1>
             <p className="text-[9px] font-black text-black/40 dark:text-white/40 uppercase tracking-[0.4em]">
               Всего: {ratings.length} 
@@ -125,7 +125,7 @@ export default function RatingsPage() {
                   <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                     <Link
                       href={`/anime/${item.anime.id}`}
-                      className="w-12 h-12 flex items-center justify-center bg-[#2EC4B6] rounded-full text-white dark:text-black scale-0 group-hover:scale-100 transition-transform"
+                      className="w-12 h-12 flex items-center justify-center bg-brand rounded-full text-white dark:text-black scale-0 group-hover:scale-100 transition-transform"
                     >
                       <FaPlay size={16} className="ml-1" />
                     </Link>
@@ -138,7 +138,7 @@ export default function RatingsPage() {
                 </div>
 
                 <div className="p-3">
-                  <h3 className="text-[11px] font-black uppercase truncate mb-1 group-hover:text-[#2EC4B6] transition-colors">
+                  <h3 className="text-[11px] font-black uppercase truncate mb-1 group-hover:text-brand transition-colors">
                     {item.anime.title}
                   </h3>
                   <div className="flex justify-between">
@@ -147,7 +147,7 @@ export default function RatingsPage() {
                     </span>
                     <Link
                       href={`/anime/${item.anime.id}#player`}
-                      className="text-[8px] font-black text-[#2EC4B6] uppercase hover:underline"
+                      className="text-[8px] font-black text-brand uppercase hover:underline"
                     >
                       Редактировать
                     </Link>

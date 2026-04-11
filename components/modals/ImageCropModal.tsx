@@ -104,7 +104,7 @@ export default function ImageCropModal({ image, onCropComplete, onClose }: Image
                     <div className="space-y-3">
                         <div className="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-tighter">
                             <span>Масштаб</span>
-                            <span className="text-[#2EC4B6]">{Math.round(zoom * 100)}%</span>
+                            <span className="text-brand">{Math.round(zoom * 100)}%</span>
                         </div>
                         <input
                             type="range"
@@ -114,14 +114,14 @@ export default function ImageCropModal({ image, onCropComplete, onClose }: Image
                             step={0.1}
                             aria-labelledby="Zoom"
                             onChange={(e) => onZoomChange(Number(e.target.value))}
-                            className="w-full h-1.5 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#2EC4B6]"
+                            className="w-full h-1.5 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-brand"
                         />
                     </div>
 
                     <div className="flex gap-3">
                         <button
                             onClick={getCroppedImg}
-                            className="flex-1 py-3 bg-[#2EC4B6] text-white dark:text-black font-black uppercase text-xs tracking-widest rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                            className="flex-1 py-3 bg-brand text-white dark:text-black font-black uppercase text-xs tracking-widest rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                         >
                             <FaCheck /> Применить
                         </button>

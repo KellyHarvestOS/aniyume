@@ -32,7 +32,7 @@ const TickerCard = ({ anime }: { anime: AnimeItem }) => (
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
         <div className="absolute bottom-5 left-6 right-6 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-          <h3 className="text-white font-black text-xs md:text-sm uppercase tracking-tight line-clamp-1 group-hover:text-[#39bcba]">
+          <h3 className="text-white font-black text-xs md:text-sm uppercase tracking-tight line-clamp-1 group-hover:text-brand">
             {anime.title}
           </h3>
         </div>

@@ -126,9 +126,9 @@ export default function SearchBar() {
   return (
     <div className="relative w-full max-w-md " ref={searchRef}>
       <form onSubmit={handleSearchSubmit} className="relative">
-        <button 
-          type="submit" 
-          className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 hover:text-[#39bcba] transition-colors"
+        <button
+          type="submit"
+          className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 hover:text-brand transition-colors"
         >
           <FaSearch />
         </button>
@@ -140,12 +140,12 @@ export default function SearchBar() {
           maxLength={60}
           onChange={(e) => setQuery(e.target.value.slice(0, 60))}
           onFocus={() => query.trim().length >= 1 && setIsOpen(true)}
-          className="block w-full rounded-xl border-none bg-gray-100 dark:bg-[#2f2f2f] py-2.5 pl-10 pr-10 text-sm text-gray-900 dark:text-gray-50 transition-all duration-200 placeholder:text-gray-500 focus:bg-white dark:focus:bg-[#262626] focus:ring-2 focus:ring-[#39bcba] focus:outline-none shadow-sm"
+          className="block w-full rounded-xl border-none bg-gray-100 dark:bg-[#2f2f2f] py-2.5 pl-10 pr-10 text-sm text-gray-900 dark:text-gray-50 transition-all duration-200 placeholder:text-gray-500 focus:bg-white dark:focus:bg-[#262626] focus:ring-2 focus:ring-brand focus:outline-none shadow-sm"
         />
 
         {isLoading && (
           <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-            <ImSpinner9 className="animate-spin text-[#39bcba]" />
+            <ImSpinner9 className="animate-spin text-brand" />
           </div>
         )}
       </form>
@@ -169,7 +169,7 @@ export default function SearchBar() {
                       />
                     </div>
                     <div className="flex flex-col flex-1 min-w-0">
-                      <span className="font-semibold text-gray-800 dark:text-gray-100 text-sm truncate group-hover:text-[#39bcba] transition-colors">
+                      <span className="font-semibold text-gray-800 dark:text-gray-100 text-sm truncate group-hover:text-brand transition-colors">
                         {item.title}
                       </span>
                       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -182,7 +182,7 @@ export default function SearchBar() {
                 </li>
               ))}
               <li className="p-2 bg-gray-50 dark:bg-gray-800/50">
-                <button 
+                <button
                   onClick={() => handleSearchSubmit()}
                   className="w-full py-2 text-xs font-medium text-[#39bcba] hover:underline"
                 >

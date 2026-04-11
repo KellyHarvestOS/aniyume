@@ -64,7 +64,7 @@ export default function PopularPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`pb-4 text-sm font-bold uppercase tracking-wide whitespace-nowrap border-b-2 transition-colors duration-300 ${activeTab === tab.id
-                  ? 'border-[#21D0B8] text-brand'
+                  ? 'border-[#899896] text-brand'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
               >
@@ -97,7 +97,7 @@ export default function PopularPage() {
                 <Link
                   href={`/anime/${anime.id}`}
                   key={anime.id}
-                  className="group flex flex-col md:flex-row items-start md:items-center p-6 gap-6 hover:bg-[#21D0B8]/5 dark:hover:bg-[#21D0B8]/10 transition-colors relative"
+                  className="group flex flex-col md:flex-row items-start md:items-center p-6 gap-6 hover:bg-[#101]/1 dark:hover:bg-[#101]/5 transition-colors relative"
                 >
                   <div className={`hidden md:flex shrink-0 w-12 text-3xl font-black italic ${index < 3 ? 'text-brand' : 'text-gray-300 dark:text-gray-600'
                     }`}>
@@ -116,7 +116,7 @@ export default function PopularPage() {
 
                   <div className="flex-1 min-w-0 flex flex-col gap-2">
                     <div className="flex justify-between items-start">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-200 group-hover:text-[#21D0B8] transition-colors line-clamp-1">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-200 group-hover:text-brand-gradient transition-all duration-300 line-clamp-1">
                         {anime.title}
                       </h3>
 
@@ -142,8 +142,8 @@ export default function PopularPage() {
                   </div>
 
                   <div className="hidden md:flex shrink-0 self-center">
-                    <button className="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-300 flex items-center justify-center group-hover:bg-[#21D0B8] group-hover:border-[#21D0B8] group-hover:text-white transition-all">
-                      <FaPlay className="pl-1" />
+                    <button className="flex items-center justify-center w-12 h-12 rounded-full text-white bg-brand shadow-lg hover:scale-110 transition-transform">
+                      <FaPlay className="ml-1" />
                     </button>
                   </div>
                 </Link>

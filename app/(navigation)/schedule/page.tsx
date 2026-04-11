@@ -77,9 +77,10 @@ export default function SchedulePage() {
             <button
               key={index}
               onClick={() => scrollToDay(index)}
-              className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 relative group ${isToday
-                  ? 'bg-brand text-white shadow-[0_0_15px_#21D0B8] scale-110'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 hover:bg-[#21D0B8] hover:text-white'
+              className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 relative group 
+    ${isToday
+                  ? 'bg-brand text-white shadow-brand-glow scale-110'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 hover:bg-brand hover:text-white'
                 }`}
             >
               {day.short}
@@ -87,7 +88,7 @@ export default function SchedulePage() {
                 {day.full}
               </span>
               {isToday && (
-                <span className="absolute inset-0 rounded-full bg-[#21D0B8] animate-ping opacity-30"></span>
+                <span className="absolute inset-0 rounded-full bg-brand animate-ping opacity-30"></span>
               )}
             </button>
           );
@@ -95,9 +96,9 @@ export default function SchedulePage() {
       </div>
 
       <div className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-10 backdrop-blur-xl">
-        <div className="container mx-auto px-6 pt-8">
+        <div className="w-full px-6 pt-8">
           <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
-            Расписание <span className="text-[#2ebaba]">новых серий</span>
+            Расписание <span className="text-brand w-[20rem]">новых серий</span>
           </h1>
         </div>
       </div>
@@ -128,12 +129,12 @@ export default function SchedulePage() {
                 key={index}
                 id={`day-${index}`}
                 className={`rounded-3xl transition-all duration-500 ${isToday
-                    ? 'bg-white dark:bg-[#0d0d0d] p-8 shadow-[0_10px_40px_-10px_rgba(33,208,184,0.15)] border border-[#21D0B8]/40 relative overflow-hidden'
-                    : 'p-2'
+                  ? 'bg-white dark:bg-[#0d0d0d] p-8 shadow-brand-soft border border-brand-dim relative overflow-hidden'
+                  : 'p-2'
                   }`}
               >
                 {isToday && (
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#21D0B8]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+                  <div className="absolute top-0 right-0 w-64 h-64  rounded-full blur-3xl  -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
                 )}
 
                 <div className="flex items-center gap-4 mb-8 relative z-10">
@@ -142,7 +143,7 @@ export default function SchedulePage() {
                     {day.full}
                   </h2>
                   {isToday && (
-                    <span className="bg-[#21D0B8] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg shadow-[#21D0B8]/40 animate-pulse">
+                    <span className="bg-brand text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg shadow-brand/40 animate-pulse">
                       Сегодня выходит
                     </span>
                   )}
@@ -161,26 +162,27 @@ export default function SchedulePage() {
                           src={anime.poster_url || '/placeholder.jpg'}
                           alt={anime.title}
                           fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+                          className="object-cover transform-gpu will-change-transform transition-transform duration-500 group-hover:scale-[1.05]"
                           unoptimized
                         />
                         <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-lg">
                           {anime.id % 24 + 1} серия
                         </div>
+
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                          <div className="w-12 h-12 bg-[#21D0B8] rounded-full flex items-center justify-center text-white shadow-lg transform scale-50 group-hover:scale-100 transition-all duration-300">
+                          <div className="w-12 h-12 bg-brand rounded-full flex items-center justify-center text-white shadow-lg transform scale-50 group-hover:scale-100 transition-all duration-300">
                             <FaPlay className="ml-1" size={14} />
                           </div>
                         </div>
                       </div>
 
                       <div>
-                        <h3 className="font-bold text-gray-800 dark:text-gray-200 text-sm line-clamp-1 group-hover:text-[#21D0B8] transition-colors">
+                        <h3 className="font-bold text-gray-800 dark:text-gray-200 text-sm line-clamp-1 group-hover:text-brand-gradient transition-colors">
                           {anime.title}
                         </h3>
-                        <div className="flex items-center text-xs text-gray-400 mt-1 gap-1">
-                          <span>Новая серия</span>
-                          <FaChevronRight size={10} className="text-[#21D0B8]" />
+                        <div className="flex items-center justify-between text-xs text-gray-400 mt-1">
+                          <span className="whitespace-nowrap">Новая серия</span>
+                          <FaChevronRight size={10} className="icon-brand shrink-0" />
                         </div>
                       </div>
                     </Link>

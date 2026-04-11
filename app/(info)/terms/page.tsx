@@ -17,7 +17,7 @@ export const metadata = {
 export default function TermsPage() {
   return (
     <div className="min-h-screen w-full bg-white dark:bg-[#111111] text-gray-900 dark:text-gray-200 flex flex-col items-center justify-center py-12 px-4 overflow-hidden relative transition-colors">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-[#21D0B8] rounded-full blur-[130px] opacity-[0.04] dark:opacity-[0.07] -z-10 pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-brand rounded-full blur-[130px] opacity-[0.04] dark:opacity-[0.07] -z-10 pointer-events-none" />
 
       <div className="max-w-[1400px] w-full grid grid-cols-1 lg:grid-cols-3 gap-10 items-center relative z-10">
         <div className="space-y-8 order-2 lg:order-1">
@@ -43,7 +43,7 @@ export default function TermsPage() {
 
         <div className="flex flex-col items-center text-center order-1 lg:order-2 mb-10 lg:mb-0">
           <div className="relative w-[300px] h-[300px] md:w-[380px] md:h-[380px] animate-float">
-            <div className="absolute inset-0 bg-linear-to-t from-[#21D0B8]/10 to-transparent rounded-full blur-3xl transform scale-90 translate-y-6" />
+            <div className="absolute inset-0 bg-gray-100/10 to-transparent rounded-full blur-3xl transform scale-90 translate-y-6" />
             <Image
               src="/images/p44.png"
               alt="Terms Mascot"
@@ -72,7 +72,7 @@ export default function TermsPage() {
             <p>
               Администрация не несет ответственности за содержание
               видеоматериалов. Сайт предоставляется по принципу{' '}
-              <span className="text-[#21D0B8] font-semibold">«как есть»</span>{' '}
+              <span className="text-brand font-semibold">«как есть»</span>{' '}
               (AS IS). Мы не гарантируем аптайм 100%.
             </p>
           </TermCard>
@@ -105,7 +105,7 @@ function TermCard({ icon, title, children, align }: TermCardProps) {
       className={`
         relative bg-white dark:bg-[#161616] border border-gray-100 dark:border-gray-800
         p-8 md:p-10
-        rounded-3xl shadow-sm hover:shadow-2xl hover:border-[#21D0B8]/30 transition-all duration-300 group
+        rounded-3xl shadow-sm hover:shadow-2xl hover:border-brand/30 transition-all duration-300 group
         flex flex-col gap-5
         lg:items-${isRightAligned ? 'end' : 'start'}
         lg:text-${isRightAligned ? 'right' : 'left'}
@@ -113,12 +113,13 @@ function TermCard({ icon, title, children, align }: TermCardProps) {
       `}
     >
       <div
-        className={`flex items-center gap-4 ${
-          isRightAligned ? 'lg:flex-row-reverse' : 'lg:flex-row'
-        } flex-row`}
+        className={`flex items-center gap-4 ${isRightAligned ? 'lg:flex-row-reverse' : 'lg:flex-row'
+          } flex-row`}
       >
-        <div className="p-4 rounded-2xl bg-[#21D0B8]/10 text-[#21D0B8] group-hover:bg-[#21D0B8] group-hover:text-white transition-colors duration-300 shadow-sm">
-          <span className="text-2xl">{icon}</span>
+        <div className="p-4 rounded-2xl group-hover:bg-brand group-hover:text-white! transition-colors duration-300 shadow-sm flex items-center justify-center">
+          <span className="text-2xl flex items-center justify-center">
+            {icon}
+          </span>
         </div>
         <h3 className="font-bold text-xl text-gray-900 dark:text-gray-200">
           {title}

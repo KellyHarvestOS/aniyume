@@ -47,7 +47,7 @@ export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: Lob
                     </div>
                     <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white leading-[1.1] mb-6 uppercase tracking-tighter">
                         Смотрите <br />
-                        <span className="text-transparent bg-clip-text bg-linear-to-r from-[#21cdd0] to-[#10a8a0]">
+                        <span className=" text-brand">
                             вместе
                         </span>
                     </h1>
@@ -73,7 +73,7 @@ export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: Lob
                             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 px-1">Начать сессию</p>
                             <button
                                 onClick={onCreate}
-                                className="group relative w-full flex items-center justify-between gap-3 bg-[#21D0B8] hover:bg-[#1bb8a3] text-white py-5 px-8 rounded-2xl font-bold transition-all"
+                                className="group relative w-full flex items-center justify-between gap-3 bg-brand hover:bg-brand/90 text-white py-5 px-8 rounded-2xl font-bold transition-all"
                             >
                                 <span className="flex items-center gap-3">
                                     <FaPlus className="text-lg" />
@@ -98,7 +98,7 @@ export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: Lob
                             <div className="space-y-3">
                                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 px-1">Уже есть код?</p>
                                 <div className="relative group">
-                                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#21D0B8] transition-colors">
+                                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand transition-colors">
                                         <FaHashtag />
                                     </div>
                                     <input
@@ -106,14 +106,14 @@ export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: Lob
                                         placeholder="Введите код комнаты..."
                                         value={inputCode}
                                         onChange={(e) => setInputCode(e.target.value)}
-                                        className="w-full bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-5 pl-12 pr-4 text-gray-900 dark:text-white focus:border-[#21D0B8] focus:ring-4 focus:ring-[#21D0B8]/10 outline-none transition-all placeholder:text-gray-500"
+                                        className="w-full bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-5 pl-12 pr-4 text-gray-900 dark:text-white focus:border-brand focus:ring-4 focus:ring-brand/10 outline-none transition-all placeholder:text-gray-500"
                                     />
                                 </div>
                             </div>
 
                             <button
                                 type="submit"
-                                className="w-full py-5 border-2 border-gray-200 dark:border-white/10 hover:border-[#21D0B8] hover:bg-[#21D0B8]/5 text-gray-700 dark:text-gray-300 hover:text-[#21D0B8] rounded-2xl font-bold transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+                                className="w-full py-5 border-2 border-gray-200 dark:border-white/10 hover:border-brand hover:bg-brand/5 text-gray-700 dark:text-gray-300 hover:text-brand rounded-2xl font-bold transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
                             >
                                 <FaDoorOpen className="text-lg" />
                                 Войти по коду
