@@ -3,27 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  BiWifi,
-  BiMobile,
-  BiHdd,
-  BiDownload,
-  BiWorld,
-  BiCalendar,
-  BiUser,
-  BiLock,
-  BiCaptions,
-  BiTv,
-  BiTrash,
-  BiShield,
-  BiLogoChrome,
-  BiUserVoice,
-  BiGlobe,
-  BiBug,
-  BiPlay,
-  BiRename,
-  BiMessageRounded,
-  BiPlus,
-  BiMinus
+  BiWifi, BiMobile, BiHdd, BiDownload, BiWorld, BiCalendar,
+  BiUser, BiLock, BiCaptions, BiTv, BiTrash, BiShield,
+  BiLogoChrome, BiGlobe, BiBug, BiPlay, BiRename,
+  BiMessageRounded, BiPlus, BiMinus
 } from 'react-icons/bi';
 import { FaWandMagicSparkles } from "react-icons/fa6";
 
@@ -35,15 +18,15 @@ export default function FAQPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#F9FAFB] dark:bg-[#111111] text-gray-900 dark:text-gray-200 pt-10 pb-20 px-4 relative overflow-hidden transition-colors">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-brand rounded-full blur-[160px] opacity-[0.04] dark:opacity-[0.07] pointer-events-none" />
+    <div className="min-h-screen w-full bg-slate-50 dark:bg-[#111111] text-gray-900 dark:text-gray-200 pt-10 pb-20 px-4 relative overflow-hidden transition-colors">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px]  rounded-full blur-[160px] pointer-events-none" />
 
-      <h1 className="text-4xl md:text-6xl text-center mb-6 relative z-10 font-extrabold tracking-tight text-gray-900 dark:text-gray-200">
-        Центр <span className="text-brand">Поддержки</span>
+      <h1 className="text-4xl md:text-6xl text-center mb-6 relative z-10 font-black uppercase italic tracking-tighter text-gray-900 dark:text-white">
+        Центр <span className="text-brand w-[30rem]">Поддержки</span>
       </h1>
 
-      <p className="text-gray-500 dark:text-gray-400 text-lg md:text-xl font-medium max-w-2xl mx-auto mb-10 text-center">
-        Мы подготовили ответы на самые популярные вопросы, чтобы помочь вам разобраться с функционалом платформы.
+      <p className="text-gray-500 dark:text-gray-400 text-lg md:text-xl font-medium max-w-2xl mx-auto mb-16 text-center italic">
+        Мы подготовили ответы на самые популярные вопросы, чтобы помочь вам разобраться с функционалом AniYume.
       </p>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-6 relative z-10">
@@ -52,70 +35,72 @@ export default function FAQPage() {
             key={index}
             onClick={() => toggleQuestion(index)}
             className={`
-              group rounded-2xl overflow-hidden cursor-pointer transition-all duration-300
-              bg-white dark:bg-[#161616] border
+              group rounded-[1rem] overflow-hidden cursor-pointer transition-all duration-500
+              bg-white dark:bg-[#161616] border shadow-sm
               ${openIndex === index
-                ? 'border-[#21D0B8] shadow-[0_8px_30px_rgba(33,208,184,0.18)] ring-1 ring-[#21D0B8]'
-                : 'border-gray-100 dark:border-gray-800 hover:border-[#21D0B8]/40 shadow-sm hover:shadow-md'
+                ? 'border-brand-simple shadow-brand-soft ring-4 ring-brand/5'
+                : 'border-gray-100 dark:border-white/5 hover:border-brand-dim hover:shadow-md'
               }
             `}
           >
-            <div className="p-6 flex items-start gap-5">
+            <div className="p-6 md:p-8 flex items-start gap-6">
               <div
                 className={`
-                  mt-1 p-3.5 rounded-xl transition-colors duration-300 shrink-0
+                  p-4 rounded-2xl transition-all duration-500 shrink-0 flex items-center justify-center
                   ${openIndex === index
-                    ? 'bg-[#21D0B8] text-white'
-                    : 'bg-gray-50 dark:bg-[#1a1a1a] text-[#21D0B8] group-hover:bg-[#21D0B8]/10'
+                    ? 'bg-brand text-white'
+                    : 'bg-brand text-white group-hover:bg-brand group-hover:text-white'
                   }
                 `}
               >
-                <span className="text-xl">{item.icon}</span>
+                <span className="text-2xl flex items-center justify-center">
+                  {item.icon}
+                </span>
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 pt-1">
                 <div className="flex justify-between items-center w-full">
-                  <h3 className="text-lg font-bold pr-4 text-gray-800 dark:text-gray-200">
+                  <h3 className={`text-lg font-black uppercase italic tracking-tight transition-colors duration-300 ${openIndex === index ? 'text-brand' : 'text-gray-800 dark:text-gray-200 group-hover:text-brand'
+                    }`}>
                     {item.question}
                   </h3>
-                  <span
-                    className={`transition-transform duration-300 ${openIndex === index
-                        ? 'rotate-180 text-brand'
-                        : 'text-gray-300 dark:text-gray-600'
+                  <div
+                    className={`shrink-0 ml-4 w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-500 ${openIndex === index
+                      ? 'bg-brand text-white border-transparent rotate-180'
+                      : 'border-gray-200 dark:border-white/10 text-gray-400'
                       }`}
                   >
-                    {openIndex === index ? <BiMinus size={14} /> : <BiPlus size={14} />}
-                  </span>
+                    {openIndex === index ? <BiMinus size={16} /> : <BiPlus size={16} />}
+                  </div>
                 </div>
 
                 <div
-                  className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${openIndex === index
-                      ? 'grid-rows-[1fr] opacity-100 mt-3'
-                      : 'grid-rows-[0fr] opacity-0 mt-0'
+                  className={`grid transition-all duration-500 ease-in-out ${openIndex === index
+                    ? 'grid-rows-[1fr] opacity-100 mt-5'
+                    : 'grid-rows-[0fr] opacity-0 mt-0'
                     }`}
                 >
                   <div className="overflow-hidden">
-                    <p className="text-gray-500 dark:text-gray-400 text-base leading-relaxed font-medium">
+                    <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base leading-relaxed font-bold border-l-4 border-brand-dim pl-4 py-1">
                       {item.answer}
                     </p>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="mt-24 text-center">
-        <p className="text-gray-400 dark:text-gray-500 font-medium mb-4">
+      <div className="mt-24 text-center relative z-10 hover^text-white!">
+        <p className="text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest text-xs mb-6">
           Не нашли нужный ответ?
         </p>
         <Link
           href="https://t.me/kellyharvest"
-          className="inline-flex items-center gap-2 text-[#21D0B8] font-bold hover:text-[#1aa895] text-lg transition-colors bg-[#21D0B8]/5 px-6 py-2 rounded-full hover:bg-[#21D0B8]/10"
+          className="inline-flex items-center gap-3 text-brand font-black uppercase italic tracking-widest text-lg transition-all bg-brand/5 px-10 py-5 rounded-2xl border border-brand-dim hover:bg-brand hover:text-white shadow-lg hover:shadow-brand/30 active:scale-95"
         >
-          <BiMessageRounded /> Написать в поддержку
+          Написать в поддержку
         </Link>
       </div>
     </div>
@@ -126,19 +111,13 @@ const faqData = [
   { icon: <BiWifi />, question: "Видео постоянно тормозит, что делать?", answer: "Попробуйте снизить качество видео или проверить интернет-соединение." },
   { icon: <BiMobile />, question: "Есть ли мобильное приложение?", answer: "Можно установить сайт как PWA через браузер." },
   { icon: <BiHdd />, question: "Как включить 1080p или 4K?", answer: "Выберите максимальное доступное качество в настройках плеера." },
-  { icon: <BiDownload />, question: "Можно ли скачивать серии?", answer: "Скачивание недоступно из-за ограничений правообладателей." },
-  { icon: <BiWorld />, question: "Как сменить озвучку?", answer: "Используйте выпадающий список «Озвучка» в плеере." },
-  { icon: <BiCalendar />, question: "Когда выходят новые серии?", answer: "Обычно через 30–60 минут после релиза." },
+  { icon: <BiCalendar />, question: "Когда выходят новые серии?", answer: "Обычно через 1-2 дня после релиза." },
   { icon: <BiUser />, question: "Как синхронизировать просмотр?", answer: "Войдите в аккаунт — данные синхронизируются автоматически." },
   { icon: <BiLock />, question: "Забыл пароль, что делать?", answer: "Напишите в поддержку для сброса доступа." },
   { icon: <BiCaptions />, question: "Есть ли субтитры?", answer: "Да, у большинства популярных тайтлов." },
   { icon: <BiTrash />, question: "Как удалить аккаунт?", answer: "Удаление доступно в настройках профиля." },
   { icon: <FaWandMagicSparkles />, question: "Как работает умный поиск?", answer: "Поиск учитывает альтернативные названия." },
-  { icon: <BiShield />, question: "Это легально?", answer: "Сайт не хранит видео и использует открытые источники." },
   { icon: <BiLogoChrome />, question: "Какой браузер лучше?", answer: "Chrome, Firefox или Safari последних версий." },
-  { icon: <BiGlobe />, question: "Нужен ли VPN?", answer: "Обычно нет, но иногда помогает." },
   { icon: <BiBug />, question: "Нашел баг, куда писать?", answer: "Напишите в поддержку с описанием проблемы." },
   { icon: <BiPlay />, question: "Файл не найден в плеере", answer: "Попробуйте выбрать другую озвучку." },
-  { icon: <BiRename />, question: "Можно ли сменить ник?", answer: "Пока недоступно напрямую." },
-  { icon: <BiMessageRounded />, question: "Как предложить идею?", answer: "Напишите нам в Telegram или Discord." }
 ];

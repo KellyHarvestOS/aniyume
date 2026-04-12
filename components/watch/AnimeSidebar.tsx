@@ -40,7 +40,7 @@ export default function AnimeSidebar({ recommendations }: AnimeSidebarProps) {
               </div>
 
               <div className="flex flex-col justify-center min-w-0">
-                <h4 className="font-medium text-sm text-gray-800 dark:text-gray-200 group-hover:text-teal-400 transition line-clamp-2 leading-tight">
+                <h4 className="font-medium text-sm text-gray-800 dark:text-gray-200 group-hover:text-brand transition line-clamp-2 leading-tight">
                   {item.title}
                 </h4>
 

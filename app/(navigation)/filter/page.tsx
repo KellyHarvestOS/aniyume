@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FaArrowLeft, FaChevronDown, FaCheck } from 'react-icons/fa';
+import { FaChevronDown, FaCheck } from 'react-icons/fa';
 
 interface Genre { id: number; name: string; slug: string; }
 
@@ -39,12 +39,12 @@ const CustomSelect: React.FC<FilterSelectProps> = ({ label, value, onChange, opt
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center justify-between w-full h-12 px-4 rounded-2xl border-2 transition-all duration-200 text-sm font-medium
           ${isOpen
-            ? 'border-[#21D0B8] bg-white dark:bg-[#1a1a1a] ring-4 ring-[#21D0B8]/10'
+            ? 'border-brand-simple bg-white dark:bg-[#1a1a1a] ring-4 ring-brand/10'
             : 'border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-[#161616] hover:border-gray-200 dark:hover:border-white/10'
           } text-gray-700 dark:text-gray-200`}
       >
         <span className="truncate">{selectedLabel}</span>
-        <FaChevronDown className={`w-3 h-3 transition-transform duration-300 ${isOpen ? 'rotate-180 text-[#21D0B8]' : 'text-gray-400'}`} />
+        <FaChevronDown className={`w-3 h-3 transition-transform duration-300 ${isOpen ? 'rotate-180 text-brand' : 'text-gray-400'}`} />
       </button>
 
       {isOpen && (
@@ -53,20 +53,20 @@ const CustomSelect: React.FC<FilterSelectProps> = ({ label, value, onChange, opt
             <button
               onClick={() => { onChange(''); setIsOpen(false); }}
               className={`flex items-center justify-between w-full px-4 py-3 text-sm transition-colors
-                ${value === '' ? 'text-[#21D0B8] bg-[#21D0B8]/5 font-bold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'}`}
+                ${value === '' ? 'text-brand bg-brand/5 font-bold' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5'}`}
             >
               Не важно
-              {value === '' && <FaCheck className="w-3 h-3" />}
+              {value === '' && <FaCheck className="w-3 h-3 icon-brand" />}
             </button>
             {options.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => { onChange(opt.value); setIsOpen(false); }}
                 className={`flex items-center justify-between w-full px-4 py-3 text-sm transition-colors
-                  ${value === opt.value ? 'text-[#21D0B8] bg-[#21D0B8]/5 font-bold' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5'}`}
+                  ${value === opt.value ? 'text-brand bg-brand/5 font-bold' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5'}`}
               >
                 <span className="truncate">{opt.label}</span>
-                {value === opt.value && <FaCheck className="w-3 h-3" />}
+                {value === opt.value && <FaCheck className="w-3 h-3 icon-brand" />}
               </button>
             ))}
           </div>
@@ -75,8 +75,8 @@ const CustomSelect: React.FC<FilterSelectProps> = ({ label, value, onChange, opt
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #444; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--brand-main); border-radius: 10px; opacity: 0.3; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--brand-main); }
       `}</style>
     </div>
   );
@@ -126,7 +126,6 @@ function FilterPageContent() {
 
   const years = Array.from({ length: 46 }, (_, i) => ({ value: String(2025 - i), label: String(2025 - i) }));
 
-
   const handleChange = (key: string, val: string) => setFilters(p => ({ ...p, [key]: val }));
 
   const handleApply = () => {
@@ -140,7 +139,7 @@ function FilterPageContent() {
       <header className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-40 backdrop-blur-xl">
         <div className="container mx-auto px-6 pt-8">
           <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
-            Настройка <span className="text-[#2ebaba]">Фильтров</span>
+            Настройка <span className="text-brand w-[20rem]">Фильтров</span>
           </h1>
         </div>
       </header>
@@ -155,8 +154,18 @@ function FilterPageContent() {
         </div>
 
         <div className="mt-16 flex flex-col sm:flex-row gap-4 items-center justify-center pt-10 border-t border-gray-100 dark:border-white/5">
-          <button onClick={() => setFilters({ genre: '', translator: '', year: '', season: '', status: '', type: '', sort: 'newest', ageRating: '', country: '' })} className="w-full sm:w-auto px-10 h-14 rounded-2xl text-sm font-bold text-gray-400 hover:text-red-500 transition-colors">Сбросить всё</button>
-          <button onClick={handleApply} className="w-full sm:w-auto px-16 h-14 rounded-2xl bg-brand text-white font-bold shadow-2xl shadow-[#21D0B8]/30 hover:scale-[1.02] active:scale-95 transition-all">Применить фильтры</button>
+          <button
+            onClick={() => setFilters({ genre: '', translator: '', year: '', season: '', status: '', type: '', sort: 'newest', ageRating: '', country: '' })}
+            className="w-full sm:w-auto px-10 h-14 rounded-2xl text-sm font-bold text-gray-400 hover:text-red-500 transition-colors"
+          >
+            Сбросить всё
+          </button>
+          <button
+            onClick={handleApply}
+            className="w-full sm:w-auto px-16 h-14 rounded-2xl bg-brand text-white font-bold shadow-2xl shadow-brand/30 hover:scale-[1.02] active:scale-95 transition-all"
+          >
+            Применить фильтры
+          </button>
         </div>
       </main>
     </div>

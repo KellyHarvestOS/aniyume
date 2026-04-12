@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -130,7 +130,7 @@ export default function BookmarksPage() {
       <div className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-40 backdrop-blur-xl">
         <div className="container mx-auto px-6 pt-8">
           <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
-            Мои <span className="text-[#2ebaba]">Списки</span>
+            Мои <span className="text-brand w-[10rem]">Списки</span>
           </h1>
 
           <div className="flex gap-6 overflow-x-auto no-scrollbar">
@@ -139,13 +139,13 @@ export default function BookmarksPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`pb-4 text-xs font-black uppercase tracking-[0.2em] whitespace-nowrap border-b-2 transition-all flex items-center gap-2 ${activeTab === tab.id
-                    ? "border-[#21D0B8] text-[#21D0B8]"
-                    : "border-transparent text-gray-400 dark:text-white/40 hover:text-gray-900 dark:hover:text-white"
+                  ? "border-[#939393] text-brand"
+                  : "border-transparent text-gray-400 dark:text-white/40 hover:text-gray-900 dark:hover:text-white"
                   }`}
               >
-                {tab.icon}
+                <span className={activeTab === tab.id ? "icon-brand" : ""}>{tab.icon}</span>
                 {tab.label}
-                <span className="text-[10px] opacity-40">
+                <span className="text-[10px] opacity-40 text-brand">
                   {allLists[tab.id]?.length || 0}
                 </span>
               </button>
@@ -167,7 +167,7 @@ export default function BookmarksPage() {
             {currentItems.map((anime) => (
               <div
                 key={`${activeTab}-${anime.id}`}
-                className="group relative bg-gray-50 dark:bg-[#121212] rounded-xl overflow-hidden border border-gray-200 dark:border-white/5 hover:border-[#21D0B8]/50 transition-all shadow-sm"
+                className="group relative bg-gray-50 dark:bg-[#121212] rounded-xl overflow-hidden border border-gray-200 dark:border-white/5 hover:border-brand-dim transition-all shadow-sm"
               >
                 <div className="relative aspect-2/3 overflow-hidden">
                   <Link href={`/anime/${anime.id}`}>
@@ -196,7 +196,7 @@ export default function BookmarksPage() {
                 </div>
 
                 <div className="p-4">
-                  <h3 className="font-black text-[11px] leading-tight uppercase tracking-tight line-clamp-2 text-gray-800 dark:text-gray-200 group-hover:text-[#21D0B8] transition-colors">
+                  <h3 className="font-black text-[11px] leading-tight uppercase tracking-tight line-clamp-2 text-gray-800 dark:text-gray-200 group-hover:text-brand transition-colors">
                     {anime.title_russian || anime.title}
                   </h3>
                 </div>

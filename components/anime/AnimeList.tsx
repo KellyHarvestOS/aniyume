@@ -98,7 +98,7 @@ const AnimeList = ({ title }: { title: string }) => {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 justify-items-center">
         {loading
           ? Array.from({ length: 10 }).map((_, i) => <AnimeCardSkeleton key={i} />)
-          : data.map(item => <AnimeCard key={item.id} {...item} />)
+          : Array.isArray(data) ? data.map(item => <AnimeCard key={item.id} {...item} />) : null
         }
       </div>
 

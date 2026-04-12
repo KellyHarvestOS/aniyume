@@ -7,7 +7,6 @@ import { usePathname } from 'next/navigation';
 import { FaUserPlus, FaUserCircle } from 'react-icons/fa';
 import { HiAdjustmentsHorizontal, HiMiniBookmark } from "react-icons/hi2";
 import { CgMenuRightAlt, CgMenuRight } from "react-icons/cg";
-
 import { IoCalendarNumberSharp } from "react-icons/io5";
 import { FaRankingStar } from "react-icons/fa6";
 import ThemeToggle from './ThemeToggle';
@@ -18,6 +17,54 @@ export default function Header() {
   const pathname = usePathname();
   const { user, isLoading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Динамические пути логотипа (с поддержкой premium-тем)
+  const [logoPaths, setLogoPaths] = useState({
+    light: '/images/logo0.png',
+    dark: '/images/logo01.png'
+  });
+
+  useEffect(() => {
+    const applyTheme = () => {
+      const isPremium = localStorage.getItem("isPremium") === "true";
+      const themeType = localStorage.getItem("profile_theme_type");
+      const themeValue = localStorage.getItem("profile_theme_value");
+      const savedLogoKey = localStorage.getItem("profile_logo_key");
+
+      if (isPremium) {
+        document.documentElement.classList.add('is-premium');
+
+        if (savedLogoKey) {
+          setLogoPaths({
+            light: `/images/LogoStyle/${savedLogoKey}Dark.png`,
+            dark: `/images/LogoStyle/${savedLogoKey}White.png`
+          });
+        }
+      } else {
+        document.documentElement.classList.remove('is-premium');
+        setLogoPaths({ light: '/images/logo0.png', dark: '/images/logo01.png' });
+      }
+
+      if (isPremium && themeValue) {
+        const root = document.documentElement;
+        if (themeType === 'gradient') {
+          const hexColors = themeValue.match(/#[a-fA-F0-9]{6}/g);
+          if (hexColors && hexColors.length >= 2) {
+            root.style.setProperty('--brand-gradient', `linear-gradient(90deg, ${hexColors[0]}, ${hexColors[1]})`);
+            root.style.setProperty('--brand-main', hexColors[0]);
+          }
+        } else {
+          root.style.setProperty('--brand-gradient', themeValue);
+          root.style.setProperty('--brand-main', themeValue);
+        }
+      }
+    };
+
+    applyTheme();
+
+    window.addEventListener('storage', applyTheme);
+    return () => window.removeEventListener('storage', applyTheme);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -46,24 +93,26 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 w-full border-b border-gray-200 dark:border-[#232323] bg-white dark:bg-[#111111] text-foreground z-100 transition-all">
-      <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="w-full flex h-20 items-center justify-between px-4 md:px-6 lg:px-8">
         <div className="flex items-center gap-4">
           <Link href="/" className="shrink-0 transition-opacity">
             <Image
-              src="/images/logo0.png"
+              src={logoPaths.dark}
               alt="Aniyume Logo"
               width={160}
               height={50}
               className="h-10 md:h-14 w-auto object-contain dark:hidden"
               priority
+              key={`dark-${logoPaths.dark}`}
             />
             <Image
-              src="/images/logo01.png"
+              src={logoPaths.light}
               alt="Aniyume Logo"
               width={160}
               height={50}
               className="hidden h-10 md:h-14 w-auto object-contain dark:block"
               priority
+              key={`light-${logoPaths.light}`}
             />
           </Link>
           <div >
@@ -85,12 +134,14 @@ export default function Header() {
                     <Link
                       href={link.href}
                       className={`group flex items-center gap-2 text-sm font-semibold transition-all ${isActive
-                          ? 'translate-x-1'
-                          : 'text-gray-500 dark:text-gray-400 hover:translate-x-1'
+                        ? 'translate-x-1'
+                        : 'text-gray-500 dark:text-gray-400 hover:translate-x-1'
                         }`}
                     >
                       <span
-                        className={`text-xl transition-transform group-hover:scale-110 ${isActive ? 'scale-110 text-[#2EC4B6]' : 'text-gray-400 group-hover:text-[#2EC4B6]'
+                        className={`text-xl inline-flex items-center transition-transform group-hover:scale-110 ${isActive
+                          ? 'scale-110 text-brand'
+                          : 'text-gray-400 group-hover:text-brand'
                           }`}
                       >
                         {link.icon}
@@ -98,8 +149,8 @@ export default function Header() {
 
                       <span
                         className={`hidden xl:inline ${isActive
-                            ? 'text-brand'
-                            : 'text-gray-500 dark:text-gray-400 group-hover:text-brand'
+                          ? 'text-brand'
+                          : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200'
                           }`}
                       >
                         {link.label}
@@ -120,11 +171,11 @@ export default function Header() {
                   <img
                     src={avatarUrl}
                     alt="Profile"
-                    className={`w-9 h-9 rounded-full object-cover border-2 shadow-sm ${pathname === '/profile' ? 'border-[#39bcba]' : 'border-transparent'}`}
-                    style={{ borderColor: pathname === '/profile' ? '#39bcba' : '' }}
+                    className={`w-9 h-9 rounded-full object-cover border-2 shadow-sm ${pathname === '/profile' ? 'border-brand' : 'border-transparent'}`}
+                    style={{ borderColor: pathname === '/profile' ? 'var(--brand-main)' : '' }}
                   />
                 ) : (
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold ${pathname === '/profile' ? 'bg-[#39bcba]' : 'bg-gray-400'}`}>
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold ${pathname === '/profile' ? 'bg-brand' : 'bg-gray-400'}`}>
                     {user?.name ? user.name[0].toUpperCase() : <FaUserCircle size={32} />}
                   </div>
                 )}
@@ -133,13 +184,13 @@ export default function Header() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/login"
-                  className={`hidden sm:inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition-all ${pathname === '/login' ? 'text-[#39bcba]' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                  className={`hidden sm:inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition-all ${pathname === '/login' ? 'text-brand' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
                 >
                   <span>Вход</span>
                 </Link>
                 <Link
                   href="/register"
-                  className="flex items-center gap-2 rounded-xl bg-[#39bcba] px-4 py-2 sm:px-5 sm:py-2.5 text-sm font-bold text-white shadow-lg shadow-[#39bcba]/20 hover:bg-[#2f9795] transition-all active:scale-95"
+                  className="flex items-center gap-2 rounded-xl bg-brand px-4 py-2 sm:px-5 sm:py-2.5 text-sm font-bold text-white shadow-lg shadow-brand/20 hover:bg-brand-hover transition-all active:scale-95"
                 >
                   <FaUserPlus className="hidden sm:inline" />
                   <span>Регистрация</span>
@@ -177,11 +228,11 @@ export default function Header() {
                     <Link
                       href={link.href}
                       onClick={() => setIsMenuOpen(false)}
-                      className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border transition-all ${isActive ? 'border-[#39bcba]' : 'border-transparent'
-                        } hover:border-[#39bcba]`}
+                      className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border transition-all ${isActive ? 'border-brand' : 'border-transparent'
+                        } hover:border-brand`}
                     >
-                      <span className={`text-2xl ${isActive ? 'text-[#39bcba]' : 'text-[#39bcba]'}`}>{link.icon}</span>
-                      <span className={`text-sm font-bold ${isActive ? 'text-[#39bcba]' : 'dark:text-gray-200'}`}>
+                      <span className={`text-2xl ${isActive ? 'text-brand' : 'text-brand'}`}>{link.icon}</span>
+                      <span className={`text-sm font-bold ${isActive ? 'text-brand' : 'dark:text-gray-200'}`}>
                         {link.label}
                       </span>
                     </Link>

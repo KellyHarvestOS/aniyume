@@ -1,14 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation'; // Импортируем хук для определения текущего пути
+import { usePathname } from 'next/navigation';
 import {
   FaTelegram,
   FaYoutube,
   FaDiscord,
-  FaInfoCircle,
   FaShieldAlt,
   FaBalanceScale,
   FaQuestionCircle,
@@ -25,27 +24,56 @@ interface FooterLinkProps {
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const [logoPaths, setLogoPaths] = useState({
+    light: '/images/logo0.png',
+    dark: '/images/logo01.png'
+  });
+
+  const applyTheme = useCallback(() => {
+    const isPremium = localStorage.getItem("isPremium") === "true";
+    const savedLogoKey = localStorage.getItem("profile_logo_key");
+
+    if (isPremium && savedLogoKey) {
+      setLogoPaths({
+        light: `/images/LogoStyle/${savedLogoKey}Dark.png`,
+        dark: `/images/LogoStyle/${savedLogoKey}White.png`
+      });
+    } else {
+      setLogoPaths({
+        light: '/images/logo0.png',
+        dark: '/images/logo01.png'
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    applyTheme();
+    window.addEventListener('storage', applyTheme);
+    return () => window.removeEventListener('storage', applyTheme);
+  }, [applyTheme]);
 
   return (
     <footer className="relative overflow-hidden bg-white pt-28 dark:bg-[#121212]">
-      <div className="relative mx-auto max-w-7xl px-4 md:px-6">
+      <div className="w-full px-4 md:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 text-center lg:text-left">
 
           <div className="max-w-xl flex flex-col items-center lg:items-start">
             <Link href="/" className="inline-block transition-opacity">
               <Image
-                src="/images/logo0.png"
+                src={logoPaths.dark}
                 alt="AniYume"
                 width={480}
                 height={180}
-                className="h-20 sm:h-30 w-auto dark:hidden"
+                className="h-20 sm:h-30 w-auto dark:hidden object-contain"
+                key={`footer-dark-${logoPaths.dark}`}
               />
               <Image
-                src="/images/logo01.png"
+                src={logoPaths.light}
                 alt="AniYume"
                 width={480}
                 height={180}
-                className="hidden h-20 sm:h-30 w-auto dark:block"
+                className="hidden h-20 sm:h-30 w-auto dark:block object-contain"
+                key={`footer-light-${logoPaths.light}`}
               />
             </Link>
 
@@ -93,7 +121,7 @@ export default function Footer() {
             <p className="text-slate-600 dark:text-gray-400">Наша команда отвечает ежедневно</p>
             <a
               href="mailto:support@aniyume.com"
-              className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-6 py-4 font-semibold text-white transition hover-bg-brand"
+              className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-brand px-6 py-4 font-semibold text-white transition hover:brightness-110 shadow-lg shadow-brand/20"
             >
               support@aniyume.com
             </a>
@@ -102,10 +130,10 @@ export default function Footer() {
 
           <Block title="Мы в соцсетях">
             <div className="grid grid-cols-4 gap-3 justify-items-center lg:justify-items-start">
-              <SocialCard href="https://discord.gg/PYMXhXcR5Y" icon={FaDiscord} label="Discord" hoverClass="hover:bg-[#5865F2] hover:text-white" />
-              <SocialCard href="https://t.me/aniYume_group" icon={FaTelegram} label="Telegram" hoverClass="hover:bg-[#2ca0de] hover:text-white" />
-              <SocialCard href="https://www.youtube.com/" icon={FaYoutube} label="YouTube" hoverClass="hover:bg-[#FF0000] hover:text-white" />
-              <SocialCard href="https://x.com/?lang=ru" icon={FaXTwitter} label="Twitter" hoverClass="hover:bg-black hover:text-white" />
+              <SocialCard href="https://discord.gg/PYMXhXcR5Y" icon={FaDiscord} label="Discord" hoverClass="hover:bg-[#5865F2]! hover:text-white!" />
+              <SocialCard href="https://t.me/aniYume_group" icon={FaTelegram} label="Telegram" hoverClass="hover:bg-[#2ca0de]! hover:text-white!" />
+              <SocialCard href="https://www.youtube.com/" icon={FaYoutube} label="YouTube" hoverClass="hover:bg-[#FF0000]! hover:text-white!" />
+              <SocialCard href="https://x.com/?lang=ru" icon={FaXTwitter} label="Twitter" hoverClass="hover:bg-black! hover:text-white!" />
             </div>
           </Block>
         </div>
@@ -122,7 +150,7 @@ function Block({ title, children }: { title: string; children: React.ReactNode }
   return (
     <div className="flex flex-col items-center lg:items-start">
       <h3 className="mb-6 text-lg font-bold text-slate-900 dark:text-gray-200">
-        <span className="border-b-4 border-[#2EC4B6] pb-1">{title}</span>
+        <span className="border-b-4 border-brand-simple pb-1">{title}</span>
       </h3>
       <div className="flex flex-col items-center lg:items-start gap-4">{children}</div>
     </div>
@@ -143,15 +171,15 @@ function FooterLink({ href, icon: Icon, children }: FooterLinkProps) {
     >
       <Icon
         className={`text-xl transition-colors ${isActive
-          ? 'text-[#2EC4B6]'
-          : 'text-slate-400 group-hover:text-[#2EC4B6]'
+          ? 'icon-brand'
+          : 'text-slate-400 group-hover:icon-brand'
           }`}
       />
 
       <span
         className={`inline-block ${isActive
-          ? 'text-brand'
-          : 'text-slate-600 dark:text-gray-400 group-hover:text-[#2EC4B6]'
+          ? 'text-brand font-bold'
+          : 'text-slate-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200'
           }`}
       >
         {children}

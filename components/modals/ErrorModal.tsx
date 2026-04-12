@@ -34,7 +34,7 @@ export default function Modal({
         onClick={onClose}
       />
 
-      <div className="relative z-1001 w-full max-w-[380px] rounded-lg border border-[#39bcba] dark:border-[#39bcba] bg-white dark:bg-[#0d0d0d] p-8 shadow-[0_0_100px_-20px_rgba(57,188,186,0.3)] animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+      <div className="relative z-1001 w-full max-w-[380px] rounded-lg border border-brand dark:border-brand bg-white dark:bg-[#0d0d0d] p-8 shadow-[0_0_100px_-20px_rgba(57,188,186,0.3)] animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
         <div className="mb-6 flex flex-col items-center">
           <div className="mb-4 flex h-40 w-45 items-center justify-center rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#1a1a1a] shadow-inner">
             <Image
@@ -61,11 +61,10 @@ export default function Modal({
               onConfirm();
               onClose();
             }}
-            className={`w-full rounded-xl py-4 text-[11px] font-black uppercase tracking-[0.25em] text-white shadow-xl transition-all active:scale-[0.97] hover:scale-[1.02] ${
-              type === 'danger'
-                ? 'bg-[#39bcba] '
-                : 'bg-[#39bcba] '
-            }`}
+            className={`w-full rounded-xl py-4 text-[11px] font-black uppercase tracking-[0.25em] text-white shadow-xl transition-all active:scale-[0.97] hover:scale-[1.02] ${type === 'danger'
+                ? 'bg-brand '
+                : 'bg-brand '
+              }`}
           >
             {confirmText}
           </button>
@@ -78,7 +77,7 @@ export default function Modal({
           </button>
         </div>
 
-        <div className="absolute top-0 left-1/2 h-px w-1/2 -translate-x-1/2 bg-linear-to-r from-transparent via-[#39bcba] to-transparent opacity-50" />
+        <div className="absolute top-0 left-1/2 h-px w-1/2 -translate-x-1/2 bg-linear-to-r from-transparent via-brand to-transparent opacity-50" />
       </div>
     </div>
   );

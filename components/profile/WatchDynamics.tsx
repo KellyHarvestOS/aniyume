@@ -27,8 +27,8 @@ export const WatchDynamics = ({
           </p>
         </div>
 
-        <div className="bg-teal-50 dark:bg-white/5 px-3 py-1 rounded-full">
-          <span className="text-[#2EC4B6] text-xs font-black">
+        <div className="bg-gray-100 dark:bg-white/5 px-3 py-1 rounded-full">
+          <span className="text-brand text-xs font-black">
             Активность
           </span>
         </div>
@@ -63,21 +63,19 @@ export const WatchDynamics = ({
               <div className="w-full relative h-full flex items-end justify-center">
                 <div
                   style={{ height: `${height}%` }}
-                  className={`w-full max-w-[42px] transition-all duration-500 ease-out ${
-                    isActive
+                  className={`w-full max-w-[42px] transition-all duration-500 ease-out ${isActive
                       ? "bg-linear-to-t from-[#2EC4B6] to-[#6EE7D8] rounded-t-lg shadow-sm group-hover:scale-x-105"
                       : "bg-slate-300/50 dark:bg-white/5 rounded-t-sm"
-                  }`}
+                    }`}
                 />
               </div>
 
               <div className="mt-3 flex flex-col items-center shrink-0">
                 <span
-                  className={`text-[10px] font-black uppercase tracking-tighter ${
-                    isActive
+                  className={`text-[10px] font-black uppercase tracking-tighter ${isActive
                       ? "text-gray-600 dark:text-gray-300"
                       : "text-slate-300 dark:text-gray-600"
-                  }`}
+                    }`}
                 >
                   {new Date(d.date).getDate()}
                 </span>

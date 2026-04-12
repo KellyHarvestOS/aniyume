@@ -128,7 +128,7 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
                 </button>
               ))}
               {userRating > 0 && !hoverRating && (
-                <span className="ml-2 text-xs font-black text-[#39bcba]">{userRating}/5</span>
+                <span className="ml-2 text-xs font-black text-brand">{userRating}/5</span>
               )}
             </div>
           </div>
