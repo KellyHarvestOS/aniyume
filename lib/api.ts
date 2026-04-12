@@ -47,7 +47,33 @@ async function apiClient(path: string, options: RequestInit = {}): Promise<Respo
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  return fetch(`${API_BASE}${path}`, { ...options, headers });
+  const url = `${API_BASE}${path}`;
+  
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[API REQUEST] ${options.method || 'GET'} ${url}`, options.body ? JSON.parse(options.body as string) : '');
+  }
+
+  try {
+    const response = await fetch(url, { ...options, headers });
+    
+    if (process.env.NODE_ENV === 'development') {
+      if (!response.ok) {
+        console.error(`[API ERROR] ${options.method || 'GET'} ${url} returned ${response.status} ${response.statusText}`);
+        // Попытка прочитать текст ошибки без краша (клонируем ответ)
+        const errorText = await response.clone().text().catch(() => 'No text');
+        console.error(`[API ERROR DETAILS]:`, errorText);
+      } else {
+        console.log(`[API SUCCESS] ${options.method || 'GET'} ${url} (${response.status})`);
+      }
+    }
+    
+    return response;
+  } catch (err) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`[API FETCH FAILED] ${options.method || 'GET'} ${url}`, err);
+    }
+    throw err;
+  }
 }
 
 // ─── Public API object ───────────────────────────────────────────────────────
