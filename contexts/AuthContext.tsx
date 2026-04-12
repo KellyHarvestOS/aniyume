@@ -9,6 +9,7 @@ export interface AuthUser {
   name: string;
   email: string;
   avatar?: string | null;
+  is_premium?: boolean;
 }
 
 interface AuthContextType {
