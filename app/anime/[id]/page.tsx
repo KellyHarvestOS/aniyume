@@ -43,10 +43,10 @@ export default function AnimeViewPage() {
       setIsLoading(true);
       try {
         const [animeRes, epRes, recRes, statsRes] = await Promise.all([
-          fetch(`${API_BASE}/anime/${id}`),
-          fetch(`${API_BASE}/anime/${id}/episodes`),
-          fetch(`${API_BASE}/anime?sort=popularity&page=1`),
-          fetch(`${API_BASE}/anime/${id}/community-stats`),
+          fetch(`${API_BASE}/public/anime/${id}`),
+          fetch(`${API_BASE}/public/anime/${id}/episodes`),
+          fetch(`${API_BASE}/public/anime?sort=popularity&page=1`),
+          fetch(`${API_BASE}/public/anime/${id}/community-stats`),
         ]);
 
         if (!animeRes.ok) {
@@ -71,8 +71,15 @@ export default function AnimeViewPage() {
 
         setAnime(rawData);
         setCommunityStats(statsJson);
-        const epList: Episode[] = Array.isArray(epJson.data) ? epJson.data : [];
-        setAllEpisodes(epList);
+        // Бэкенд возвращает эпизоды сгруппированными по переводчику: { "AniLibria": [...], ... }
+        const epData = epJson.data;
+        let flatEpisodes: Episode[] = [];
+        if (Array.isArray(epData)) {
+          flatEpisodes = epData;
+        } else if (epData && typeof epData === 'object') {
+          flatEpisodes = (Object.values(epData) as Episode[][]).flat();
+        }
+        setAllEpisodes(flatEpisodes);
         setRecommendations((recJson.data || []).filter((a: any) => String(a.id) !== String(id)).slice(0, 4));
       } catch (err) {
         return notFound();
@@ -113,7 +120,7 @@ export default function AnimeViewPage() {
   const handleEpisodeWatch = async (episodeNumber: number) => {
     if (!token || !id) return;
     try {
-      await fetch(`${API_BASE}/anime/${id}/episodes-watched/${episodeNumber}`, {
+      await fetch(`${API_BASE}/anime/${id}/episodes-watched/${episodeNumber}`, { // PATCH /anime/{id}/episodes-watched/{n}
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,

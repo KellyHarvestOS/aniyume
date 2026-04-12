@@ -107,7 +107,7 @@ function SearchContent() {
       setIsLoading(true);
       try {
         const res = await fetch(
-          `/api/external/anime?search=${encodeURIComponent(query)}&page=${page}`
+          `/api/external/public/anime?search=${encodeURIComponent(query)}&page=${page}`
         );
         const json = await res.json();
         setResults(json.data || []);

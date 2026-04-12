@@ -92,7 +92,7 @@ export default function ProfilePage() {
             />
 
             <WatchDynamics
-              dynamics={statsSummary?.episodes_per_day_last_10_days || []}
+              dynamics={Array.isArray(statsSummary) ? statsSummary : []}
             />
 
             {data.recently_watched && data.recently_watched.length > 0 && (

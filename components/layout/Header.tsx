@@ -93,26 +93,26 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 w-full border-b border-gray-200 dark:border-[#232323] bg-white dark:bg-[#111111] text-foreground z-100 transition-all">
-      <div className="w-full flex h-20 items-center justify-between px-4 md:px-6 lg:px-8">
+      <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
           <Link href="/" className="shrink-0 transition-opacity">
-            <Image
-              src={logoPaths.dark}
-              alt="Aniyume Logo"
-              width={160}
-              height={50}
-              className="h-10 md:h-14 w-auto object-contain dark:hidden"
-              priority
-              key={`dark-${logoPaths.dark}`}
-            />
             <Image
               src={logoPaths.light}
               alt="Aniyume Logo"
               width={160}
               height={50}
+              className="h-10 md:h-14 w-auto object-contain dark:hidden"
+              priority
+              key={`dark-${logoPaths.light}`}
+            />
+            <Image
+              src={logoPaths.dark}
+              alt="Aniyume Logo"
+              width={160}
+              height={50}
               className="hidden h-10 md:h-14 w-auto object-contain dark:block"
               priority
-              key={`light-${logoPaths.light}`}
+              key={`light-${logoPaths.dark}`}
             />
           </Link>
           <div >
@@ -139,9 +139,9 @@ export default function Header() {
                         }`}
                     >
                       <span
-                        className={`text-xl inline-flex items-center transition-transform group-hover:scale-110 ${isActive
-                          ? 'scale-110 text-brand'
-                          : 'text-gray-400 group-hover:text-brand'
+                        className={`text-xl transition-transform group-hover:scale-110 ${isActive
+                          ? 'scale-110 text-[#2EC4B6]'
+                          : 'text-gray-400 group-hover:text-[#2EC4B6]'
                           }`}
                       >
                         {link.icon}

@@ -48,7 +48,7 @@ function CatalogContent() {
         if (!params.has('page')) params.set('page', '1');
         if (!params.has('per_page')) params.set('per_page', '20');
 
-        const res = await fetch(`${API_BASE}/anime?${params.toString()}`);
+        const res = await fetch(`${API_BASE}/public/anime?${params.toString()}`);
         if (!res.ok) throw new Error('Ошибка API');
         const data = await res.json();
         

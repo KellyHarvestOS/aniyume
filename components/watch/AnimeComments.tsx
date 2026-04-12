@@ -150,7 +150,7 @@ export default function AnimeComments({ animeId }: { animeId: string | number })
                   <button onClick={() => {
                     let cleanedHtml = upRef.current?.innerHTML.replace(/&nbsp;/g, ' ') || "";
                     cleanedHtml = applyCensorship(cleanedHtml);
-                    call(`/api/external/comments/${c.id}`, "PUT", { comment: cleanedHtml }).then(j => { setComments(prev => prev.map(x => x.id === c.id ? j.data : x)); setUi(p => ({ ...p, edit: null })); })
+                    call(`/api/external/comments/${c.id}`, "PATCH", { comment: cleanedHtml }).then(j => { setComments(prev => prev.map(x => x.id === c.id ? j.data : x)); setUi(p => ({ ...p, edit: null })); })
                   }} className="bg-[#39bcba] text-white px-4 py-1.5 rounded text-[10px] font-black uppercase flex items-center gap-2"><FaSave /> Ок</button>
                 </div>
               ) : (
