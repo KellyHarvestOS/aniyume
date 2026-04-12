@@ -108,20 +108,35 @@ export const swrFetcher = (url: string) => fetch(url).then((r) => r.json());
 export async function getAnimeList(page = 1, filters: Record<string, string> = {}): Promise<Anime[]> {
   const params = new URLSearchParams({ page: page.toString(), ...filters });
   const res = await fetch(`${API_BASE}/public/anime?${params}`, { cache: 'no-store' });
-  if (!res.ok) throw new Error('Failed to fetch anime list');
+  if (!res.ok) {
+    console.error(`[API ERROR] GET /public/anime?${params} returned ${res.status}`);
+    const errText = await res.clone().text().catch(()=>'');
+    console.error(`Details:`, errText);
+    throw new Error('Failed to fetch anime list');
+  }
   const data = await res.json();
   return data.data || data;
 }
 
 export async function getAnimeById(id: string): Promise<Anime> {
-  const res = await fetch(`${API_BASE}/public/anime/${id}`, { next: { revalidate: 60 } } as RequestInit);
-  if (!res.ok) throw new Error('Failed to fetch anime details');
+  const url = `${API_BASE}/public/anime/${id}`;
+  const res = await fetch(url, { next: { revalidate: 60 } } as RequestInit);
+  if (!res.ok) {
+    console.error(`[API ERROR] GET ${url} returned ${res.status}`);
+    const errText = await res.clone().text().catch(()=>'');
+    console.error(`Details:`, errText);
+    throw new Error('Failed to fetch anime details');
+  }
   return res.json();
 }
 
 export async function getAnimeEpisodes(id: string): Promise<Episode[]> {
-  const res = await fetch(`${API_BASE}/public/anime/${id}/episodes`, { cache: 'no-store' });
-  if (!res.ok) return [];
+  const url = `${API_BASE}/public/anime/${id}/episodes`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) {
+    console.error(`[API ERROR] GET ${url} returned ${res.status}`);
+    return [];
+  }
   const data = await res.json();
   // Бэкенд возвращает объект { "AniLibria": [...] } — флэттим
   if (Array.isArray(data.data)) return data.data;
