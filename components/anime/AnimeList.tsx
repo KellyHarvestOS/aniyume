@@ -48,7 +48,7 @@ const AnimeList = ({ title }: { title: string }) => {
         setLoading(true);
         if (page > 1) titleRef.current?.scrollIntoView({ behavior: 'smooth' });
 
-        const res = await fetch(`/api/external/anime?page=${page}&sort=newest&per_page=10`);
+        const res = await fetch(`/api/external/public/anime?page=${page}&sort=newest&per_page=10`);
         const json = await res.json();
 
         const raw = json.data || json;

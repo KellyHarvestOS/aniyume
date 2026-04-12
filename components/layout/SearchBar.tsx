@@ -82,7 +82,7 @@ export default function SearchBar() {
     setIsOpen(true);
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/external/anime?search=${encodeURIComponent(cleanQuery)}`);
+        const res = await fetch(`/api/external/public/anime?search=${encodeURIComponent(cleanQuery)}`);
         if (res.ok) {
           const data = await res.json();
           const list = Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []);

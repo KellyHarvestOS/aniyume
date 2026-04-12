@@ -59,8 +59,8 @@ export default function FeaturedNewestRows() {
 
       try {
         const [p1, p2] = await Promise.all([
-          fetch('/api/external/anime?sort=newest&page=1').then(r => r.json()),
-          fetch('/api/external/anime?sort=newest&page=2').then(r => r.json()),
+          fetch('/api/external/public/anime?sort=newest&page=1').then(r => r.json()),
+          fetch('/api/external/public/anime?sort=newest&page=2').then(r => r.json()),
         ]);
         const combined = [...(p1.data || []), ...(p2.data || [])];
         const shuffled = shuffleArray(combined);
