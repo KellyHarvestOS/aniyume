@@ -23,6 +23,10 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
+        source: '/api/external/:path*',
+        destination: 'http://localhost:8000/api/v1/:path*',
+      },
+      {
         source: '/api-storage/:path*',
         destination: 'http://localhost:8000/storage/:path*',
       },

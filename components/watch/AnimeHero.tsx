@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { FaPlay, FaStar, FaShareAlt, FaCheck } from 'react-icons/fa';
+import { FaPlay, FaStar, FaShareAlt, FaCheck, FaTv, FaFilm } from 'react-icons/fa';
 import { AnimeDetails } from '@/types/anime';
 
 interface AnimeHeroProps {
@@ -9,164 +9,213 @@ interface AnimeHeroProps {
   episodesCount: number;
 }
 
+const TYPE_LABELS: Record<string, string> = {
+  tv: 'TV',
+  movie: 'Фильм',
+  ova: 'OVA',
+  ona: 'ONA',
+  special: 'Special',
+};
+
+const STATUS_LABELS: Record<string, { label: string; color: string }> = {
+  ongoing:   { label: 'Онгоинг',    color: 'bg-green-500/20 text-green-400 border-green-500/30' },
+  finished:  { label: 'Завершён',   color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+  completed: { label: 'Завершён',   color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+  announced: { label: 'Анонс',      color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
+};
+
 export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
   const [copied, setCopied] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const descriptionRef = useRef<HTMLDivElement>(null);
+  const [bannerLoaded, setBannerLoaded] = useState(false);
+  const descRef = useRef<HTMLDivElement>(null);
 
   const tagsList = anime.tags || anime.genres || [];
-  const displayGenres = tagsList.slice(0, 3);
+
+  // Используем cover_url как широкий баннер, poster_url как постер
+  const bannerUrl = anime.cover_url || anime.poster_url || '/placeholder.jpg';
+  const posterUrl = anime.poster_url || '/placeholder.jpg';
+
+  const cleanDescription = anime.description ? anime.description.replace(/<[^>]+>/g, '') : '';
+  const isLong = cleanDescription.length > 200;
+
+  const statusInfo = STATUS_LABELS[anime.status?.toLowerCase()] || { label: anime.status, color: 'bg-gray-500/20 text-gray-400 border-gray-500/30' };
 
   const handleShare = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error(err);
-    }
+      setTimeout(() => setCopied(false), 2400);
+    } catch { }
   };
-
-  const handleToggleDescription = () => {
-    if (isExpanded && descriptionRef.current) {
-      descriptionRef.current.scrollTop = 0;
-    }
-    setIsExpanded(!isExpanded);
-  };
-
-  const cleanDescription = anime.description ? anime.description.replace(/<[^>]+>/g, '') : '';
-  const isLongDescription = cleanDescription.length > 180;
 
   return (
-    <div className="relative w-full min-h-[850px] flex items-start bg-white dark:bg-[#111111] transition-colors">
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        .left-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .left-scrollbar::-webkit-scrollbar-track {
-          background: rgba(156, 163, 175, 0.2);
-          border-radius: 4px;
-        }
-        .left-scrollbar::-webkit-scrollbar-thumb {
-          background-color: var(--brand-main);
-          border-radius: 4px;
-        }
-      `}} />
+    <div className="relative w-full min-h-[540px] md:min-h-[620px] overflow-hidden bg-[#0a0a0a]">
 
-      <div className="absolute inset-0 z-0 overflow-hidden">
+      {/* ── Фоновый баннер ── */}
+      <div
+        className="absolute inset-0 z-0"
+        aria-hidden="true"
+      >
+        {/* Skeleton-blur пока грузится */}
+        {!bannerLoaded && (
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 animate-pulse" />
+        )}
+
         <img
-          src={anime.poster_url || '/placeholder.jpg'}
-          alt={anime.title}
-          className="w-full h-full object-cover object-top scale-105"
+          src={bannerUrl}
+          alt=""
+          onLoad={() => setBannerLoaded(true)}
+          className={`w-full h-full object-cover object-center transition-opacity duration-700 ${bannerLoaded ? 'opacity-100' : 'opacity-0'}`}
+          style={{ imageRendering: 'auto' }}
         />
-        <div className="absolute inset-0 bg-linear-to-r from-white via-white/20 to-transparent dark:from-[#111111] dark:via-[#111111]/20"></div>
-        <div className="absolute inset-0 bg-linear-to-t from-white via-transparent to-transparent dark:from-[#111111]"></div>
-        <div className="absolute top-0 right-0 w-[55%] h-full blur-[100px] opacity-60"></div>
+
+        {/* Градиент слева — под контент */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/10" />
+        {/* Градиент снизу */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+        {/* Тонкий overlay для насыщенности */}
+        <div className="absolute inset-0 bg-black/20" />
       </div>
 
-      <div className="container mx-auto px-4 md:px-12 relative z-20 pt-20 md:pt-20 pb-12">
-        <div className="max-w-3xl">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-wide text-black dark:text-gray-200 drop-shadow-lg">
-            {anime.title}
-          </h1>
+      {/* ── Контент ── */}
+      <div className="relative z-10 container mx-auto px-4 md:px-12 py-10 md:py-14 flex flex-col md:flex-row gap-8 md:gap-12 items-start">
 
-          <div className="flex flex-wrap items-center gap-4 text-sm md:text-base font-medium text-gray-700 dark:text-gray-300 mb-6">
-            <span className="bg-gray-200 dark:bg-[#1a1a1a] text-black dark:text-gray-200 px-2 py-0.5 rounded border border-gray-900 dark:border-gray-700 uppercase">
-              {anime.type || 'TV'}
-            </span>
-            <ul className="flex items-center gap-2 list-none">
-              <li>• {anime.year}</li>
-              <li>• {anime.status}</li>
-            </ul>
-            <div className="flex items-center gap-1 ml-2">
-              <FaStar className="text-brand text-sm" />
-              <span className="ml-1 text-gray-800 dark:text-gray-200 font-semibold">
-                {anime.rating} ({anime.popularity ? `${(anime.popularity / 1000).toFixed(0)}K` : '0'})
-              </span>
+        {/* Постер */}
+        <div className="hidden md:block shrink-0">
+          <div className="relative w-44 lg:w-52 rounded-2xl overflow-hidden shadow-2xl shadow-black/60 border border-white/10 group">
+            <img
+              src={posterUrl}
+              alt={anime.title}
+              className="w-full aspect-[2/3] object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            {/* Рейтинг поверх постера */}
+            <div className="absolute top-3 left-3 flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-lg border border-yellow-500/30">
+              <FaStar className="text-yellow-400 text-[10px]" />
+              <span className="text-yellow-400 text-xs font-black">{anime.rating || '—'}</span>
             </div>
           </div>
+        </div>
 
-          {displayGenres.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-8">
-              {displayGenres.map((genre) => (
+        {/* Основная информация */}
+        <div className="flex-1 min-w-0 pt-0 md:pt-4">
+
+          {/* Теги жанров */}
+          {tagsList.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {tagsList.slice(0, 4).map((g) => (
                 <span
-                  key={genre.id}
-                  className="px-3 py-1 bg-white/70 dark:bg-[#1a1a1a]/80 backdrop-blur-md border border-gray-400 dark:border-gray-700 rounded-full text-xs font-bold text-gray-900 dark:text-gray-200 uppercase tracking-wider shadow-sm"
+                  key={g.id}
+                  className="px-3 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-full bg-white/5 border border-white/10 text-gray-400 backdrop-blur-sm"
                 >
-                  {genre.name}
+                  {g.name}
                 </span>
               ))}
             </div>
           )}
 
-          <div className="flex items-center gap-4 mb-8">
+          {/* Название */}
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1] mb-3 drop-shadow-2xl">
+            {anime.title}
+          </h1>
+
+          {anime.title_english && (
+            <p className="text-gray-500 text-sm font-medium mb-4 tracking-wider truncate">
+              {anime.title_english}
+            </p>
+          )}
+
+          {/* Мета-строка */}
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            {/* Тип */}
+            <span className="flex items-center gap-1.5 px-3 py-1 bg-white/8 border border-white/10 rounded-lg text-xs font-bold text-gray-300 uppercase backdrop-blur-sm">
+              {anime.type?.toLowerCase() === 'movie' ? <FaFilm size={10} /> : <FaTv size={10} />}
+              {TYPE_LABELS[anime.type?.toLowerCase()] || anime.type || 'TV'}
+            </span>
+
+            {/* Год */}
+            {anime.year && (
+              <span className="text-gray-400 text-sm font-bold">{anime.year}</span>
+            )}
+
+            {/* Статус */}
+            <span className={`px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${statusInfo.color}`}>
+              {statusInfo.label}
+            </span>
+
+            {/* Эпизоды */}
+            {episodesCount > 0 && (
+              <span className="text-gray-500 text-xs font-bold">
+                {episodesCount} эп.
+              </span>
+            )}
+
+            {/* Рейтинг (мобильный) */}
+            <span className="flex items-center gap-1 md:hidden">
+              <FaStar className="text-yellow-400 text-xs" />
+              <span className="text-yellow-400 text-sm font-black">{anime.rating || '—'}</span>
+            </span>
+          </div>
+
+          {/* Кнопки */}
+          <div className="flex items-center gap-3 mb-8">
             <button
               onClick={() => document.getElementById('player')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-brand hover:bg-brand-hover text-black dark:text-[#111111] text-lg font-bold py-3 px-8 rounded flex items-center gap-3 transition transform hover:scale-105 shadow-lg"
+              className="relative flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-black text-sm uppercase tracking-wider text-black bg-brand shadow-lg shadow-brand/30 hover:brightness-110 active:scale-95 transition-all duration-200 overflow-hidden group"
             >
-              <FaPlay className="text-sm" /> СМОТРЕТЬ
+              <span className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-200" />
+              <FaPlay className="text-xs relative z-10" />
+              <span className="relative z-10">Смотреть</span>
             </button>
 
-            <div className="flex gap-3 relative">
+            <div className="relative">
               <button
                 onClick={handleShare}
                 title="Скопировать ссылку"
-                className={`w-12 h-12 flex items-center justify-center border-2 rounded transition bg-white/40 dark:bg-[#1a1a1a]/70 backdrop-blur-sm 
+                className={`w-12 h-12 flex items-center justify-center rounded-xl border transition-all duration-200 backdrop-blur-sm
                   ${copied
-                    ? 'border-teal-500 text-teal-500'
-                    : 'border-gray-400 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:border-black dark:hover:border-gray-200'
+                    ? 'bg-brand/20 border-brand text-brand'
+                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20 hover:text-white'
                   }`}
               >
-                {copied ? <FaCheck /> : <FaShareAlt />}
+                {copied ? <FaCheck size={14} /> : <FaShareAlt size={14} />}
               </button>
-
               {copied && (
-                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-black text-white text-xs py-1 px-2 rounded">
+                <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-black/90 text-white text-[10px] py-1 px-2.5 rounded-lg whitespace-nowrap font-bold border border-white/10">
                   Скопировано!
                 </span>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 text-sm md:text-[15px] leading-relaxed relative">
-            <div className="flex flex-col items-start">
-              <div
-                ref={descriptionRef}
-                className={`text-black dark:text-gray-200 drop-shadow-md w-full transition-all duration-300
-                  ${isExpanded
-                    ? 'max-h-56 overflow-y-auto left-scrollbar'
-                    : 'line-clamp-4 overflow-hidden'
-                  }`}
-                dir={isExpanded ? 'rtl' : 'ltr'}
+          {/* Описание */}
+          <div className="max-w-xl">
+            <div
+              ref={descRef}
+              className={`text-gray-400 text-sm leading-relaxed transition-all duration-300 ${isExpanded ? '' : 'line-clamp-3'}`}
+              dangerouslySetInnerHTML={{ __html: anime.description || 'Описание отсутствует' }}
+            />
+            {isLong && (
+              <button
+                onClick={() => setIsExpanded(v => !v)}
+                className="mt-2 text-brand hover:text-white text-xs font-bold uppercase tracking-wider transition-colors"
               >
-                <div
-                  dir="ltr"
-                  className={isExpanded ? 'pl-4 pr-1' : ''}
-                  dangerouslySetInnerHTML={{ __html: anime.description || 'Описание отсутствует' }}
-                />
-              </div>
+                {isExpanded ? 'Свернуть ↑' : 'Читать далее...'}
+              </button>
+            )}
+          </div>
 
-              {isLongDescription && (
-                <button
-                  onClick={handleToggleDescription}
-                  className="mt-2 text-brand hover:text-brand-hover dark:text-brand dark:hover:text-brand-hover text-xs font-bold uppercase tracking-wider transition-colors"
-                >
-                  {isExpanded ? 'Свернуть описание' : 'Читать далее...'}
-                </button>
-              )}
-            </div>
-
-            <div className="text-gray-800 dark:text-gray-300 text-xs md:text-sm space-y-3 font-medium">
-              <p>
-                <span className="font-semibold text-gray-800 dark:text-gray-200">Оригинал:</span>{' '}
-                {anime.title_english || '-'}
-              </p>
-              <p>
-                <span className="font-semibold text-gray-800 dark:text-gray-200">Всего серий:</span>{' '}
-                {episodesCount > 0 ? episodesCount : '?'}
-              </p>
-            </div>
+          {/* Доп. инфо */}
+          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-600 font-medium border-t border-white/5 pt-5">
+            {anime.title_english && (
+              <span><span className="text-gray-500">Оригинал:</span> {anime.title_english}</span>
+            )}
+            {(anime.episodes_count || episodesCount > 0) && (
+              <span><span className="text-gray-500">Всего серий:</span> {anime.episodes_count || episodesCount}</span>
+            )}
+            {anime.duration && (
+              <span><span className="text-gray-500">Длительность:</span> {anime.duration} мин.</span>
+            )}
           </div>
         </div>
       </div>

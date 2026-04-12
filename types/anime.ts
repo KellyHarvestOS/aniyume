@@ -21,13 +21,18 @@ export interface AnimeDetails {
   id: number;
   title: string;
   title_english?: string;
+  title_jp?: string;
   poster_url: string;
+  cover_url?: string;
   rating: string;
   popularity: number;
   description: string;
   year: number;
   type: string;
   status: string;
+  episodes_count?: number;
+  duration?: number;
   genres?: Genre[];
   tags?: Genre[];
-}
+  favorites_count?: number;
+}
