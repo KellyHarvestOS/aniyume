@@ -5,7 +5,7 @@ import { FaBold, FaItalic, FaSyncAlt, FaSmile, FaTrash, FaEdit, FaSave, FaTimes,
 import Modal from '@/components/modals/ErrorModal';
 
 const EMOJIS = ['😊', '😂', '😍', '🤔', '😎', '😭', '😮', '🔥', '✨', '👍', '👎', '❤️', '😱', '🙌', '👀'];
-const API = "http://164.90.185.95/storage/";
+const API = "/api-storage/";
 
 
 const BAD_WORDS = ["нах", "хуй", "пизд", "ебат", "ебал", "бля", "сук", "хуе", "пидо", "гандон", "ублюд", "курва", "шалав", "ебан", "мудил", "дроч", "залуп", "пидр", "трах", "член", "ссан", "гавно", "гавно", "говно", "пор", "конч", "залу"];

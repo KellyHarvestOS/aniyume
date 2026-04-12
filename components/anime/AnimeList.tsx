@@ -30,13 +30,17 @@ const AnimeList = ({ title }: { title: string }) => {
       const cached = sessionStorage.getItem(cacheKey);
 
       if (cached) {
-        const { data: cachedData, total: cachedTotal, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < CACHE_DURATION) {
-          setData(cachedData);
-          setTotal(cachedTotal);
-          setLoading(false);
-          if (page > 1) titleRef.current?.scrollIntoView({ behavior: 'smooth' });
-          return;
+        try {
+          const { data: cachedData, total: cachedTotal, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < CACHE_DURATION && Array.isArray(cachedData)) {
+            setData(cachedData);
+            setTotal(cachedTotal);
+            setLoading(false);
+            if (page > 1) titleRef.current?.scrollIntoView({ behavior: 'smooth' });
+            return;
+          }
+        } catch {
+          sessionStorage.removeItem(cacheKey);
         }
       }
 
@@ -47,7 +51,8 @@ const AnimeList = ({ title }: { title: string }) => {
         const res = await fetch(`/api/external/anime?page=${page}&sort=newest&per_page=10`);
         const json = await res.json();
 
-        const newData = json.data || json;
+        const raw = json.data || json;
+        const newData = Array.isArray(raw) ? raw : [];
         const newTotal = json.meta?.last_page || json.last_page || 10;
 
         setData(newData);

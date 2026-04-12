@@ -6,9 +6,11 @@ import { StatsOverview } from "@/components/profile/StatsOverview";
 import { WatchDynamics } from "@/components/profile/WatchDynamics";
 import { RecentActivity } from "@/components/profile/RecentActivity";
 import { ProfileSkeleton } from "@/components/skeletons/ProfileSkeleton";
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { logout: authLogout } = useAuth();
   const [data, setData] = useState<any>(null);
   const [statsSummary, setStatsSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -49,8 +51,7 @@ export default function ProfilePage() {
   }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem("userToken");
-
+    authLogout();
     window.dispatchEvent(new Event("authChange"));
     router.push("/");
   };

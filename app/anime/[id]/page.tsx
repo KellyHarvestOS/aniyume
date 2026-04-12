@@ -168,6 +168,7 @@ export default function AnimeViewPage() {
 
       <AnimePlayer
         animeId={anime.id}
+        anime={anime}
         episodes={allEpisodes}
         onEpisodeSelect={handleEpisodeWatch}
       />

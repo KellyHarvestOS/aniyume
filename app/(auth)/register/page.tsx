@@ -15,9 +15,11 @@ import {
 } from "react-icons/fa";
 import AuthBackground from "@/components/layout/AuthBackground";
 import Modal from "@/components/modals/ErrorModal";
+import { useAuth } from '@/contexts/AuthContext';
 
 const RegisterPage = () => {
   const router = useRouter();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -133,8 +135,7 @@ const RegisterPage = () => {
       const token = responseData.data?.token || responseData.token || responseData.access_token;
       const user = responseData.data?.user || responseData.user;
       if (token) {
-        localStorage.setItem("userToken", token);
-        if (user) localStorage.setItem("userData", JSON.stringify(user));
+        login(token, user || { id: 0, name: formData.username, email: formData.email });
         openAlert("Успех!", "Ваш аккаунт создан. Приятного просмотра аниме!", "success", () => {
           router.push("/");
         });

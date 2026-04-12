@@ -32,7 +32,7 @@ export const ProfileCard = ({
   const getAvatarUrl = () => {
     if (!user.avatar) return null;
 
-    const baseUrl = "http://164.90.185.95/storage/";
+    const baseUrl = "/api-storage/";
     const fullPath = user.avatar.startsWith("http")
       ? user.avatar
       : `${baseUrl}${user.avatar}`;

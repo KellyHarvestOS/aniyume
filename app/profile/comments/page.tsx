@@ -105,7 +105,7 @@ export default function MyCommentsPage() {
   const getPosterUrl = (path: string | undefined) => {
     if (!path) return '/no-poster.png';
     if (path.startsWith('http')) return path;
-    return `http://164.90.185.95/storage/${path}`;
+    return `/api-storage/${path}`;
   };
 
   useEffect(() => {

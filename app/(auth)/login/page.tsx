@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation';
 import { FaEnvelope, FaLock, FaSignInAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
 import AuthBackground from '@/components/layout/AuthBackground';
 import Modal from '@/components/modals/ErrorModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 const LoginPage = () => {
   const router = useRouter();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
 
@@ -68,10 +70,7 @@ const LoginPage = () => {
         throw new Error('Ошибка авторизации: токен отсутствует');
       }
 
-      localStorage.setItem('userToken', token);
-      if (user) {
-        localStorage.setItem('userData', JSON.stringify(user));
-      }
+      login(token, user || { id: 0, name: '', email: formData.email });
 
       openAlert('С возвращением!', 'Вы успешно вошли в систему AniYume.', 'success', () => {
         router.push('/');

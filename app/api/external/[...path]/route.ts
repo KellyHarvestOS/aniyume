@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BASE_URL = "http://164.90.185.95/api/v1";
+const BASE_URL = process.env.BACKEND_URL || "http://localhost:8000/api/v1";
 
 export async function handleProxy(
   req: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
   try {
     const { path } = await params;
@@ -24,6 +24,9 @@ export async function handleProxy(
       "studios",
       "comments",
       "my-anime-list",
+      "friends",
+      "watch-party",
+      "users"
     ];
 
     const isPrivate = privateKeywords.some((keyword) =>

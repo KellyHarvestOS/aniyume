@@ -12,45 +12,12 @@ import { IoCalendarNumberSharp } from "react-icons/io5";
 import { FaRankingStar } from "react-icons/fa6";
 import ThemeToggle from './ThemeToggle';
 import SearchBar from './SearchBar';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Header() {
   const pathname = usePathname();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const { user, isLoading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const fetchUser = async () => {
-    const token = localStorage.getItem('userToken');
-    if (!token) {
-      setIsLoggedIn(false);
-      setUser(null);
-      return;
-    }
-
-    setIsLoggedIn(true);
-    try {
-      const res = await fetch('/api/external/profile/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json'
-        }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user || data);
-      }
-    } catch { }
-  };
-
-  useEffect(() => {
-    fetchUser();
-    window.addEventListener('authChange', fetchUser);
-    window.addEventListener('storage', fetchUser);
-    return () => {
-      window.removeEventListener('authChange', fetchUser);
-      window.removeEventListener('storage', fetchUser);
-    };
-  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -62,12 +29,13 @@ export default function Header() {
 
   const getAvatarUrl = () => {
     if (!user?.avatar) return null;
-    const baseUrl = "http://164.90.185.95/storage/";
+    const baseUrl = "/api-storage/";
     const fullPath = user.avatar.startsWith('http') ? user.avatar : `${baseUrl}${user.avatar}`;
     return `${fullPath}?t=${Date.now()}`;
   };
 
   const avatarUrl = getAvatarUrl();
+  const isLoggedIn = !!user;
 
   const navLinks = [
     { href: '/popular', label: 'Популярное', icon: <FaRankingStar /> },
@@ -144,7 +112,9 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-3 sm:gap-4 lg:border-l lg:border-gray-200 lg:dark:border-gray-800 lg:pl-6">
-            {isLoggedIn ? (
+            {isLoading ? (
+              <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            ) : isLoggedIn ? (
               <Link href="/profile" className="flex items-center transition-transform hover:scale-105">
                 {avatarUrl ? (
                   <img

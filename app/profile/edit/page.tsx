@@ -45,7 +45,7 @@ export default function EditProfilePage() {
 
           const avatar = user.avatar || user.avatar_url;
           if (avatar) {
-            const baseUrl = "http://164.90.185.95/storage/";
+            const baseUrl = "/api-storage/";
             const fullUrl = avatar.startsWith("http") ? avatar : `${baseUrl}${avatar}`;
             setPreviewUrl(`${fullUrl}?t=${Date.now()}`);
           }

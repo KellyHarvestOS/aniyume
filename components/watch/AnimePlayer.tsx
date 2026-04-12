@@ -1,17 +1,22 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
-import SeriesDropdown from '@/components/SeriesDropdown';
+import EpisodePicker from './EpisodePicker';
 import { Episode } from '@/types/anime';
 import { FaStar } from 'react-icons/fa';
 import { useWatchTracker } from '@/hooks/useWatchTracker';
+import { useRouter } from 'next/navigation';
+import CreateRoomModal from '@/components/watch-party/CreateRoomModal';
 
 interface AnimePlayerProps {
   animeId: number;
+  anime?: any;
   episodes: Episode[];
   onEpisodeSelect?: (episodeNumber: number) => void;
 }
 
-export default function AnimePlayer({ animeId, episodes, onEpisodeSelect }: AnimePlayerProps) {
+export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect }: AnimePlayerProps) {
+  const [showCreateRoom, setShowCreateRoom] = useState(false);
+  const router = typeof window !== 'undefined' ? useRouter() : null;
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
   const [userRating, setUserRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
@@ -79,8 +84,7 @@ export default function AnimePlayer({ animeId, episodes, onEpisodeSelect }: Anim
     }
   }, [uniqueEpisodes, currentEpisode]);
 
-  const handleEpisodeChange = (label: string) => {
-    const epNum = parseInt(label.replace(/\D/g, ''));
+  const handleEpisodeChange = (epNum: number) => {
     const ep = uniqueEpisodes.find(e => e.episode_number === epNum);
     if (ep) {
       setCurrentEpisode(ep);
@@ -128,13 +132,31 @@ export default function AnimePlayer({ animeId, episodes, onEpisodeSelect }: Anim
               )}
             </div>
           </div>
-          <div className="w-full md:w-64">
-            <SeriesDropdown
-              series={uniqueEpisodes.map(ep => `Серия ${ep.episode_number}`)}
-              onSelect={handleEpisodeChange}
-            />
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+            <div className="w-full sm:w-[320px]">
+              {uniqueEpisodes.length > 0 && currentEpisode && (
+                <EpisodePicker
+                  episodes={uniqueEpisodes}
+                  currentEpisode={currentEpisode.episode_number}
+                  onSelect={handleEpisodeChange}
+                />
+              )}
+            </div>
           </div>
         </div>
+        
+        {anime && currentEpisode && (
+          <div className="mb-4 flex justify-end">
+            <button
+              onClick={() => setShowCreateRoom(true)}
+              className="bg-[#21D0B8] text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-105 hover:shadow-lg shadow-[#21D0B8]/20 transition-all active:scale-95"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
+              Включить вместе (Watch Party)
+            </button>
+          </div>
+        )}
+
         <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl border border-gray-500 bg-black">
           {currentEpisode?.player_url ? (
             <iframe
@@ -151,6 +173,19 @@ export default function AnimePlayer({ animeId, episodes, onEpisodeSelect }: Anim
         </div>
       </div>
       <hr className="border-gray-500 mb-10" />
+
+      {showCreateRoom && anime && currentEpisode && (
+         <CreateRoomModal
+           anime={anime}
+           episodeNumber={currentEpisode.episode_number}
+           onClose={() => setShowCreateRoom(false)}
+           onCreated={(code) => {
+             if (router) {
+               router.push(`/watch-party/${code}`);
+             }
+           }}
+         />
+      )}
     </div>
   );
 }
