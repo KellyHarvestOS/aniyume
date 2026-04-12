@@ -40,8 +40,8 @@ export default function Footer() {
       });
     } else {
       setLogoPaths({
-        light: '/images/logo0.png',
-        dark: '/images/logo01.png'
+        light: '/images/logo01.png',
+        dark: '/images/logo0.png'
       });
     }
   }, []);

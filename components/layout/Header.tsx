@@ -66,8 +66,8 @@ export default function Header() {
 
       if (isPremium) {
         document.documentElement.classList.add('is-premium');
-        
-        // Если есть премиум и ключ логотипа, меняем пути
+
+
         if (savedLogoKey) {
           setLogoPaths({
             light: `/images/LogoStyle/${savedLogoKey}Dark.png`,
@@ -76,8 +76,8 @@ export default function Header() {
         }
       } else {
         document.documentElement.classList.remove('is-premium');
-        // Сброс на стандартные лого
-        setLogoPaths({ light: '/images/logo0.png', dark: '/images/logo01.png' });
+
+        setLogoPaths({ light: '/images/logo01.png', dark: '/images/logo0.png' });
       }
 
       if (isPremium && themeValue) {
