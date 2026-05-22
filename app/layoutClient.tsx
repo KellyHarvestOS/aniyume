@@ -9,7 +9,7 @@ import CookieConsent from '../components/layout/CookieConsent';
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const noLayoutPages = ['/login', '/register', '/premium', '/watch'];
+  const noLayoutPages = ['/login', '/register', '/premium', '/premium/checkout', '/watch'];
   const hideLayout = noLayoutPages.includes(pathname);
 
   useEffect(() => {

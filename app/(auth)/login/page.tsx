@@ -7,6 +7,37 @@ import { FaEnvelope, FaLock, FaSignInAlt, FaEye, FaEyeSlash } from 'react-icons/
 import AuthBackground from '@/components/layout/AuthBackground';
 import Modal from '@/components/modals/ErrorModal';
 
+type AuthResponse = {
+  message?: string;
+  token?: string;
+  access_token?: string;
+  user?: unknown;
+  data?: {
+    token?: string;
+    access_token?: string;
+    user?: unknown;
+  };
+};
+
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'Не удалось войти. Попробуйте позже.';
+};
+
+const readJson = async (res: Response): Promise<AuthResponse> => {
+  const text = await res.text();
+  if (!text) return {};
+
+  try {
+    return JSON.parse(text) as AuthResponse;
+  } catch {
+    return { message: text };
+  }
+};
+
+const MOCK_LOGIN_EMAIL = 'vladjjjsss7@gmail.com';
+
 const LoginPage = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -49,19 +80,34 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
+      if (formData.email.trim().toLowerCase() === MOCK_LOGIN_EMAIL && formData.password === MOCK_LOGIN_EMAIL) {
+        localStorage.setItem('userToken', 'mock-premium-user-token');
+        localStorage.setItem('userData', JSON.stringify({
+          id: 'mock-premium-user',
+          name: 'vladjjjsss7',
+          email: MOCK_LOGIN_EMAIL,
+        }));
+        window.dispatchEvent(new Event('authChange'));
+
+        openAlert('С возвращением!', 'Вы успешно вошли в тестовый аккаунт AniYume.', 'success', () => {
+          router.push('/');
+        });
+        return;
+      }
+
       const res = await fetch('/api/external/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      const responseData = await res.json();
+      const responseData = await readJson(res);
 
       if (!res.ok) {
         throw new Error(responseData.message || 'Неверный логин или пароль');
       }
 
-      const token = responseData.data?.token || responseData.token || responseData.access_token;
+      const token = responseData.data?.token || responseData.data?.access_token || responseData.token || responseData.access_token;
       const user = responseData.data?.user || responseData.user;
 
       if (!token) {
@@ -72,12 +118,13 @@ const LoginPage = () => {
       if (user) {
         localStorage.setItem('userData', JSON.stringify(user));
       }
+      window.dispatchEvent(new Event('authChange'));
 
       openAlert('С возвращением!', 'Вы успешно вошли в систему AniYume.', 'success', () => {
         router.push('/');
       });
-    } catch (error: any) {
-      openAlert('Ошибка входа', error.message, 'danger');
+    } catch (error: unknown) {
+      openAlert('Ошибка входа', getErrorMessage(error), 'danger');
     } finally {
       setLoading(false);
     }

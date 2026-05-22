@@ -90,12 +90,12 @@ export const ProfileCard = ({
           <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-4 border-white dark:border-black/70 rounded-full z-10" />
         </div>
 
-        <p className={`text-sm w-40 mx-auto font-bold mt-1 text-white dark:text-gray-900 italic ${user.is_premium ? "text-white" : "text-black"}`}>
+        <p className={`text-sm w-40 mx-auto font-bold mt-1 text-black dark:text-gray-100 italic ${user.is_premium ? "text-white" : "text-black"}`}>
           {user.custom_status || "Cтатус отсутствует"}
         </p>
 
 
-        <p className={`text-xs mt-3 line-clamp-3 font-bold text-white dark:text-gray-900 px-2 ${user.is_premium ? "text-white" : "text-slate-400"
+        <p className={`text-xs mt-3 line-clamp-3 font-bold text-black dark:text-gray-100 px-2 ${user.is_premium ? "text-white" : "text-slate-400"
           }`}>
           {user.bio?.trim() ? user.bio : "Биография отсутствует"}
         </p>

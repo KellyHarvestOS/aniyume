@@ -4,7 +4,7 @@ const BASE_URL = "http://164.90.185.95/api/v1";
 
 export async function handleProxy(
   req: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
   try {
     const { path } = await params;
@@ -51,7 +51,7 @@ export async function handleProxy(
         method: req.method,
         headers: upstreamHeaders,
         body: req.body,
-        // @ts-ignore
+        // @ts-expect-error Node fetch requires duplex when streaming multipart bodies.
         duplex: "half",
       });
 
