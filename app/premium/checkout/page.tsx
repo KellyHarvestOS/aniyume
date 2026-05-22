@@ -177,9 +177,7 @@ export default function PremiumCheckoutPage() {
             </div>
           )}
 
-          <div className="mt-6 rounded-2xl bg-neutral-50 p-4 text-sm font-semibold text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">
-            <div className="flex items-center gap-2 text-[#168a7f]"><FaShieldAlt /> Платежные данные будут обрабатываться на стороне вашего платежного backend.</div>
-          </div>
+          
 
           <button type="submit" disabled={isProcessing} className="mt-5 w-full rounded-2xl bg-[#168a7f] px-5 py-5 text-sm font-black uppercase tracking-[0.16em] text-white shadow-xl shadow-[#168a7f]/20 transition hover:bg-[#106f66] disabled:cursor-not-allowed disabled:opacity-70">
             {isProcessing ? "Проверяем оплату..." : "Оплатить 199₽"}
