@@ -66,6 +66,7 @@ export default function Header() {
 
       if (isPremium) {
         document.documentElement.classList.add('is-premium');
+        document.documentElement.classList.toggle('premium-cursor-disabled', localStorage.getItem('premium_cursor_disabled') === 'true');
 
 
         if (savedLogoKey) {
@@ -74,8 +75,16 @@ export default function Header() {
             dark: `/images/LogoStyle/${savedLogoKey}White.png`
           });
         }
+
+        const savedCursor = localStorage.getItem("profile_cursor_path") || "/images/cursor/Mouse-cursor.png";
+        const savedCursorKey = localStorage.getItem("profile_cursor_key") || "default";
+        document.documentElement.dataset.premiumCursor = savedCursorKey;
+        document.documentElement.style.setProperty('--premium-cursor', `url('${savedCursor}') 4 4`);
       } else {
         document.documentElement.classList.remove('is-premium');
+        document.documentElement.classList.remove('premium-cursor-disabled');
+        delete document.documentElement.dataset.premiumCursor;
+        document.documentElement.style.removeProperty('--premium-cursor');
 
         setLogoPaths({ light: '/images/logo01.png', dark: '/images/logo0.png' });
       }
