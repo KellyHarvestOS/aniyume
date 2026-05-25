@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import AnimeCardSkeleton from '@/components/skeletons/AnimeCardSkeleton';
 import AnimeCard from '@/components/anime/AnimeCard';
 
@@ -17,41 +16,99 @@ interface AnimeData {
 const CACHE_KEY_PREFIX = 'aniyume_animelist_page_';
 const CACHE_DURATION = 1000 * 60 * 15;
 
+const normalizeAnimeData = (value: unknown): AnimeData[] => Array.isArray(value) ? value : [];
+
+const readCachedPage = (page: number) => {
+  const cacheKey = `${CACHE_KEY_PREFIX}${page}`;
+  const cached = sessionStorage.getItem(cacheKey);
+  if (!cached) return null;
+
+  try {
+    const parsed = JSON.parse(cached);
+    const items = normalizeAnimeData(parsed.data);
+    if (items.length === 0) return null;
+
+    return {
+      items,
+      total: Number(parsed.total) || page,
+      isFresh: Date.now() - Number(parsed.timestamp || 0) < CACHE_DURATION,
+    };
+  } catch {
+    sessionStorage.removeItem(cacheKey);
+    return null;
+  }
+};
+
 const AnimeList = ({ title }: { title: string }) => {
   const titleRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<AnimeData[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchAnime = async () => {
       const cacheKey = `${CACHE_KEY_PREFIX}${page}`;
-      const cached = sessionStorage.getItem(cacheKey);
+      const cached = readCachedPage(page);
 
       if (cached) {
-        const { data: cachedData, total: cachedTotal, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < CACHE_DURATION) {
-          setData(cachedData);
+        if (!cancelled) {
+          setData((current) => page === 1 ? cached.items : [...current, ...cached.items]);
+          setTotal(cached.total);
+          setLoading(false);
+          setLoadingMore(false);
+        }
+
+        if (cached.isFresh) return;
+      }
+
+      if (!cached) {
+        const cachedPages: AnimeData[] = [];
+        let cachedTotal = 1;
+
+        for (let pageNumber = 1; pageNumber <= 100; pageNumber++) {
+          const cachedPage = readCachedPage(pageNumber);
+          if (!cachedPage) break;
+          cachedPages.push(...cachedPage.items);
+          cachedTotal = Math.max(cachedTotal, cachedPage.total);
+        }
+
+        if (page === 1 && cachedPages.length > 0 && !cancelled) {
+          setData(cachedPages);
+          setPage(Math.ceil(cachedPages.length / 10));
           setTotal(cachedTotal);
           setLoading(false);
-          if (page > 1) titleRef.current?.scrollIntoView({ behavior: 'smooth' });
-          return;
+          setLoadingMore(false);
         }
       }
 
+      if (!navigator.onLine && cached) return;
+
       try {
-        setLoading(true);
-        if (page > 1) titleRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (!cached) {
+          if (page === 1) {
+            setLoading(true);
+          } else {
+            setLoadingMore(true);
+          }
+        }
 
         const res = await fetch(`/api/external/anime?page=${page}&sort=newest&per_page=10`);
         const json = await res.json();
 
-        const newData = json.data || json;
+        const newData = normalizeAnimeData(json.data || json);
         const newTotal = json.meta?.last_page || json.last_page || 10;
 
-        setData(newData);
-        setTotal(newTotal);
+        if (newData.length === 0) return;
+
+        if (!cancelled) {
+          setData((current) => page === 1 ? newData : [...current, ...newData]);
+          setTotal(newTotal);
+        }
 
         sessionStorage.setItem(cacheKey, JSON.stringify({
           data: newData,
@@ -62,25 +119,35 @@ const AnimeList = ({ title }: { title: string }) => {
       } catch (e) {
         console.error(e);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          setLoadingMore(false);
+        }
       }
     };
     fetchAnime();
+
+    return () => {
+      cancelled = true;
+    };
   }, [page]);
 
-  const renderPages = () => {
-    const nums = [];
-    const pushBtn = (p: number) => nums.push(
-      <button key={p} onClick={() => setPage(p)} className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${page === p ? "bg-brand text-white shadow-lg scale-110" : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-zinc-800"}`}>{p}</button>
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target || loading || loadingMore || page >= total) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setPage((current) => current >= total ? current : current + 1);
+        }
+      },
+      { rootMargin: '500px 0px' }
     );
 
-    pushBtn(1);
-    if (page > 3) nums.push(<span key="l" className="px-1 text-gray-400">...</span>);
-    for (let i = Math.max(2, page - 1); i <= Math.min(total - 1, page + 1); i++) pushBtn(i);
-    if (page < total - 2) nums.push(<span key="r" className="px-1 text-gray-400">...</span>);
-    if (total > 1) pushBtn(total);
-    return nums;
-  };
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [loading, loadingMore, page, total]);
 
   return (
     <section className="container mx-auto px-4 py-10 md:py-16">
@@ -97,16 +164,19 @@ const AnimeList = ({ title }: { title: string }) => {
         }
       </div>
 
-      {!loading && data.length > 0 && (
-        <div className="mt-16 flex justify-center">
-          <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-3 disabled:opacity-20 dark:text-gray-300"><FaChevronLeft /></button>
-            <div className="hidden sm:flex gap-1">{renderPages()}</div>
-            <div className="sm:hidden px-4 font-black text-sm dark:text-gray-300">{page} / {total}</div>
-            <button onClick={() => setPage(p => Math.min(total, p + 1))} disabled={page === total} className="p-3 disabled:opacity-20 dark:text-gray-300"><FaChevronRight /></button>
+      <div ref={loadMoreRef} className="mt-12 min-h-20">
+        {loadingMore && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 justify-items-center">
+            {Array.from({ length: 5 }).map((_, i) => <AnimeCardSkeleton key={`more-${i}`} />)}
           </div>
-        </div>
-      )}
+        )}
+
+        {!loading && page >= total && data.length > 0 && (
+          <p className="text-center text-xs font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-600">
+            Все аниме загружены
+          </p>
+        )}
+      </div>
     </section>
   );
 };

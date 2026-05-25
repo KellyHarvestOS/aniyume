@@ -422,7 +422,7 @@ export default function EditProfilePage() {
                           onChange={() => handleCursorDisabledChange(false)}
                           className="h-4 w-4 accent-black"
                         />
-                        <span className="text-sm font-bold text-slate-700 dark:text-gray-200">
+                        <span className="text-sm font-bold text-slate-700 dark:text-gray-500">
                           Включить кастомную мышку
                         </span>
                       </label>
@@ -438,7 +438,7 @@ export default function EditProfilePage() {
                           onChange={() => handleCursorDisabledChange(true)}
                           className="h-4 w-4 accent-black"
                         />
-                        <span className="text-sm font-bold text-slate-700 dark:text-gray-200">
+                        <span className="text-sm font-bold text-slate-700 dark:text-gray-500">
                           Отключить кастомную мышку
                         </span>
                       </label>
