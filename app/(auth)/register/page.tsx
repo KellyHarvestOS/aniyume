@@ -9,13 +9,45 @@ import {
   FaLock,
   FaUserPlus,
   FaRegAddressCard,
-  FaCalendarAlt,
   FaEye,
   FaEyeSlash
 } from "react-icons/fa";
 import AuthBackground from "@/components/layout/AuthBackground";
 import Modal from "@/components/modals/ErrorModal";
 import { useAuth } from '@/contexts/AuthContext';
+import DatePicker from "@/components/ui/DatePicker";
+
+type RegisterResponse = {
+  message?: string;
+  token?: string;
+  access_token?: string;
+  user?: unknown;
+  errors?: Record<string, string[] | string>;
+  data?: {
+    token?: string;
+    access_token?: string;
+    user?: unknown;
+  };
+};
+
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "Не удалось создать аккаунт. Попробуйте позже.";
+};
+
+const readJson = async (res: Response): Promise<RegisterResponse> => {
+  const text = await res.text();
+  if (!text) return {};
+
+  try {
+    return JSON.parse(text) as RegisterResponse;
+  } catch {
+    return { message: text };
+  }
+};
+
+type RegisterUser = Parameters<ReturnType<typeof useAuth>['login']>[1];
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -51,6 +83,10 @@ const RegisterPage = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleDateChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, dateOfBirth: value }));
   };
 
   const openAlert = (title: string, message: string, type: "success" | "danger", action?: () => void) => {
@@ -122,9 +158,9 @@ const RegisterPage = () => {
           password_confirmation: formData.confirmPassword,
         }),
       });
-      const responseData = await res.json();
+      const responseData = await readJson(res);
       if (!res.ok) {
-        let errorMessage = "Ошибка регистрации";
+        let errorMessage = responseData.message || "Ошибка регистрации";
         if (responseData.errors) {
           const firstError = Object.values(responseData.errors)[0];
           errorMessage = Array.isArray(firstError) ? firstError[0] : "Ошибка валидации";
@@ -132,10 +168,10 @@ const RegisterPage = () => {
         openAlert("Регистрация отклонена", errorMessage, "danger");
         return;
       }
-      const token = responseData.data?.token || responseData.token || responseData.access_token;
+      const token = responseData.data?.token || responseData.data?.access_token || responseData.token || responseData.access_token;
       const user = responseData.data?.user || responseData.user;
       if (token) {
-        login(token, user || { id: 0, name: formData.username, email: formData.email });
+        login(token, (user as RegisterUser | undefined) || { id: 0, name: formData.username, email: formData.email });
         openAlert("Успех!", "Ваш аккаунт создан. Приятного просмотра аниме!", "success", () => {
           router.push("/");
         });
@@ -144,8 +180,8 @@ const RegisterPage = () => {
           router.push("/login");
         });
       }
-    } catch (error: any) {
-      openAlert("Сбой сервера", "Не удалось связаться с базой данных. Попробуйте позже.", "danger");
+    } catch (error: unknown) {
+      openAlert("Сбой сервера", getErrorMessage(error), "danger");
     } finally {
       setLoading(false);
     }
@@ -197,17 +233,7 @@ const RegisterPage = () => {
               <label htmlFor="dateOfBirth" className="block text-[10px] font-black uppercase tracking-tight text-[#2EC4B6] mb-2 ml-1 h-4 whitespace-nowrap overflow-hidden">
                 Дата рождения
               </label>
-              <div className="relative group">
-                <input
-                  id="dateOfBirth"
-                  type="date"
-                  value={formData.dateOfBirth}
-                  onChange={handleChange}
-                  className="w-full h-[52px] px-3 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-[#111111] text-gray-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-[#2EC4B6]/50 transition-all font-bold text-xs appearance-none
-                  [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:left-0 [&::-webkit-calendar-picker-indicator]:top-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-                />
-                <FaCalendarAlt className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs opacity-50" />
-              </div>
+              <DatePicker id="dateOfBirth" value={formData.dateOfBirth} onChange={handleDateChange} />
             </div>
 
             <div className="md:col-span-10 flex flex-col">

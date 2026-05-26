@@ -237,6 +237,31 @@ body {
 :root {
     --brand-main: #39bcba;
     --brand-gradient: linear-gradient(90deg, #2EC4B6, #2193b0);
+    --premium-cursor: url('/images/cursor/Mouse-cursor.png') 4 4;
+}
+
+.is-premium[data-premium-cursor="default"] {
+    --premium-cursor: url('/images/cursor/Mouse-cursor.png') 4 4;
+}
+
+.is-premium[data-premium-cursor="red"] {
+    --premium-cursor: url('/images/cursor/redMouse-cursor.png') 4 4;
+}
+
+.is-premium[data-premium-cursor="purple"] {
+    --premium-cursor: url('/images/cursor/purpleMouse-cursor.png') 4 4;
+}
+
+.is-premium[data-premium-cursor="yellow"] {
+    --premium-cursor: url('/images/cursor/yellowMouse-cursor.png') 4 4;
+}
+
+.is-premium[data-premium-cursor="green"] {
+    --premium-cursor: url('/images/cursor/greenMouse-cursor.png') 4 4;
+}
+
+.is-premium[data-premium-cursor="gray"] {
+    --premium-cursor: url('/images/cursor/grayMouse-cursor.png') 4 4;
 }
 
 .bg-brand {
@@ -248,6 +273,32 @@ body {
     background: var(--brand-gradient) !important;
     background-size: cover;
     border: none;
+}
+
+.is-premium:not(.premium-cursor-disabled),
+.is-premium:not(.premium-cursor-disabled) * {
+    cursor: var(--premium-cursor), auto !important;
+}
+
+.dark.is-premium:not(.premium-cursor-disabled),
+.dark.is-premium:not(.premium-cursor-disabled) * {
+    cursor: var(--premium-cursor), auto !important;
+}
+
+.is-premium:not(.premium-cursor-disabled) a,
+.is-premium:not(.premium-cursor-disabled) button,
+.is-premium:not(.premium-cursor-disabled) [role="button"],
+.is-premium:not(.premium-cursor-disabled) input[type="button"],
+.is-premium:not(.premium-cursor-disabled) input[type="submit"] {
+    cursor: var(--premium-cursor), pointer !important;
+}
+
+.dark.is-premium:not(.premium-cursor-disabled) a,
+.dark.is-premium:not(.premium-cursor-disabled) button,
+.dark.is-premium:not(.premium-cursor-disabled) [role="button"],
+.dark.is-premium:not(.premium-cursor-disabled) input[type="button"],
+.dark.is-premium:not(.premium-cursor-disabled) input[type="submit"] {
+    cursor: var(--premium-cursor), pointer !important;
 }
 
 .text-brand {

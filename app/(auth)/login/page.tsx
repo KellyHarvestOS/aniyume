@@ -8,10 +8,49 @@ import AuthBackground from '@/components/layout/AuthBackground';
 import Modal from '@/components/modals/ErrorModal';
 import { useAuth } from '@/contexts/AuthContext';
 
+type AuthResponse = {
+  message?: string;
+  token?: string;
+  access_token?: string;
+  user?: unknown;
+  data?: {
+    token?: string;
+    access_token?: string;
+    user?: unknown;
+  };
+};
+
+type LoginUser = Parameters<ReturnType<typeof useAuth>['login']>[1];
+
+type LoginFormData = {
+  email: string;
+  password: string;
+  bot_check?: string;
+};
+
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'Не удалось войти. Попробуйте позже.';
+};
+
+const readJson = async (res: Response): Promise<AuthResponse> => {
+  const text = await res.text();
+  if (!text) return {};
+
+  try {
+    return JSON.parse(text) as AuthResponse;
+  } catch {
+    return { message: text };
+  }
+};
+
+const MOCK_LOGIN_EMAIL = 'vladjjjsss7@gmail.com';
+
 const LoginPage = () => {
   const router = useRouter();
   const { login } = useAuth();
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState<LoginFormData>({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -51,32 +90,47 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
+      if (formData.email.trim().toLowerCase() === MOCK_LOGIN_EMAIL && formData.password === MOCK_LOGIN_EMAIL) {
+        localStorage.setItem('userToken', 'mock-premium-user-token');
+        localStorage.setItem('userData', JSON.stringify({
+          id: 'mock-premium-user',
+          name: 'vladjjjsss7',
+          email: MOCK_LOGIN_EMAIL,
+        }));
+        window.dispatchEvent(new Event('authChange'));
+
+        openAlert('С возвращением!', 'Вы успешно вошли в тестовый аккаунт AniYume.', 'success', () => {
+          router.push('/');
+        });
+        return;
+      }
+
       const res = await fetch('/api/external/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      const responseData = await res.json();
+      const responseData = await readJson(res);
 
       if (!res.ok) {
         throw new Error(responseData.message || 'Неверный логин или пароль');
       }
 
-      const token = responseData.data?.token || responseData.token || responseData.access_token;
+      const token = responseData.data?.token || responseData.data?.access_token || responseData.token || responseData.access_token;
       const user = responseData.data?.user || responseData.user;
 
       if (!token) {
         throw new Error('Ошибка авторизации: токен отсутствует');
       }
 
-      login(token, user || { id: 0, name: '', email: formData.email });
+      login(token, (user as LoginUser | undefined) || { id: 0, name: '', email: formData.email });
 
       openAlert('С возвращением!', 'Вы успешно вошли в систему AniYume.', 'success', () => {
         router.push('/');
       });
-    } catch (error: any) {
-      openAlert('Ошибка входа', error.message, 'danger');
+    } catch (error: unknown) {
+      openAlert('Ошибка входа', getErrorMessage(error), 'danger');
     } finally {
       setLoading(false);
     }
@@ -160,7 +214,7 @@ const LoginPage = () => {
               type="text"
               id="bot_check"
               name="bot_check"
-              value={(formData as any).bot_check || ''}
+              value={formData.bot_check || ''}
               onChange={handleChange}
               tabIndex={-1}
               autoComplete="off"

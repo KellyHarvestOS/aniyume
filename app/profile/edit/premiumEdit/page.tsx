@@ -15,15 +15,15 @@ export default function PremiumEditPage() {
 
     // Массив с ключами логотипов
     const gradients = [
-        { name: "Лазурный поток", value: "from-[#34dccb] to-[#007492]", logoKey: "AzureFlow" },
-        { name: "Неоновая страсть", value: "from-[#b80016] to-[#f8079c]", logoKey: "NeonPassion" },
-        { name: "Космический разлом", value: "from-[#9a00b6] to-[#1500ff]", logoKey: "SpaceRift" },
-        { name: "Солнечный импульс", value: "from-[#d76800] to-[#e1eb22]", logoKey: "SolarImpulse" },
-        { name: "Тропический яд", value: "from-[#039e00] to-[#c1ff31]", logoKey: "TropicalPoison" },
-        { name: "Пустотная энергия", value: "from-[#230236] to-[#aed7d7]", logoKey: "VoidEnergy" }
+        { name: "Лазурный поток", value: "from-[#34dccb] to-[#007492]", logoKey: "AzureFlow", cursorKey: "default", cursorPath: "/images/cursor/Mouse-cursor.png" },
+        { name: "Неоновая страсть", value: "from-[#b80016] to-[#f8079c]", logoKey: "NeonPassion", cursorKey: "red", cursorPath: "/images/cursor/redMouse-cursor.png" },
+        { name: "Космический разлом", value: "from-[#9a00b6] to-[#1500ff]", logoKey: "SpaceRift", cursorKey: "purple", cursorPath: "/images/cursor/purpleMouse-cursor.png" },
+        { name: "Солнечный импульс", value: "from-[#d76800] to-[#e1eb22]", logoKey: "SolarImpulse", cursorKey: "yellow", cursorPath: "/images/cursor/yellowMouse-cursor.png" },
+        { name: "Тропический яд", value: "from-[#039e00] to-[#c1ff31]", logoKey: "TropicalPoison", cursorKey: "green", cursorPath: "/images/cursor/greenMouse-cursor.png" },
+        { name: "Пустотная энергия", value: "from-[#230236] to-[#aed7d7]", logoKey: "VoidEnergy", cursorKey: "gray", cursorPath: "/images/cursor/grayMouse-cursor.png" }
     ];
 
-    const updateGlobalStyles = useCallback((value: string, type: 'gradient' | 'solid') => {
+    const updateGlobalStyles = useCallback((value: string, type: 'gradient' | 'solid', cursorPath?: string, cursorKey?: string) => {
         const root = document.documentElement;
         if (type === 'gradient') {
             const hexColors = value.match(/#[a-fA-F0-9]{6}/g);
@@ -35,6 +35,14 @@ export default function PremiumEditPage() {
         } else {
             root.style.setProperty('--brand-gradient', value);
             root.style.setProperty('--brand-main', value);
+        }
+
+        if (cursorPath) {
+            root.style.setProperty('--premium-cursor', `url('${cursorPath}') 4 4`);
+        }
+
+        if (cursorKey) {
+            root.dataset.premiumCursor = cursorKey;
         }
     }, []);
 
@@ -48,27 +56,33 @@ export default function PremiumEditPage() {
 
         const savedValue = localStorage.getItem("profile_theme_value") || "from-[#34dccb] to-[#007492]";
         const savedType = localStorage.getItem("profile_theme_type") as 'gradient' | 'solid' || 'gradient';
+        const savedCursor = localStorage.getItem("profile_cursor_path") || "/images/cursor/Mouse-cursor.png";
+        const savedCursorKey = localStorage.getItem("profile_cursor_key") || "default";
 
         setProfileValue(savedValue);
         setThemeType(savedType);
-        updateGlobalStyles(savedValue, savedType);
+        updateGlobalStyles(savedValue, savedType, savedCursor, savedCursorKey);
         setLoading(false);
     }, [router, updateGlobalStyles]);
 
     const handleSave = () => {
         localStorage.setItem("profile_theme_value", profileValue);
         localStorage.setItem("profile_theme_type", themeType);
-        updateGlobalStyles(profileValue, themeType);
+        const savedCursor = localStorage.getItem("profile_cursor_path") || "/images/cursor/Mouse-cursor.png";
+        const savedCursorKey = localStorage.getItem("profile_cursor_key") || "default";
+        updateGlobalStyles(profileValue, themeType, savedCursor, savedCursorKey);
         alert("Настройки оформления сохранены!");
         router.back();
     };
 
-    const handleValueChange = (value: string, type: 'gradient' | 'solid', logoKey: string) => {
+    const handleValueChange = (value: string, type: 'gradient' | 'solid', logoKey: string, cursorPath: string, cursorKey: string) => {
         setThemeType(type);
         setProfileValue(value);
-        updateGlobalStyles(value, type);
+        updateGlobalStyles(value, type, cursorPath, cursorKey);
 
         localStorage.setItem("profile_logo_key", logoKey);
+        localStorage.setItem("profile_cursor_path", cursorPath);
+        localStorage.setItem("profile_cursor_key", cursorKey);
         localStorage.setItem("profile_theme_value", value);
         localStorage.setItem("profile_theme_type", type);
 
@@ -118,7 +132,7 @@ export default function PremiumEditPage() {
                                 {gradients.map((grad) => (
                                     <button
                                         key={grad.value}
-                                        onClick={() => handleValueChange(grad.value, 'gradient', grad.logoKey)}
+                                        onClick={() => handleValueChange(grad.value, 'gradient', grad.logoKey, grad.cursorPath, grad.cursorKey)}
                                         className={`group relative aspect-square rounded-3xl transition-all duration-500 ${profileValue === grad.value
                                             ? "scale-100 ring-4 ring-offset-4 dark:ring-offset-[#0a0a0a] ring-brand shadow-2xl"
                                             : "scale-[0.96] hover:scale-100 opacity-70 hover:opacity-100 shadow-lg"

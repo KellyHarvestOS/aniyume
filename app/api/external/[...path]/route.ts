@@ -45,7 +45,7 @@ export async function handleProxy(
         method: req.method,
         headers: upstreamHeaders,
         body: req.body,
-        // @ts-ignore
+        // @ts-expect-error Node fetch requires duplex when streaming multipart bodies.
         duplex: "half",
       });
 

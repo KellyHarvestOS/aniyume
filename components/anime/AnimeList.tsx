@@ -25,6 +25,24 @@ interface AnimeListProps {
   };
 }
 
+const PER_PAGE = 20;
+
+const normalizeAnimeData = (value: unknown): AnimeData[] => Array.isArray(value) ? value : [];
+
+const buildParams = (page: number, filters: AnimeListProps['filters'] = {}) => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    per_page: PER_PAGE.toString(),
+    sort: filters.sort || 'smart',
+  });
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value && key !== 'sort') params.set(key, value);
+  });
+
+  return params;
+};
+
 const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
   const [data, setData] = useState<AnimeData[]>([]);
   const [page, setPage] = useState(1);
@@ -32,95 +50,92 @@ const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
   const [loading, setLoading] = useState(true);
   const [loadingNext, setLoadingNext] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  
+
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  // 1. Initial Load & Reset on Filters Change
   useEffect(() => {
+    let cancelled = false;
+
     const fetchInitial = async () => {
       setLoading(true);
       setPage(1);
-      
-      try {
-        const params = new URLSearchParams({
-          page: '1',
-          per_page: '20',
-          sort: filters.sort || 'smart',
-          ...Object.fromEntries(Object.entries(filters).filter(([k, v]) => !!v && k !== 'sort'))
-        });
+      setHasMore(true);
 
+      try {
+        const params = buildParams(1, filters);
         const res = await fetch(`/api/external/public/anime?${params.toString()}`);
         const json = await res.json();
-        const raw = json.data || [];
-        
-        setData(raw);
-        setHasMore(raw.length >= 20);
+        const items = normalizeAnimeData(json.data || json);
+
+        if (cancelled) return;
+
+        setData(items);
+        setHasMore(items.length >= PER_PAGE);
       } catch (e) {
         console.error('Initial fetch failed:', e);
+        if (!cancelled) {
+          setData([]);
+          setHasMore(false);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchInitial();
-  }, [filters.search, filters.genre, filters.year, filters.type, filters.sort]);
 
-  // 2. Load Next Page
+    return () => {
+      cancelled = true;
+    };
+  }, [filters]);
+
   const fetchNextPage = useCallback(async () => {
-    if (loadingNext || !hasMore) return;
-    
+    if (loadingNext || loading || !hasMore) return;
+
     setLoadingNext(true);
     const nextPage = page + 1;
-    
-    try {
-      const params = new URLSearchParams({
-        page: nextPage.toString(),
-        per_page: '20',
-        sort: filters.sort || 'smart',
-        ...Object.fromEntries(Object.entries(filters).filter(([k, v]) => !!v && k !== 'sort'))
-      });
 
+    try {
+      const params = buildParams(nextPage, filters);
       const res = await fetch(`/api/external/public/anime?${params.toString()}`);
       const json = await res.json();
-      const raw = json.data || [];
-      
-      if (raw.length === 0) {
+      const items = normalizeAnimeData(json.data || json);
+
+      if (items.length === 0) {
         setHasMore(false);
-      } else {
-        setData(prev => [...prev, ...raw]);
-        setPage(nextPage);
-        setHasMore(raw.length >= 20);
+        return;
       }
+
+      setData((current) => [...current, ...items]);
+      setPage(nextPage);
+      setHasMore(items.length >= PER_PAGE);
     } catch (e) {
       console.error('Next page fetch failed:', e);
     } finally {
       setLoadingNext(false);
     }
-  }, [page, hasMore, loadingNext, filters]);
+  }, [filters, hasMore, loading, loadingNext, page]);
 
-  // 3. Intersection Observer Logic
   useEffect(() => {
+    const target = observerTarget.current;
+    if (!target) return;
+
     const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting && hasMore && !loading && !loadingNext) {
-          fetchNextPage();
-        }
+      ([entry]) => {
+        if (entry.isIntersecting) fetchNextPage();
       },
       { threshold: 0.1, rootMargin: '400px' }
     );
 
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
+    observer.observe(target);
     return () => observer.disconnect();
-  }, [fetchNextPage, hasMore, loading, loadingNext]);
+  }, [fetchNextPage]);
 
-  // 4. Scroll to Top logic
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 1000);
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -138,12 +153,11 @@ const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 justify-items-center">
         {loading
-          ? Array.from({ length: 20 }).map((_, i) => <AnimeCardSkeleton key={i} />)
-          : data.map(item => <AnimeCard key={`${item.id}-${Math.random()}`} {...item} />)
+          ? Array.from({ length: PER_PAGE }).map((_, i) => <AnimeCardSkeleton key={i} />)
+          : data.map((item) => <AnimeCard key={item.id} {...item} />)
         }
       </div>
 
-      {/* Loading indicator for next pages */}
       <div ref={observerTarget} className="w-full flex justify-center py-16">
         {loadingNext && (
           <div className="flex flex-col items-center gap-4">
@@ -165,9 +179,9 @@ const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
         )}
       </div>
 
-      {/* Scroll to Top Button */}
       {showScrollTop && (
         <button
+          type="button"
           onClick={scrollToTop}
           className="fixed bottom-8 right-8 w-14 h-14 bg-brand text-white rounded-2xl shadow-2xl flex items-center justify-center text-xl transition-all hover:scale-110 active:scale-95 z-[60] group"
         >

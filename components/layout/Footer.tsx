@@ -40,8 +40,8 @@ export default function Footer() {
       });
     } else {
       setLogoPaths({
-        light: '/images/logo0.png',
-        dark: '/images/logo01.png'
+        light: '/images/logo01.png',
+        dark: '/images/logo0.png'
       });
     }
   }, []);
@@ -103,7 +103,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-14 border-t border-slate-400 pt-20 sm:grid-cols-2 lg:grid-cols-4 dark:border-gray-700 dark:border-t-4">
+        <div className="grid grid-cols-1 gap-14 border-t border-slate-400 pt-20 px-10 sm:grid-cols-2 lg:grid-cols-4 dark:border-gray-700 dark:border-t-4">
           <Block title="Навигация">
             <FooterLink href="/popular" icon={HiFire}>Популярное</FooterLink>
             <FooterLink href="/schedule" icon={IoCalendarNumberSharp}>Расписание</FooterLink>

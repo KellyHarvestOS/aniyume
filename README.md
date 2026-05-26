@@ -101,7 +101,7 @@
 
 | Категория | Технологии |
 | :--- | :--- |
-| **Framework** | [Next.js 14 (App Router)](https://nextjs.org/) |
+| **Framework** | [Next.js 16 (App Router)](https://nextjs.org/) |
 | **Language** | [TypeScript](https://www.typescriptlang.org/) |
 | **Styling** | [Tailwind CSS](https://tailwindcss.com/) |
 | **Icons** | React Icons (Fa, Md, Hi), Heroicons |
