@@ -26,7 +26,7 @@ export default function Header() {
 
   useEffect(() => {
     const applyTheme = () => {
-      const isPremium = localStorage.getItem("isPremium") === "true";
+      const isPremium = user?.is_premium || localStorage.getItem("isPremium") === "true";
       const themeType = localStorage.getItem("profile_theme_type");
       const themeValue = localStorage.getItem("profile_theme_value");
       const savedLogoKey = localStorage.getItem("profile_logo_key");
@@ -64,7 +64,7 @@ export default function Header() {
 
     window.addEventListener('storage', applyTheme);
     return () => window.removeEventListener('storage', applyTheme);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -97,22 +97,22 @@ export default function Header() {
         <div className="flex items-center gap-4">
           <Link href="/" className="shrink-0 transition-opacity">
             <Image
-              src={logoPaths.light}
+              src={logoPaths.dark}
               alt="Aniyume Logo"
               width={160}
               height={50}
               className="h-10 md:h-14 w-auto object-contain dark:hidden"
               priority
-              key={`dark-${logoPaths.light}`}
+              key={`dark-${logoPaths.dark}`}
             />
             <Image
-              src={logoPaths.dark}
+              src={logoPaths.light}
               alt="Aniyume Logo"
               width={160}
               height={50}
               className="hidden h-10 md:h-14 w-auto object-contain dark:block"
               priority
-              key={`light-${logoPaths.dark}`}
+              key={`light-${logoPaths.light}`}
             />
           </Link>
           <div >

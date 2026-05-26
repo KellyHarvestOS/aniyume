@@ -106,14 +106,21 @@ export default function BookmarksPage() {
     }));
 
     try {
-      const url = activeTab === "favorites"
-        ? `/api/external/favorites/${animeId}`
-        : `/api/external/my-anime-list/${animeId}`;
-
-      await fetch(url, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      if (activeTab === "favorites") {
+        await fetch(`/api/external/favorites/${animeId}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else {
+        await fetch(`/api/external/anime/${animeId}/status`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: "not_watching" }),
+        });
+      }
     } catch (e) {
       console.error(e);
     }

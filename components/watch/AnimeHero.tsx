@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FaPlay, FaStar, FaShareAlt, FaCheck, FaTv, FaFilm } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AnimeDetails } from '@/types/anime';
+import { getAnimeBanner } from '@/lib/api';
 
 interface AnimeHeroProps {
   anime: AnimeDetails;
@@ -28,13 +30,23 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
   const [copied, setCopied] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [bannerLoaded, setBannerLoaded] = useState(false);
+  const [fetchedBanner, setFetchedBanner] = useState<string | null>(null);
   const descRef = useRef<HTMLDivElement>(null);
+
+  // 1. Fetch banner progressive load
+  useEffect(() => {
+    if (anime.id) {
+      getAnimeBanner(anime.id).then((data) => {
+        if (data.banner) setFetchedBanner(data.banner);
+      });
+    }
+  }, [anime.id]);
 
   const tagsList = anime.tags || anime.genres || [];
 
-  // Используем cover_url как широкий баннер, poster_url как постер
-  const bannerUrl = anime.cover_url || anime.poster_url || '/placeholder.jpg';
+  // 2. Logic for banners: fetched > cover_url > poster_url
   const posterUrl = anime.poster_url || '/placeholder.jpg';
+  const bannerUrl = fetchedBanner || anime.cover_url || posterUrl;
 
   const cleanDescription = anime.description ? anime.description.replace(/<[^>]+>/g, '') : '';
   const isLong = cleanDescription.length > 200;
@@ -52,30 +64,41 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
   return (
     <div className="relative w-full min-h-[540px] md:min-h-[620px] overflow-hidden bg-[#0a0a0a]">
 
-      {/* ── Фоновый баннер ── */}
-      <div
-        className="absolute inset-0 z-0"
-        aria-hidden="true"
-      >
-        {/* Skeleton-blur пока грузится */}
-        {!bannerLoaded && (
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 animate-pulse" />
-        )}
+      {/* ── Фоновый баннер (Progressive Loading) ── */}
+      <div className="absolute inset-0 z-0 bg-[#060606]" aria-hidden="true">
+        
+        {/* 1. LQIP: Размытый постер как фон пока грузится основной баннер */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="absolute inset-0 z-0 overflow-hidden"
+        >
+          <img
+            src={posterUrl}
+            alt=""
+            className="w-full h-full object-cover blur-3xl scale-110 opacity-40 brightness-50"
+          />
+        </motion.div>
 
-        <img
-          src={bannerUrl}
-          alt=""
-          onLoad={() => setBannerLoaded(true)}
-          className={`w-full h-full object-cover object-center transition-opacity duration-700 ${bannerLoaded ? 'opacity-100' : 'opacity-0'}`}
-          style={{ imageRendering: 'auto' }}
-        />
+        {/* 2. Основной баннер с анимацией появления */}
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={bannerUrl}
+            src={bannerUrl}
+            alt=""
+            initial={{ opacity: 0 }}
+            animate={{ opacity: bannerLoaded ? 1 : 0 }}
+            transition={{ duration: 1, ease: 'easeOut' }}
+            onLoad={() => setBannerLoaded(true)}
+            className="absolute inset-0 w-full h-full object-cover object-center"
+            style={{ imageRendering: 'auto' }}
+          />
+        </AnimatePresence>
 
-        {/* Градиент слева — под контент */}
+        {/* Градиенты и оверлеи */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/10" />
-        {/* Градиент снизу */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
-        {/* Тонкий overlay для насыщенности */}
-        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
+        <div className="absolute inset-0 bg-black/10" />
       </div>
 
       {/* ── Контент ── */}

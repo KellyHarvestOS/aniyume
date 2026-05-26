@@ -47,6 +47,11 @@ async function apiClient(path: string, options: RequestInit = {}): Promise<Respo
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  const fingerprintId = typeof window !== 'undefined' ? localStorage.getItem('visitor_fp_id') : null;
+  if (fingerprintId) {
+    headers['X-Fingerprint-ID'] = fingerprintId;
+  }
+
   const url = `${API_BASE}${path}`;
   
   if (process.env.NODE_ENV === 'development') {
@@ -128,6 +133,17 @@ export async function getAnimeById(id: string): Promise<Anime> {
     throw new Error('Failed to fetch anime details');
   }
   return res.json();
+}
+
+export async function getAnimeBanner(id: string | number): Promise<{ banner: string | null; cover: string | null }> {
+  const url = `${API_BASE}/public/anime/${id}/banner`;
+  try {
+    const res = await fetch(url, { next: { revalidate: 3600 } } as RequestInit);
+    if (!res.ok) return { banner: null, cover: null };
+    return res.json();
+  } catch {
+    return { banner: null, cover: null };
+  }
 }
 
 export async function getAnimeEpisodes(id: string): Promise<Episode[]> {

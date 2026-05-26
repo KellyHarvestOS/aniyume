@@ -37,19 +37,12 @@ export default function SchedulePage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`${API_BASE}/anime?status=ongoing&per_page=60&sort=popularity`);
+        const res = await fetch(`${API_BASE}/schedule`);
         if (!res.ok) throw new Error('Failed');
         const json = await res.json();
-        const list: AnimeItem[] = Array.isArray(json.data) ? json.data : [];
-
         const grouped: Record<number, AnimeItem[]> = {};
         DAYS_INFO.forEach((_, index) => {
-          grouped[index] = [];
-        });
-
-        list.forEach(anime => {
-          const dayIndex = anime.id % 7;
-          grouped[dayIndex].push(anime);
+          grouped[index] = Array.isArray(json.data?.[index]) ? json.data[index] : [];
         });
 
         setSchedule(grouped);

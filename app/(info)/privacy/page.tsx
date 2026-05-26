@@ -1,134 +1,144 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { FaUserLock, FaDatabase, FaServer, FaFingerprint } from 'react-icons/fa';
-
-export const metadata = {
-  title: 'Конфиденциальность | Aniyume',
-  description: 'Политика обработки данных платформы Aniyume',
-};
+import { motion } from 'framer-motion';
+import {
+  FaUserLock,
+  FaDatabase,
+  FaServer,
+  FaFingerprint,
+  FaEnvelopeOpenText,
+  FaShieldAlt,
+  FaTrashAlt,
+} from 'react-icons/fa';
 
 export default function PrivacyPage() {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+  };
+
   return (
-    <div className="min-h-screen w-full bg-white dark:bg-[#111111] text-gray-900 dark:text-gray-200 flex flex-col items-center justify-center py-12 px-4 overflow-hidden relative transition-colors">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand rounded-full blur-[120px] opacity-[0.03] dark:opacity-[0.06] -z-10 pointer-events-none" />
+    <div className="min-h-screen w-full bg-white dark:bg-[#111111] text-gray-900 dark:text-gray-200 py-16 px-4 sm:px-6 lg:px-8 overflow-hidden relative transition-colors duration-500">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-brand/10 rounded-full blur-[140px] -z-10 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand/5 rounded-full blur-[140px] -z-10 pointer-events-none" />
 
-      <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-3 gap-8 items-center relative z-10">
-        <div className="space-y-6 order-2 lg:order-1">
-          <PolicyCard icon={<FaUserLock />} title="1. Данные аккаунта" align="right">
-            <p>
-              Для входа мы храним <span className="font-bold text-gray-900 dark:text-gray-200">Логин</span> и{' '}
-              <span className="font-bold text-gray-900 dark:text-gray-200">Пароль</span>. Пароли шифруются в{' '}
-              <span className="text-brand font-semibold">Hash</span> — мы их не видим.
-            </p>
-          </PolicyCard>
-
-          <PolicyCard icon={<FaDatabase />} title="2. Синхронизация" align="right">
-            <p>
-              Чтобы вы могли продолжить просмотр с другого устройства, мы храним списки
-              («Смотрю», «В планах») и историю серий в базе данных.
-            </p>
-          </PolicyCard>
-        </div>
-
-        <div className="flex flex-col items-center text-center order-1 lg:order-2 mb-8 lg:mb-0">
-          <div className="relative w-[280px] h-[280px] md:w-[350px] md:h-[350px] animate-float">
-            <div className="absolute inset-0 bg-gray-100/10 to-transparent rounded-full blur-2xl transform scale-90 translate-y-4" />
-            <Image
-              src="/images/s44.png"
-              alt="Security Mascot"
-              fill
-              className="object-contain drop-shadow-2xl"
-              unoptimized
-            />
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="max-w-5xl mx-auto"
+      >
+        <motion.div variants={itemVariants} className="text-center mb-16">
+          <div className="inline-flex items-center justify-center p-4 bg-brand/10 rounded-3xl mb-6 text-brand">
+            <FaShieldAlt className="text-4xl" />
           </div>
-
-          <h1 className="text-3xl md:text-4xl font-extrabold mt-6 tracking-tight text-gray-900 dark:text-gray-200 leading-tight">
-            Политика <br />
-            <span className="text-brand">Безопасности</span>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic text-gray-900 dark:text-white mb-6">
+            Политика <span className="text-brand">конфиденциальности</span>
           </h1>
-          <p className="text-gray-400 dark:text-gray-500 text-sm mt-3 font-medium max-w-xs mx-auto">
-            Ваши данные под защитой. <br />
-            Честно и прозрачно.
+          <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-medium leading-relaxed">
+            Ваша приватность — наш приоритет. Мы собираем только те данные, которые необходимы для полноценной работы сервиса.
           </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <PolicySection
+            variants={itemVariants}
+            icon={<FaUserLock />}
+            title="1. Данные аккаунта"
+          >
+            При регистрации мы запрашиваем минимальный набор данных: <strong>Имя пользователя (никнейм)</strong> и <strong>Email</strong>. Пароли хранятся исключительно в зашифрованном виде (Hash). Мы не имеем доступа к вашему паролю в открытом виде.
+          </PolicySection>
+
+          <PolicySection
+            variants={itemVariants}
+            icon={<FaDatabase />}
+            title="2. История и списки"
+          >
+            Для обеспечения синхронизации между вашими устройствами мы сохраняем информацию о просмотренных сериях, текущем прогрессе в плеере и списки аниме («Смотрю», «В планах» и т.д.). Эти данные привязаны к вашему профилю.
+          </PolicySection>
+
+          <PolicySection
+            variants={itemVariants}
+            icon={<FaServer />}
+            title="3. Техническая информация"
+          >
+            Наши серверы могут автоматически регистрировать стандартную техническую информацию: IP-адрес, тип браузера, время посещения. Это необходимо исключительно для защиты от спама, предотвращения кибератак и анализа общей аудитории сайта.
+          </PolicySection>
+
+          <PolicySection
+            variants={itemVariants}
+            icon={<FaFingerprint />}
+            title="4. Передача данных"
+          >
+            AniYume <strong>не продает</strong> и не передает ваши персональные данные третьим лицам. Мы используем публичные API (Kodik, Shikimori) только для отображения контента. Ваш профиль на AniYume остается полностью изолированным.
+          </PolicySection>
         </div>
 
-        <div className="space-y-6 order-3">
-          <PolicyCard icon={<FaFingerprint />} title="3. Анонимность" align="left">
-            <p>
-              Никаких ФИО и телефонов. Ваш профиль — это только никнейм. Мы уважаем ваше
-              право оставаться инкогнито.
-            </p>
-          </PolicyCard>
-
-          <PolicyCard icon={<FaServer />} title="4. Источники" align="left">
-            <p>
-              Видео загружается напрямую через публичные API (Kodik, Shikimori). Мы
-              предоставляем только удобный интерфейс.
-            </p>
-          </PolicyCard>
-        </div>
-      </div>
-
-      <div className="mt-16 relative z-10">
-        <Link
-          href="https://t.me/kellyharvest"
-          target="_blank"
-          className="group relative inline-flex items-center gap-3 px-8 py-3 bg-white dark:bg-[#161616] text-gray-900 dark:text-gray-200 border border-gray-200 dark:border-gray-800 rounded-full font-bold  hover:border-brand hover:text-white dark:hover:text-dark transition-all duration-300 overflow-hidden"
+        <motion.div
+          variants={itemVariants}
+          className="bg-gray-50 dark:bg-[#161616] border border-gray-100 dark:border-white/5 rounded-3xl p-8 md:p-12"
         >
-          <span className="relative z-10">Связаться с разработчиком</span>
-          <div className="absolute inset-0 bg-brand opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </Link>
-      </div>
-
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-6px); }
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-      `}</style>
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="flex-1 text-center md:text-left">
+              <h3 className="text-2xl font-bold dark:text-white mb-4 italic uppercase">Управление данными</h3>
+              <p className="text-gray-600 dark:text-gray-400 font-medium">
+                Вы имеете полное право в любой момент изменить данные своего профиля или полностью удалить аккаунт через настройки. При удалении аккаунта все связанные с ним данные стираются безвозвратно.
+              </p>
+            </div>
+            <div className="flex flex-col gap-4 min-w-[200px]">
+              <Link
+                href="/profile"
+                className="flex items-center justify-center gap-2 bg-brand text-white px-6 py-3 rounded-2xl font-bold hover:brightness-110 shadow-lg shadow-brand/10 transition-all"
+              >
+                Настройки профиля
+              </Link>
+              <Link
+                href="mailto:privacy@aniyume.com"
+                className="flex items-center justify-center gap-2 border border-gray-200 dark:border-white/10 dark:text-gray-200 px-6 py-3 rounded-2xl font-bold hover:bg-white dark:hover:bg-white/5 transition-all text-sm"
+              >
+                <FaEnvelopeOpenText /> Вопросы по данным
+              </Link>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
 
-interface PolicyCardProps {
-  icon: React.ReactNode;
-  title: string;
-  children: React.ReactNode;
-  align: 'left' | 'right';
-}
-
-function PolicyCard({ icon, title, children, align }: PolicyCardProps) {
-  const isRightAligned = align === 'right';
-
+function PolicySection({ icon, title, children, variants }: { icon: React.ReactNode; title: string; children: React.ReactNode; variants: any }) {
   return (
-    <div
-      className={`
-        relative bg-white dark:bg-[#161616] border border-gray-100 dark:border-gray-800 p-10 rounded-2xl shadow-sm hover:shadow-xl hover:border-brand transition-all duration-300 group
-        flex flex-col gap-3
-        lg:items-${isRightAligned ? 'end' : 'start'} 
-        lg:text-${isRightAligned ? 'right' : 'left'}
-        items-start text-left
-      `}
+    <motion.div
+      variants={variants}
+      className="group p-8 bg-white dark:bg-[#111111] border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm hover:shadow-xl hover:border-brand/20 transition-all duration-300"
     >
-      <div
-        className={`flex items-center gap-3 ${isRightAligned ? 'lg:flex-row-reverse' : 'lg:flex-row'
-          } flex-row`}
-      >
-        <div className="p-3 rounded-xl bg-[#21D0B8]/10 text-brand group-hover:bg-brand group-hover:text-white transition-colors duration-300">
-          <span className="text-xl">{icon}</span>
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-12 h-12 flex items-center justify-center bg-brand/10 rounded-xl text-brand text-xl group-hover:bg-brand group-hover:text-white transition-all duration-300">
+          {icon}
         </div>
-        <h3 className="font-bold text-lg text-gray-800 dark:text-gray-200">
+        <h2 className="text-xl font-black italic uppercase tracking-tight text-gray-900 dark:text-white">
           {title}
-        </h3>
+        </h2>
       </div>
-
-      <div className="text-gray-500 dark:text-gray-400 text-lg leading-relaxed font-medium">
+      <div className="text-gray-500 dark:text-gray-400 leading-relaxed font-bold text-base">
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 }

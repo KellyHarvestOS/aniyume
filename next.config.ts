@@ -3,12 +3,19 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: false,
   images: {
-    domains: [
-      'picsum.photos',
-      'www.anilibria.tv',
-      'anilibria.tv',
-    ],
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.anilibria.tv',
+      },
+      {
+        protocol: 'https',
+        hostname: 'anilibria.tv',
+      },
       {
         protocol: 'https',
         hostname: '**',
@@ -22,10 +29,6 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
-      {
-        source: '/api/external/:path*',
-        destination: 'http://127.0.0.1:8000/api/v1/:path*',
-      },
       {
         source: '/api-storage/:path*',
         destination: 'http://127.0.0.1:8000/storage/:path*',

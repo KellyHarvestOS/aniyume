@@ -47,26 +47,26 @@ export const useWatchTracker = ({ episodeId, token }: TrackerProps) => {
 
       bufferRef.current -= secondsToSend;
 
-      if (isClosing) {
-        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-        navigator.sendBeacon('/api/external/watch-history', blob);
-      } else {
-        try {
-          isSyncingRef.current = true;
-          await fetch('/api/external/watch-history', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify(payload)
-          });
-        } catch (e) {
+      try {
+        isSyncingRef.current = true;
+        const response = await fetch('/api/external/watch-history', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(payload),
+          keepalive: isClosing,
+        });
+
+        if (!response.ok) {
           bufferRef.current += secondsToSend;
-        } finally {
-          isSyncingRef.current = false;
         }
+      } catch (e) {
+        bufferRef.current += secondsToSend;
+      } finally {
+        isSyncingRef.current = false;
       }
     };
 

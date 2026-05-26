@@ -109,6 +109,12 @@
 | **Architecture** | Server Components + Client Hooks |
 | **API** | Custom API Proxy (Bypass CORS & Cloudflare) |
 
+### AI Chat Gateway
+
+Frontend chat does not contain provider configuration, system prompts, domain policy, or rules about what the AI can know. The chat UI sends the user's text to the backend AI gateway through the frontend API proxy, which forwards it to `POST /api/v1/ai/chat`. AI behavior, provider access, moderation and response rules are backend-owned.
+
+The frontend is limited to rendering the chat, sending the request payload, displaying the gateway response, and showing gateway errors or limit messages.
+
 ##  Дерево проекта (File Tree)
 
 ```bash

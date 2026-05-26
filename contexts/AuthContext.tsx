@@ -55,7 +55,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
     })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data) => setUser(data.user || data))
+      .then((data) => {
+        const u = data.user || data;
+        setUser(u);
+        localStorage.setItem('isPremium', u.is_premium ? 'true' : 'false');
+      })
       .catch(() => {
         // Токен невалидный — очищаем
         localStorage.removeItem('userToken');
@@ -66,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (newToken: string, newUser: AuthUser) => {
     localStorage.setItem('userToken', newToken);
+    localStorage.setItem('isPremium', newUser.is_premium ? 'true' : 'false');
     setToken(newToken);
     setUser(newUser);
   };

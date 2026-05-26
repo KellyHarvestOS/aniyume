@@ -57,23 +57,23 @@ export default function Footer() {
       <div className="w-full px-4 md:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 text-center lg:text-left">
 
-          <div className="max-w-xl flex flex-col items-center lg:items-start">
+          <div className="max-w-xl flex flex-col items-center lg:items-start grow">
             <Link href="/" className="inline-block transition-opacity">
-              <Image
-                src={logoPaths.light}
-                alt="AniYume"
-                width={480}
-                height={180}
-                className="h-20 sm:h-30 w-auto dark:hidden object-contain"
-                key={`footer-dark-${logoPaths.light}`}
-              />
               <Image
                 src={logoPaths.dark}
                 alt="AniYume"
                 width={480}
                 height={180}
+                className="h-20 sm:h-30 w-auto dark:hidden object-contain"
+                key={`footer-dark-${logoPaths.dark}`}
+              />
+              <Image
+                src={logoPaths.light}
+                alt="AniYume"
+                width={480}
+                height={180}
                 className="hidden h-20 sm:h-30 w-auto dark:block object-contain"
-                key={`footer-light-${logoPaths.dark}`}
+                key={`footer-light-${logoPaths.light}`}
               />
             </Link>
 

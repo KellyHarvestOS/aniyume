@@ -42,11 +42,14 @@ export default function AnimeViewPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
+        const fpHeader = typeof window !== "undefined" ? (localStorage.getItem('visitor_fp_id') || '') : '';
+        const fetchOpts = { headers: { 'X-Fingerprint-ID': fpHeader } };
+
         const [animeRes, epRes, recRes, statsRes] = await Promise.all([
-          fetch(`${API_BASE}/public/anime/${id}`),
-          fetch(`${API_BASE}/public/anime/${id}/episodes`),
-          fetch(`${API_BASE}/public/anime?sort=popularity&page=1`),
-          fetch(`${API_BASE}/public/anime/${id}/community-stats`),
+          fetch(`${API_BASE}/public/anime/${id}`, fetchOpts),
+          fetch(`${API_BASE}/public/anime/${id}/episodes`, fetchOpts),
+          fetch(`${API_BASE}/public/anime?sort=popularity&page=1`, fetchOpts),
+          fetch(`${API_BASE}/public/anime/${id}/community-stats`, fetchOpts),
         ]);
 
         if (!animeRes.ok) {
@@ -54,7 +57,10 @@ export default function AnimeViewPage() {
         }
 
         const animeJson = await animeRes.json();
-        const epJson = await epRes.json();
+        
+        let epJson = { data: [] };
+        if (epRes.ok) epJson = await epRes.json();
+        
         const recJson = await recRes.json();
         let statsJson = null;
         if (statsRes.ok) statsJson = await statsRes.json();
@@ -95,15 +101,18 @@ export default function AnimeViewPage() {
     if (!currentToken || !episodeId || seconds < 1) return;
 
     try {
+      const fpHeader = localStorage.getItem('visitor_fp_id') || '';
       const res = await fetch(`${API_BASE}/watch-history`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${currentToken}`,
+          'X-Fingerprint-ID': fpHeader
         },
         body: JSON.stringify({
           episode_id: Number(episodeId),
           progress: Math.floor(seconds),
+          delta_time: Math.max(1, Math.min(300, Math.floor(seconds))),
           completed: completed
         }),
       });

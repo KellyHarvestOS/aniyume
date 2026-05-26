@@ -1,134 +1,142 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { motion } from 'framer-motion';
 import {
   FaFileContract,
   FaGavel,
   FaCopyright,
   FaBan,
   FaExclamationTriangle,
+  FaShieldAlt,
+  FaExternalLinkAlt,
 } from 'react-icons/fa';
 
-export const metadata = {
-  title: 'Условия использования | Aniyume',
-  description: 'Правила использования платформы Aniyume',
-};
-
 export default function TermsPage() {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+  };
+
   return (
-    <div className="min-h-screen w-full bg-white dark:bg-[#111111] text-gray-900 dark:text-gray-200 flex flex-col items-center justify-center py-12 px-4 overflow-hidden relative transition-colors">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-brand rounded-full blur-[130px] opacity-[0.04] dark:opacity-[0.07] -z-10 pointer-events-none" />
+    <div className="min-h-screen w-full bg-white dark:bg-[#111111] text-gray-900 dark:text-gray-200 py-16 px-4 sm:px-6 lg:px-8 overflow-hidden relative transition-colors duration-500">
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
 
-      <div className="max-w-[1400px] w-full grid grid-cols-1 lg:grid-cols-3 gap-10 items-center relative z-10">
-        <div className="space-y-8 order-2 lg:order-1">
-          <TermCard icon={<FaCopyright />} title="1. Авторское право" align="right">
-            <p>
-              Aniyume — это поисковая система (индексатор). Мы{' '}
-              <span className="font-bold text-gray-900 dark:text-gray-200">
-                не храним
-              </span>{' '}
-              видеофайлы на своих серверах. Весь контент подгружается из открытых
-              источников (Kodik).
-            </p>
-          </TermCard>
-
-          <TermCard icon={<FaBan />} title="2. Правила поведения" align="right">
-            <p>
-              Запрещено использовать скрипты для автоматического сбора данных
-              (парсинг) и пытаться нарушить работу сайта (DDoS). Мы оставляем за
-              собой право заблокировать доступ нарушителям.
-            </p>
-          </TermCard>
-        </div>
-
-        <div className="flex flex-col items-center text-center order-1 lg:order-2 mb-10 lg:mb-0">
-          <div className="relative w-[300px] h-[300px] md:w-[380px] md:h-[380px] animate-float">
-            <div className="absolute inset-0 bg-gray-100/10 to-transparent rounded-full blur-3xl transform scale-90 translate-y-6" />
-            <Image
-              src="/images/p44.png"
-              alt="Terms Mascot"
-              fill
-              className="object-contain drop-shadow-2xl"
-              unoptimized
-            />
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="max-w-5xl mx-auto"
+      >
+        <motion.div variants={itemVariants} className="text-center mb-16">
+          <div className="inline-flex items-center justify-center p-4 bg-brand/10 rounded-3xl mb-6 text-brand">
+            <FaFileContract className="text-4xl" />
           </div>
-
-          <h1 className="text-4xl md:text-5xl font-extrabold mt-8 tracking-tight text-gray-900 dark:text-gray-200 leading-tight">
-            Условия <br />
-            <span className="text-brand">Использования</span>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic text-gray-900 dark:text-white mb-6">
+            Условия <span className="text-brand">использования</span>
           </h1>
-
-          <p className="text-gray-400 dark:text-gray-500 text-base mt-4 font-medium max-w-xs mx-auto">
-            Правила просты: будьте вежливы и наслаждайтесь просмотром.
+          <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-medium leading-relaxed">
+            Пожалуйста, внимательно ознакомьтесь с правилами использования платформы AniYume. Пользование сайтом означает ваше согласие с данными условиями.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="space-y-8 order-3">
-          <TermCard
-            icon={<FaExclamationTriangle />}
-            title="3. Отказ от ответственности"
-            align="left"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <TermSection
+            variants={itemVariants}
+            icon={<FaCopyright />}
+            title="1. Статус контента"
           >
-            <p>
-              Администрация не несет ответственности за содержание
-              видеоматериалов. Сайт предоставляется по принципу{' '}
-              <span className="text-brand font-semibold">«как есть»</span>{' '}
-              (AS IS). Мы не гарантируем аптайм 100%.
-            </p>
-          </TermCard>
+            AniYume является <strong>индексатором</strong> (поисковой системой). Мы не храним видеофайлы на собственных серверах. Весь контент транслируется из открытых сторонних источников (Kodik, Anilibria). Мы не несем ответственности за содержание, доступность или качество внешних ресурсов.
+          </TermSection>
 
-          <TermCard icon={<FaGavel />} title="4. Изменения правил" align="left">
-            <p>
-              Мы можем обновлять условия использования в любой момент.
-              Продолжая пользоваться сайтом, вы автоматически соглашаетесь с
-              актуальной версией правил.
-            </p>
-          </TermCard>
+          <TermSection
+            variants={itemVariants}
+            icon={<FaShieldAlt />}
+            title="2. Авторское право"
+          >
+            Мы уважаем интеллектуальную собственность. Если вы являетесь правообладателем и считаете, что ваши права нарушены, свяжитесь напрямую с хостинг-провайдером видео. В случае необходимости мы можем заблокировать отображение конкретного контента в нашем индексе.
+          </TermSection>
+
+          <TermSection
+            variants={itemVariants}
+            icon={<FaBan />}
+            title="3. Правила поведения"
+          >
+            Запрещается: использование скриптов для парсинга данных, попытки нарушения работы серверов (DDoS), распространение вредоносного ПО или спама. Любая активность, направленная на дестабилизацию платформы, приведет к немедленной блокировке доступа по IP.
+          </TermSection>
+
+          <TermSection
+            variants={itemVariants}
+            icon={<FaGavel />}
+            title="4. Ответственность"
+          >
+            Сервис предоставляется по принципу <strong>«как есть»</strong> (AS IS). Администрация не гарантирует бесперебойную работу сайта и не несет ответственности за любой ущерб, возникший в результате использования материалов, найденных через нашу систему.
+          </TermSection>
         </div>
-      </div>
+
+        <motion.div
+          variants={itemVariants}
+          className="bg-brand/5 border border-brand/20 rounded-3xl p-8 md:p-12 text-center"
+        >
+          <FaExclamationTriangle className="text-3xl text-brand mx-auto mb-4" />
+          <h3 className="text-2xl font-bold dark:text-white mb-4 italic uppercase">Изменение условий</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 font-medium">
+            Мы оставляем за собой право обновлять правила в любое время без уведомления. Последняя версия всегда доступна на этой странице.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="https://t.me/aniYume_group"
+              target="_blank"
+              className="flex items-center gap-2 bg-brand text-white px-8 py-4 rounded-2xl font-bold hover:brightness-110 shadow-lg shadow-brand/20 transition-all active:scale-95"
+            >
+              Связаться с нами <FaExternalLinkAlt className="text-xs" />
+            </Link>
+            <Link
+              href="/privacy"
+              className="flex items-center gap-2 border border-gray-200 dark:border-white/10 dark:text-gray-200 px-8 py-4 rounded-2xl font-bold hover:bg-gray-50 dark:hover:bg-white/5 transition-all"
+            >
+              Конфиденциальность
+            </Link>
+          </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
 
-interface TermCardProps {
-  icon: React.ReactNode;
-  title: string;
-  children: React.ReactNode;
-  align: 'left' | 'right';
-}
-
-function TermCard({ icon, title, children, align }: TermCardProps) {
-  const isRightAligned = align === 'right';
-
+function TermSection({ icon, title, children, variants }: { icon: React.ReactNode; title: string; children: React.ReactNode; variants: any }) {
   return (
-    <div
-      className={`
-        relative bg-white dark:bg-[#161616] border border-gray-100 dark:border-gray-800
-        p-8 md:p-10
-        rounded-3xl shadow-sm hover:shadow-2xl hover:border-brand/30 transition-all duration-300 group
-        flex flex-col gap-5
-        lg:items-${isRightAligned ? 'end' : 'start'}
-        lg:text-${isRightAligned ? 'right' : 'left'}
-        items-start text-left
-      `}
+    <motion.div
+      variants={variants}
+      className="bg-gray-50 dark:bg-[#161616] p-8 rounded-3xl border border-gray-100 dark:border-white/5 hover:border-brand/30 transition-colors group"
     >
-      <div
-        className={`flex items-center gap-4 ${isRightAligned ? 'lg:flex-row-reverse' : 'lg:flex-row'
-          } flex-row`}
-      >
-        <div className="p-4 rounded-2xl group-hover:bg-brand group-hover:text-white! transition-colors duration-300 shadow-sm flex items-center justify-center">
-          <span className="text-2xl flex items-center justify-center">
-            {icon}
-          </span>
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-12 h-12 flex items-center justify-center bg-white dark:bg-[#1a1a1a] rounded-xl text-brand text-xl shadow-sm group-hover:bg-brand group-hover:text-white transition-all duration-300">
+          {icon}
         </div>
-        <h3 className="font-bold text-xl text-gray-900 dark:text-gray-200">
+        <h2 className="text-xl font-black italic uppercase tracking-tight text-gray-900 dark:text-white">
           {title}
-        </h3>
+        </h2>
       </div>
-
-      <div className="text-gray-500 dark:text-gray-400 text-base md:text-lg leading-relaxed font-medium">
+      <div className="text-gray-500 dark:text-gray-400 leading-relaxed font-bold text-base">
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 }

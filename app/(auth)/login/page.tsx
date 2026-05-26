@@ -153,6 +153,20 @@ const LoginPage = () => {
             </div>
           </div>
 
+          {/* Honeypot field for bot detection */}
+          <div aria-hidden="true" style={{ opacity: 0, position: 'absolute', top: 0, left: 0, height: 0, width: 0, zIndex: -1 }}>
+            <label htmlFor="bot_check">Не заполняйте это поле / Leave this blank</label>
+            <input
+              type="text"
+              id="bot_check"
+              name="bot_check"
+              value={(formData as any).bot_check || ''}
+              onChange={handleChange}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
           <button
             type="submit"
             disabled={loading}

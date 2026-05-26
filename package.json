@@ -9,14 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^5.2.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
-    "hls.js": "^1.6.15",
+    "hls.js": "^1.6.16",
+    "jquery": "^4.0.0",
     "laravel-echo": "^2.3.4",
     "lucide-react": "^0.555.0",
     "motion": "^12.23.26",
     "next": "16.0.1",
     "next-themes": "^0.4.6",
+    "p2p-media-loader-core": "^2.2.2",
+    "p2p-media-loader-hlsjs": "^2.2.2",
     "pusher-js": "^8.5.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
@@ -27,8 +31,10 @@
     "react-slick": "^0.31.0",
     "remark-gfm": "^4.0.1",
     "slick-carousel": "^1.8.1",
+    "socket.io-client": "^4.8.3",
     "swr": "^2.3.6",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "ws": "^8.20.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

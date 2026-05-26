@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { FaChevronDown } from 'react-icons/fa';
 import AnimeCardSkeleton from '@/components/skeletons/AnimeCardSkeleton';
 import AnimeCard from '@/components/anime/AnimeCard';
 
@@ -14,103 +14,166 @@ interface AnimeData {
   type?: string;
 }
 
-const CACHE_KEY_PREFIX = 'aniyume_animelist_page_';
-const CACHE_DURATION = 1000 * 60 * 15;
+interface AnimeListProps {
+  title: string;
+  filters?: {
+    search?: string;
+    genre?: string;
+    year?: string;
+    type?: string;
+    sort?: string;
+  };
+}
 
-const AnimeList = ({ title }: { title: string }) => {
-  const titleRef = useRef<HTMLDivElement>(null);
+const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
   const [data, setData] = useState<AnimeData[]>([]);
   const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [loadingNext, setLoadingNext] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  
+  const observerTarget = useRef<HTMLDivElement>(null);
 
+  // 1. Initial Load & Reset on Filters Change
   useEffect(() => {
-    const fetchAnime = async () => {
-      const cacheKey = `${CACHE_KEY_PREFIX}${page}`;
-      const cached = sessionStorage.getItem(cacheKey);
-
-      if (cached) {
-        try {
-          const { data: cachedData, total: cachedTotal, timestamp } = JSON.parse(cached);
-          if (Date.now() - timestamp < CACHE_DURATION && Array.isArray(cachedData)) {
-            setData(cachedData);
-            setTotal(cachedTotal);
-            setLoading(false);
-            if (page > 1) titleRef.current?.scrollIntoView({ behavior: 'smooth' });
-            return;
-          }
-        } catch {
-          sessionStorage.removeItem(cacheKey);
-        }
-      }
-
+    const fetchInitial = async () => {
+      setLoading(true);
+      setPage(1);
+      
       try {
-        setLoading(true);
-        if (page > 1) titleRef.current?.scrollIntoView({ behavior: 'smooth' });
+        const params = new URLSearchParams({
+          page: '1',
+          per_page: '20',
+          sort: filters.sort || 'smart',
+          ...Object.fromEntries(Object.entries(filters).filter(([k, v]) => !!v && k !== 'sort'))
+        });
 
-        const res = await fetch(`/api/external/public/anime?page=${page}&sort=newest&per_page=10`);
+        const res = await fetch(`/api/external/public/anime?${params.toString()}`);
         const json = await res.json();
-
-        const raw = json.data || json;
-        const newData = Array.isArray(raw) ? raw : [];
-        const newTotal = json.meta?.last_page || json.last_page || 10;
-
-        setData(newData);
-        setTotal(newTotal);
-
-        sessionStorage.setItem(cacheKey, JSON.stringify({
-          data: newData,
-          total: newTotal,
-          timestamp: Date.now()
-        }));
-
+        const raw = json.data || [];
+        
+        setData(raw);
+        setHasMore(raw.length >= 20);
       } catch (e) {
-        console.error(e);
+        console.error('Initial fetch failed:', e);
       } finally {
         setLoading(false);
       }
     };
-    fetchAnime();
-  }, [page]);
 
-  const renderPages = () => {
-    const nums = [];
-    const pushBtn = (p: number) => nums.push(
-      <button key={p} onClick={() => setPage(p)} className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${page === p ? "bg-brand text-white shadow-lg scale-110" : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-zinc-800"}`}>{p}</button>
+    fetchInitial();
+  }, [filters.search, filters.genre, filters.year, filters.type, filters.sort]);
+
+  // 2. Load Next Page
+  const fetchNextPage = useCallback(async () => {
+    if (loadingNext || !hasMore) return;
+    
+    setLoadingNext(true);
+    const nextPage = page + 1;
+    
+    try {
+      const params = new URLSearchParams({
+        page: nextPage.toString(),
+        per_page: '20',
+        sort: filters.sort || 'smart',
+        ...Object.fromEntries(Object.entries(filters).filter(([k, v]) => !!v && k !== 'sort'))
+      });
+
+      const res = await fetch(`/api/external/public/anime?${params.toString()}`);
+      const json = await res.json();
+      const raw = json.data || [];
+      
+      if (raw.length === 0) {
+        setHasMore(false);
+      } else {
+        setData(prev => [...prev, ...raw]);
+        setPage(nextPage);
+        setHasMore(raw.length >= 20);
+      }
+    } catch (e) {
+      console.error('Next page fetch failed:', e);
+    } finally {
+      setLoadingNext(false);
+    }
+  }, [page, hasMore, loadingNext, filters]);
+
+  // 3. Intersection Observer Logic
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !loading && !loadingNext) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1, rootMargin: '400px' }
     );
 
-    pushBtn(1);
-    if (page > 3) nums.push(<span key="l" className="px-1 text-gray-400">...</span>);
-    for (let i = Math.max(2, page - 1); i <= Math.min(total - 1, page + 1); i++) pushBtn(i);
-    if (page < total - 2) nums.push(<span key="r" className="px-1 text-gray-400">...</span>);
-    if (total > 1) pushBtn(total);
-    return nums;
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasMore, loading, loadingNext]);
+
+  // 4. Scroll to Top logic
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 1000);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <section className="container mx-auto px-4 py-10 md:py-16">
-      <div className="border-t-2 border-slate-100 pt-10 dark:border-zinc-800 mb-10" />
-      <div ref={titleRef} className="flex flex-col items-center mb-10">
-        <h2 className="text-3xl sm:text-6xl font-black text-gray-800 dark:text-gray-100 tracking-tighter uppercase">{title}</h2>
-        <div className="w-24 sm:w-48 h-1.5 bg-brand rounded-full mt-3" />
+    <section className="container mx-auto px-4 py-6 md:py-10 relative">
+      <div className="flex flex-col items-center mb-10">
+        <h2 className="text-3xl sm:text-6xl font-black text-gray-800 dark:text-gray-100 tracking-tighter uppercase italic">{title}</h2>
+        <div className="w-24 sm:w-48 h-1.5 bg-brand rounded-full mt-3 shadow-lg shadow-brand/20" />
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 justify-items-center">
         {loading
-          ? Array.from({ length: 10 }).map((_, i) => <AnimeCardSkeleton key={i} />)
-          : Array.isArray(data) ? data.map(item => <AnimeCard key={item.id} {...item} />) : null
+          ? Array.from({ length: 20 }).map((_, i) => <AnimeCardSkeleton key={i} />)
+          : data.map(item => <AnimeCard key={`${item.id}-${Math.random()}`} {...item} />)
         }
       </div>
 
-      {!loading && data.length > 0 && (
-        <div className="mt-16 flex justify-center">
-          <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-3 disabled:opacity-20 dark:text-gray-300"><FaChevronLeft /></button>
-            <div className="hidden sm:flex gap-1">{renderPages()}</div>
-            <div className="sm:hidden px-4 font-black text-sm dark:text-gray-300">{page} / {total}</div>
-            <button onClick={() => setPage(p => Math.min(total, p + 1))} disabled={page === total} className="p-3 disabled:opacity-20 dark:text-gray-300"><FaChevronRight /></button>
+      {/* Loading indicator for next pages */}
+      <div ref={observerTarget} className="w-full flex justify-center py-16">
+        {loadingNext && (
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-10 h-10 border-4 border-brand/20 border-t-brand rounded-full animate-spin" />
+            <span className="text-xs font-black uppercase tracking-widest text-gray-500 animate-pulse">Загружаем ещё...</span>
           </div>
-        </div>
+        )}
+        {!hasMore && data.length > 0 && (
+          <div className="flex flex-col items-center gap-2">
+            <div className="h-px w-24 bg-gradient-to-r from-transparent via-gray-600 to-transparent mb-4" />
+            <span className="text-sm font-bold text-gray-500 italic">На этом всё! :)</span>
+          </div>
+        )}
+        {!loading && data.length === 0 && (
+          <div className="text-center py-20">
+            <h3 className="text-xl font-bold text-gray-400">Ничего не найдено по вашему запросу</h3>
+            <p className="text-sm text-gray-500 mt-2">Попробуйте изменить параметры фильтрации</p>
+          </div>
+        )}
+      </div>
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 w-14 h-14 bg-brand text-white rounded-2xl shadow-2xl flex items-center justify-center text-xl transition-all hover:scale-110 active:scale-95 z-[60] group"
+        >
+          <div className="absolute inset-0 bg-brand rounded-2xl animate-ping opacity-20 group-hover:opacity-40" />
+          <FaChevronDown className="rotate-180" />
+        </button>
       )}
     </section>
   );

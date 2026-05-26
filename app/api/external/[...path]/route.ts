@@ -11,31 +11,22 @@ export async function handleProxy(
     const pathStr = path.join("/");
     const searchParams = req.nextUrl.search;
 
-    const privateKeywords = [
-      "user",
-      "status",
-      "profile",
-      "favorites",
-      "watch-history",
-      "ratings",
-      "bookmarks",
-      "statistics",
-      "auth",
-      "studios",
-      "comments",
-      "my-anime-list",
-      "friends",
-      "watch-party",
-      "users"
+    const publicPrefixes = [
+      "anime",
+      "episodes",
+      "tags",
+      "schedule",
     ];
 
-    const isPrivate = privateKeywords.some((keyword) =>
-      pathStr.includes(keyword)
-    );
+    const normalizedPath = pathStr.startsWith("public/")
+      ? pathStr
+      : publicPrefixes.some((prefix) => pathStr === prefix || pathStr.startsWith(`${prefix}/`))
+        ? `public/${pathStr}`
+        : pathStr;
 
-    const finalUrl = isPrivate
-      ? `${BASE_URL}/${pathStr}${searchParams}`
-      : `${BASE_URL}/public/${pathStr}${searchParams}`;
+    const isPrivate = !normalizedPath.startsWith("public/");
+
+    const finalUrl = `${BASE_URL}/${normalizedPath}${searchParams}`;
 
     let token = req.headers.get("authorization") || "";
     if (token && !token.startsWith("Bearer ")) {
@@ -84,9 +75,9 @@ export async function handleProxy(
     let revalidateTime = 0;
 
     if (req.method === "GET" && !isPrivate) {
-      if (pathStr.includes("search")) {
+      if (normalizedPath.includes("search")) {
         revalidateTime = 300;
-      } else if (pathStr.includes("schedule")) {
+      } else if (normalizedPath.includes("schedule")) {
         revalidateTime = 1800;
       } else {
         revalidateTime = 3600;

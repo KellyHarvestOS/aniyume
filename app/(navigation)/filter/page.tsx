@@ -149,7 +149,7 @@ function FilterPageContent() {
           <CustomSelect label="Озвучка" value={filters.translator} onChange={v => handleChange('translator', v)} options={translators.map(t => ({ value: t, label: t }))} />
           <CustomSelect label="Сортировка" value={filters.sort} onChange={v => handleChange('sort', v)} options={[{ value: 'newest', label: 'Новые' }, { value: 'rating', label: 'По рейтингу' }, { value: 'popularity', label: 'Популярные' }, { value: 'title', label: 'По алфавиту' }]} />
           <CustomSelect label="Год выпуска" value={filters.year} onChange={v => handleChange('year', v)} options={years} />
-          <CustomSelect label="Статус" value={filters.status} onChange={v => handleChange('status', v)} options={[{ value: 'finished', label: 'Завершен' }, { value: 'ongoing', label: 'Онгоинг' }, { value: 'upcoming', label: 'Анонс' }]} />
+          <CustomSelect label="Статус" value={filters.status} onChange={v => handleChange('status', v)} options={[{ value: 'finished', label: 'Завершен' }, { value: 'ongoing', label: 'Онгоинг' }, { value: 'planned', label: 'Анонс' }, { value: 'paused', label: 'Приостановлен' }]} />
           <CustomSelect label="Тип контента" value={filters.type} onChange={v => handleChange('type', v)} options={[{ value: 'tv', label: 'TV Сериал' }, { value: 'movie', label: 'Фильм' }, { value: 'ova', label: 'OVA' }, { value: 'special', label: 'Спешл' }]} />
         </div>
 
