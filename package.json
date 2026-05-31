@@ -20,7 +20,7 @@
     "laravel-echo": "^2.3.4",
     "lucide-react": "^0.555.0",
     "motion": "^12.23.26",
-    "next": "16.0.1",
+    "next": "16.2.6",
     "next-themes": "^0.4.6",
     "p2p-media-loader-core": "^2.2.2",
     "p2p-media-loader-hlsjs": "^2.2.2",
