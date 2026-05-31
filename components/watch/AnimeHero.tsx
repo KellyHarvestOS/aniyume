@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { FaPlay, FaStar, FaShareAlt, FaCheck, FaTv, FaFilm } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AnimeDetails } from '@/types/anime';
-import { getAnimeBanner } from '@/lib/api';
 
 interface AnimeHeroProps {
   anime: AnimeDetails;
@@ -30,23 +29,13 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
   const [copied, setCopied] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [bannerLoaded, setBannerLoaded] = useState(false);
-  const [fetchedBanner, setFetchedBanner] = useState<string | null>(null);
   const descRef = useRef<HTMLDivElement>(null);
-
-  // 1. Fetch banner progressive load
-  useEffect(() => {
-    if (anime.id) {
-      getAnimeBanner(anime.id).then((data) => {
-        if (data.banner) setFetchedBanner(data.banner);
-      });
-    }
-  }, [anime.id]);
 
   const tagsList = anime.tags || anime.genres || [];
 
-  // 2. Logic for banners: fetched > cover_url > poster_url
+  // Show imported banner when present; otherwise fall back to old Shikimori poster.
   const posterUrl = anime.poster_url || '/placeholder.jpg';
-  const bannerUrl = fetchedBanner || anime.cover_url || posterUrl;
+  const bannerUrl = anime.cover_url || posterUrl;
 
   const cleanDescription = anime.description ? anime.description.replace(/<[^>]+>/g, '') : '';
   const isLong = cleanDescription.length > 200;

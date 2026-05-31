@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Hls from 'hls.js';
 
 interface P2PVideoPlayerProps {
@@ -9,7 +9,6 @@ interface P2PVideoPlayerProps {
 
 export default function P2PVideoPlayer({ src }: P2PVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [engineLoaded, setEngineLoaded] = useState(false);
   const engineRef = useRef<any>(null);
   const hlsRef = useRef<Hls | null>(null);
 
@@ -46,7 +45,6 @@ export default function P2PVideoPlayer({ src }: P2PVideoPlayerProps) {
              // if (dlSource === 'p2p') console.log(`[P2P] Downloaded ${bytesDownloaded} bytes`);
           });
 
-          setEngineLoaded(true);
         } else if (videoRef.current && videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
           // Fallback for native HLS (Safari etc)
           videoRef.current.src = src;
@@ -77,12 +75,6 @@ export default function P2PVideoPlayer({ src }: P2PVideoPlayerProps) {
         className="w-full h-full outline-none"
         crossOrigin="anonymous"
       />
-      {engineLoaded && (
-        <div className="absolute top-4 left-4 bg-black/60 text-xs font-bold text-[#2EC4B6] px-3 py-1.5 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 pointer-events-none">
-          <span className="w-2 h-2 rounded-full bg-[#2EC4B6] animate-pulse shadow-[0_0_8px_#2EC4B6]"></span>
-          P2P NETWORK ACTIVE
-        </div>
-      )}
     </div>
   );
 }
