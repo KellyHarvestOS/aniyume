@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useAnimation, PanInfo } from 'framer-motion';
 import { IoClose, IoSend } from 'react-icons/io5';
 import { PiSoundcloudLogoFill } from "react-icons/pi";
+import { FaLock } from 'react-icons/fa';
+import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { AiChatGatewayError, fetchAiChatSession, fetchAiChatSessions, sendAiChatMessage } from '@/lib/aiChat';
@@ -71,6 +73,15 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
     const [isSessionsLoading, setIsSessionsLoading] = useState(false);
     const [isSessionLoading, setIsSessionLoading] = useState(false);
     const [historyUnavailable, setHistoryUnavailable] = useState(false);
+    const [token, setToken] = useState<string | null>(null);
+    const [authChecked, setAuthChecked] = useState(false);
+
+    useEffect(() => {
+        setToken(localStorage.getItem('userToken'));
+        setAuthChecked(true);
+    }, []);
+
+    const isAuthenticated = Boolean(token);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -83,6 +94,8 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
     }, [controls]);
 
     const loadSessions = async () => {
+        if (!isAuthenticated) return;
+
         setIsSessionsLoading(true);
         try {
             const result = await fetchAiChatSessions();
@@ -97,8 +110,10 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
     };
 
     useEffect(() => {
-        void loadSessions();
-    }, []);
+        if (authChecked && isAuthenticated) {
+            void loadSessions();
+        }
+    }, [authChecked, isAuthenticated]);
 
     const handleNewChat = () => {
         setMessages([]);
@@ -133,6 +148,12 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
     };
 
     const handleSend = async (text: string) => {
+        if (!isAuthenticated) {
+            setErrorMessage('Войдите в аккаунт, чтобы пользоваться AI-чатом.');
+
+            return;
+        }
+
         if (!text.trim() || isLoading || isSessionLoading) return;
 
         const userMsg = createMessage('outgoing', text);
@@ -251,6 +272,18 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
             )}
 
             <div ref={scrollRef} className="flex-1 p-4 overflow-y-auto space-y-4 bg-[#f8fafc] dark:bg-[#0d0d0d] custom-scrollbar">
+                {authChecked && !isAuthenticated && (
+                    <div className="h-full flex items-center justify-center">
+                        <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 rounded-2xl p-6 text-center shadow-sm max-w-[260px]">
+                            <FaLock className="mx-auto mb-3 text-slate-300 dark:text-slate-600" size={26} />
+                            <div className="text-sm font-black text-slate-800 dark:text-gray-100 mb-2">AI-чат доступен после входа</div>
+                            <p className="text-xs text-slate-500 dark:text-gray-400 mb-4">Авторизуйтесь, чтобы писать сообщения и сохранять историю чатов.</p>
+                            <Link href="/login" className="inline-flex bg-brand text-white px-6 py-2.5 rounded-lg font-black text-xs uppercase">
+                                Войти
+                            </Link>
+                        </div>
+                    </div>
+                )}
                 {isSessionLoading && (
                     <div className="text-xs text-slate-500 dark:text-gray-400 bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-white/5 rounded-xl p-3">
                         Загружаем выбранную историю...
@@ -314,7 +347,7 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
             </div>
 
             <div className="p-4 bg-white dark:bg-[#0f0f0f] border-t border-slate-200 dark:border-white/5">
-                {!isLoading && messages.length === 0 && (
+                {isAuthenticated && !isLoading && messages.length === 0 && (
                     <div className="flex flex-wrap gap-2 mb-3">
                         {['Расписание', 'Проблемы с плеером', 'Помощь'].map((text) => (
                             <button
@@ -336,12 +369,12 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Напишите сообщение..."
-                        disabled={isSessionLoading}
+                        disabled={!isAuthenticated || isSessionLoading}
                         className="flex-1 bg-transparent px-3 py-2 text-sm outline-none dark:text-gray-200"
                     />
                     <button
                         type="submit"
-                        disabled={isLoading || isSessionLoading || !input.trim()}
+                        disabled={!isAuthenticated || isLoading || isSessionLoading || !input.trim()}
                         className="bg-brand text-white p-2.5 rounded-lg shadow-lg hover:shadow-brand/50 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         <IoSend size={16} />
