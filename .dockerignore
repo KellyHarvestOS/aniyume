@@ -2,6 +2,14 @@
 .env
 .env.*
 !.env.example
+*.env.backup*
+*.backup.env*
+*.pem
+*.key
+*.p12
+*.pfx
+auth.json
+credentials.json
 node_modules
 .next
 coverage

@@ -23,6 +23,13 @@
 # misc
 .DS_Store
 *.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+auth.json
+credentials.json
 
 # debug
 npm-debug.log*
@@ -33,6 +40,8 @@ yarn-error.log*
 # env files — ignore all real env, allow example
 .env*
 !.env.example
+*.env.backup*
+*.backup.env*
 
 # vercel
 .vercel
