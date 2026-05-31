@@ -1,21 +1,11 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
-import dynamic from 'next/dynamic';
 import EpisodePicker from './EpisodePicker';
 import { Episode } from '@/types/anime';
 import { FaStar } from 'react-icons/fa';
 import { useWatchTracker } from '@/hooks/useWatchTracker';
 import { useRouter } from 'next/navigation';
 import CreateRoomModal from '@/components/watch-party/CreateRoomModal';
-
-const P2PVideoPlayer = dynamic(() => import('./P2PVideoPlayer'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center w-full h-full text-white">
-      Загрузка плеера...
-    </div>
-  ),
-});
 
 interface AnimePlayerProps {
   animeId: number;
@@ -170,7 +160,12 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
         <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl border border-gray-500 bg-black">
           {currentEpisode?.player_url ? (
             currentEpisode.player_url.includes('.m3u8') ? (
-              <P2PVideoPlayer src={getVideoSrc(currentEpisode.player_url)} />
+              <video
+                controls
+                className="absolute top-0 left-0 w-full h-full bg-black outline-none"
+                src={getVideoSrc(currentEpisode.player_url)}
+                crossOrigin="anonymous"
+              />
             ) : (
               <iframe
                 className="absolute top-0 left-0 w-full h-full"
