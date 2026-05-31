@@ -164,3 +164,33 @@ export async function searchAnime(query: string) {
   const res = await fetch(`${API_BASE}/public/anime?search=${encodeURIComponent(query)}`);
   return res.json();
 }
+
+export async function submitContactMessage(payload: {
+  name?: string;
+  email?: string;
+  category: string;
+  subject: string;
+  message: string;
+}) {
+  const response = await api.post('/contacts', payload);
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || 'Не удалось отправить сообщение');
+  }
+  return data;
+}
+
+export async function submitReport(payload: {
+  target_type: 'anime' | 'comment' | 'user';
+  target_id: number;
+  category: 'spam' | 'abuse' | 'toxicity' | 'bug' | 'content' | 'copyright' | 'other';
+  reason: string;
+  details?: string;
+}) {
+  const response = await api.post('/reports', payload);
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || 'Не удалось отправить жалобу');
+  }
+  return data;
+}

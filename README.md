@@ -153,6 +153,51 @@ aniyume/
 | **4** | **Запуск** | `npm run dev` |
 | **5** | **Готово!** | Откройте в браузере: [http://localhost:3000](http://localhost:3000) |
 
+---
+
+## CI/CD и branch model
+
+Frontend repository использует две основные ветки для GitHub Actions:
+
+- `dev` — интеграционная ветка. На push и pull request запускаются установка зависимостей, TypeScript typecheck, scoped safe ESLint, production build Next.js и smoke-сборка frontend Docker image.
+- `release` — release-кандидат. На push и pull request запускается тот же набор проверок и smoke-сборка Docker image. На push в `release` и ручной `workflow_dispatch` дополнительно собирается production-like Docker image и публикуется в GHCR без production deploy.
+
+Production deploy пока намеренно не выполняется автоматически: release workflow заканчивается публикацией immutable image. Для полного deploy нужно отдельно настроить GitHub Environment `production`, runtime values/secrets и безопасный deploy job.
+
+### Release image pipeline
+
+Workflow: `.github/workflows/release-ci.yml`.
+
+Для ветки `release` pipeline выполняет:
+
+1. `npm ci`, `npm run typecheck`, `npm run lint`, `npm run build`.
+2. Smoke-сборку Docker target `prod-like` без push.
+3. Для `push` в `release` или `workflow_dispatch` — сборку и публикацию image в GitHub Container Registry:
+   - `ghcr.io/<owner>/aniyume-web:release`
+   - `ghcr.io/<owner>/aniyume-web:release-<short-sha>`
+   - `ghcr.io/<owner>/aniyume-web:release-<github-run-number>`
+
+Тег `release-<short-sha>` является predictable immutable tag для конкретного commit. Тег `release` — moving alias текущего release-кандидата.
+
+Frontend использует public build-time env, поэтому значения `NEXT_PUBLIC_*` должны быть доступны во время Docker build. Для release image настройте GitHub Actions repository/environment variables:
+
+| Variable | Назначение |
+| :--- | :--- |
+| `NEXT_PUBLIC_REVERB_APP_KEY` | Public key для realtime/watch-party интеграции |
+| `NEXT_PUBLIC_REVERB_HOST` | Public websocket host |
+| `NEXT_PUBLIC_REVERB_PORT` | Public websocket port |
+| `NEXT_PUBLIC_REVERB_SCHEME` | `http` или `https` для websocket схемы |
+
+Runtime backend endpoint остаётся server-side env:
+
+| Environment variable | Назначение |
+| :--- | :--- |
+| `BACKEND_URL` | Backend API base URL для frontend API proxy, например `https://api.example.com/api/v1` |
+
+Release workflow не меняет backend, не деплоит production автоматически и не меняет AI/history/frontend integration.
+
+> `npm run lint` сейчас проверяет стабильный scoped-набор (`app/api`, `lib`, `types`, root config/type declarations), чтобы CI не блокировался существующим UI lint backlog. Полная локальная проверка доступна через `npm run lint:all`.
+
 <br />
 
 <div align="center">

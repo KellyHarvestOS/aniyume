@@ -11,6 +11,7 @@ import {
   FaShieldAlt,
   FaBalanceScale,
   FaQuestionCircle,
+  FaEnvelopeOpenText,
 } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { HiAdjustmentsHorizontal, HiMiniBookmark, HiFire } from 'react-icons/hi2';
@@ -115,6 +116,7 @@ export default function Footer() {
             <FooterLink href="/privacy" icon={FaShieldAlt}>Приватность</FooterLink>
             <FooterLink href="/terms" icon={FaBalanceScale}>Условия</FooterLink>
             <FooterLink href="/faq" icon={FaQuestionCircle}>FAQ</FooterLink>
+            <FooterLink href="/contacts" icon={FaEnvelopeOpenText}>Контакты</FooterLink>
           </Block>
 
           <Block title="Поддержка">

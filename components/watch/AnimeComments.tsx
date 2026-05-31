@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { FaBold, FaItalic, FaSyncAlt, FaSmile, FaTrash, FaEdit, FaSave, FaTimes, FaLock } from 'react-icons/fa';
 import Modal from '@/components/modals/ErrorModal';
+import ReportButton from '@/components/reports/ReportButton';
 
 const EMOJIS = ['😊', '😂', '😍', '🤔', '😎', '😭', '😮', '🔥', '✨', '👍', '👎', '❤️', '😱', '🙌', '👀'];
 const API = "/api-storage/";
@@ -137,12 +138,10 @@ export default function AnimeComments({ animeId }: { animeId: string | number })
             <div className="flex-1 min-w-0">
               <div className="flex justify-between mb-2">
                 <div className="flex items-center gap-2 text-sm font-black dark:text-gray-200">{c.user.name} <span className="text-[10px] text-gray-400 uppercase">{new Date(c.created_at).toLocaleDateString()}</span></div>
-                {user.ok && user.name === c.user.name && (
-                  <div className="flex gap-2 text-gray-400">
-                    <button onClick={() => setUi(p => ({ ...p, edit: ui.edit === c.id ? null : c.id }))} className='hover:text-teal-400'>{ui.edit === c.id ? <FaTimes /> : <FaEdit />}</button>
-                    <button onClick={() => setUi(p => ({ ...p, del: c.id }))} className="hover:text-red-500"><FaTrash /></button>
-                  </div>
-                )}
+                <div className="flex gap-2 text-gray-400 items-center">
+                  {user.ok && user.name !== c.user.name ? <ReportButton targetType="comment" targetId={Number(c.id)} compact /> : null}
+                  {user.ok && user.name === c.user.name && <><button onClick={() => setUi(p => ({ ...p, edit: ui.edit === c.id ? null : c.id }))} className='hover:text-teal-400'>{ui.edit === c.id ? <FaTimes /> : <FaEdit />}</button><button onClick={() => setUi(p => ({ ...p, del: c.id }))} className="hover:text-red-500"><FaTrash /></button></>}
+                </div>
               </div>
               {ui.edit === c.id ? (
                 <div>

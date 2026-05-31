@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api-storage/:path*',
-        destination: 'http://127.0.0.1:8000/storage/:path*',
+        destination: `${process.env.STORAGE_PROXY_URL || 'http://127.0.0.1:8000'}/storage/:path*`,
       },
     ];
   },

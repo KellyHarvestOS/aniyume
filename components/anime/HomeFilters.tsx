@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaChevronDown, FaCheck, FaTimes } from 'react-icons/fa';
+import { Zap, Flame, Sparkles, Star } from 'lucide-react';
 
 interface Genre { id: number; name: string; slug: string; }
 
@@ -26,7 +27,8 @@ const HomeFilters: React.FC<HomeFiltersProps> = ({ onFilterChange }) => {
   const typesRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
-  const years = Array.from({ length: 46 }, (_, i) => String(2025 - i));
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1980 + 1 }, (_, i) => String(currentYear - i));
   const types = [
     { value: 'tv', label: 'TV Сериал' },
     { value: 'movie', label: 'Фильм' },
@@ -36,11 +38,13 @@ const HomeFilters: React.FC<HomeFiltersProps> = ({ onFilterChange }) => {
   ];
 
   const sortOptions = [
-    { value: 'smart', label: '⚡ Умная' },
-    { value: 'popularity', label: '🔥 Популярные' },
-    { value: 'newest', label: '🆕 Новинки' },
-    { value: 'rating', label: '⭐ Рейтинг' },
+    { value: 'smart', label: 'Умная', Icon: Zap },
+    { value: 'popularity', label: 'Популярные', Icon: Flame },
+    { value: 'newest', label: 'Новинки', Icon: Sparkles },
+    { value: 'rating', label: 'Рейтинг', Icon: Star },
   ];
+  const currentSort = sortOptions.find(o => o.value === sort) || sortOptions[0];
+  const CurrentSortIcon = currentSort.Icon;
 
   useEffect(() => {
     fetch('/api/external/public/tags')
@@ -78,7 +82,7 @@ const HomeFilters: React.FC<HomeFiltersProps> = ({ onFilterChange }) => {
   const hasFilters = search || genre || year || type || sort !== 'smart';
 
   return (
-    <div className="container mx-auto px-4 mb-8">
+    <div className="container mx-auto px-4 mb-8 relative z-40">
       <div className="flex flex-col lg:flex-row gap-4 items-end bg-white/5 dark:bg-white/[0.03] backdrop-blur-md border border-white/10 p-5 rounded-3xl shadow-xl shadow-black/10">
         
         {/* Search */}
@@ -153,17 +157,20 @@ const HomeFilters: React.FC<HomeFiltersProps> = ({ onFilterChange }) => {
               onClick={() => setIsSortOpen(!isSortOpen)}
               className={`h-full w-full px-4 rounded-2xl bg-brand/10 dark:bg-brand/5 border-2 transition-all flex items-center justify-between gap-2 text-sm font-bold ${isSortOpen ? 'border-brand/40 bg-brand/15' : 'border-brand/20 hover:border-brand/40 text-brand'}`}
             >
-              <span className="truncate">{sortOptions.find(o => o.value === sort)?.label}</span>
+              <span className="flex items-center gap-2 truncate"><CurrentSortIcon size={14} className="shrink-0" />{currentSort.label}</span>
               <FaChevronDown className={`text-[10px] transition-transform ${isSortOpen ? 'rotate-180' : ''}`} />
             </button>
             {isSortOpen && (
               <div className="absolute top-[calc(100%+8px)] left-0 w-full min-w-[170px] z-50 bg-white dark:bg-[#1f1f1f] border border-brand/20 rounded-2xl shadow-2xl py-2 animate-in fade-in zoom-in-95 duration-150">
-                {sortOptions.map(o => (
+                {sortOptions.map(o => {
+                  const OptIcon = o.Icon;
+                  return (
                   <button key={o.value} onClick={() => { setSort(o.value); setIsSortOpen(false); }} className={`w-full px-4 py-2.5 text-left text-sm transition-colors flex items-center justify-between ${sort === o.value ? 'text-brand bg-brand/5 font-bold' : 'text-gray-300 hover:bg-white/5'}`}>
-                    {o.label}
+                    <span className="flex items-center gap-2"><OptIcon size={14} className="shrink-0" />{o.label}</span>
                     {sort === o.value && <FaCheck className="text-[10px]" />}
                   </button>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

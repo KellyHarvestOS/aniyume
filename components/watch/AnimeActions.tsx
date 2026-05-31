@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { FaChevronDown, FaHeart, FaHeartBroken } from 'react-icons/fa';
+import { FaChevronDown, FaHeart, FaRegHeart } from 'react-icons/fa';
 
 interface AnimeActionsProps {
   animeId: number;
@@ -66,7 +66,7 @@ export default function AnimeActions({
           `${API_BASE}/anime/${animeId}/user-status`,
           {
             headers: {
-              Authorization: token,
+              Authorization: `Bearer ${token}`,
               Accept: 'application/json',
             },
           }
@@ -84,7 +84,7 @@ export default function AnimeActions({
         const favRes = await fetch(
           `${API_BASE}/favorites/${animeId}/check`,
           {
-            headers: { Authorization: token },
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
 
@@ -113,7 +113,7 @@ export default function AnimeActions({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
             Accept: 'application/json',
           },
           body: JSON.stringify({ status: newStatus }),
@@ -141,7 +141,7 @@ export default function AnimeActions({
           method: isFavorite ? 'DELETE' : 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
           },
           body: isFavorite
             ? undefined
@@ -202,7 +202,7 @@ export default function AnimeActions({
             : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
         }`}
       >
-        {isFavorite ? <FaHeart /> : <FaHeartBroken />}
+        {isFavorite ? <FaHeart /> : <FaRegHeart />}
       </button>
     </div>
   );

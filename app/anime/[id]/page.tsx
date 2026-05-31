@@ -8,6 +8,7 @@ import AnimeComments from "@/components/watch/AnimeComments";
 import AnimeSidebar from "@/components/watch/AnimeSidebar";
 import AnimeActions from "@/components/watch/AnimeActions";
 import AnimeViewSkeleton from "@/components/skeletons/AnimeViewSkeleton";
+import ReportButton from "@/components/reports/ReportButton";
 import { AnimeDetails, Episode } from "@/types/anime";
 import { CommunityStats } from "@/types/profile";
 
@@ -155,6 +156,7 @@ export default function AnimeViewPage() {
             animeId={anime.id}
             initialFavCount={(anime as any).favorites_count || 0}
           />
+          {token ? <ReportButton targetType="anime" targetId={Number(anime.id)} /> : null}
 
           {communityStats && totalStats > 0 && (
             <div className="flex-1 w-full pt-1">

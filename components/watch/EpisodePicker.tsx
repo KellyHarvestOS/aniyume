@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { FaChevronLeft, FaChevronRight, FaSearch, FaTimes } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaSearch, FaTimes, FaChevronDown } from 'react-icons/fa';
 
 interface Episode {
   episode_number: number;
@@ -23,6 +23,7 @@ export default function EpisodePicker({
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeRangeIdx, setActiveRangeIdx] = useState(0);
+  const [expanded, setExpanded] = useState(true);
   const rangeScrollRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -31,13 +32,20 @@ export default function EpisodePicker({
   }, [episodes]);
 
   const episodeNumbers = useMemo(() => sortedEpisodes.map(e => e.episode_number), [sortedEpisodes]);
-  
+
+  // Collapse the big grid by default on small screens so the video stays reachable.
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768 && episodeNumbers.length > 12) {
+      setExpanded(false);
+    }
+  }, [episodeNumbers.length]);
+
   const ranges = useMemo(() => {
     if (episodeNumbers.length === 0) return [];
     const min = episodeNumbers[0];
     const max = episodeNumbers[episodeNumbers.length - 1];
     const result: { start: number; end: number; label: string }[] = [];
-    
+
     for (let s = min; s <= max; s += rangeSize) {
       const end = Math.min(s + rangeSize - 1, max);
       result.push({
@@ -69,13 +77,13 @@ export default function EpisodePicker({
 
   // Scroll to current episode in grid when range changes
   useEffect(() => {
-    if (gridRef.current) {
+    if (expanded && gridRef.current) {
       const currentBtn = gridRef.current.querySelector(`[data-ep="${currentEpisode}"]`) as HTMLElement;
       if (currentBtn) {
         currentBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
-  }, [activeRangeIdx, currentEpisode]);
+  }, [activeRangeIdx, currentEpisode, expanded]);
 
   const currentRange = ranges[activeRangeIdx] || { start: 0, end: 0 };
   const visibleEpisodes = useMemo(() => {
@@ -125,9 +133,9 @@ export default function EpisodePicker({
           <button
             onClick={handlePrev}
             disabled={!hasPrev}
-            className="p-2 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400 
-                       hover:bg-[#39bcba]/20 hover:text-[#39bcba] disabled:opacity-30 disabled:cursor-default 
-                       transition-all duration-200"
+            className="p-2.5 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400
+                       hover:bg-[#39bcba]/20 hover:text-[#39bcba] disabled:opacity-30 disabled:cursor-default
+                       transition-all duration-200 active:scale-95"
             aria-label="Предыдущая серия"
           >
             <FaChevronLeft size={14} />
@@ -138,22 +146,22 @@ export default function EpisodePicker({
           <button
             onClick={handleNext}
             disabled={!hasNext}
-            className="p-2 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400 
-                       hover:bg-[#39bcba]/20 hover:text-[#39bcba] disabled:opacity-30 disabled:cursor-default 
-                       transition-all duration-200"
+            className="p-2.5 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400
+                       hover:bg-[#39bcba]/20 hover:text-[#39bcba] disabled:opacity-30 disabled:cursor-default
+                       transition-all duration-200 active:scale-95"
             aria-label="Следующая серия"
           >
             <FaChevronRight size={14} />
           </button>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(48px, 1fr))' }}>
           {episodeNumbers.map(num => (
             <button
               key={num}
               onClick={() => onSelect(num)}
-              className={`w-12 h-10 rounded-lg text-sm font-medium transition-all duration-200
+              className={`h-11 rounded-lg text-sm font-medium transition-all duration-200 active:scale-95
                 ${num === currentEpisode
-                  ? 'bg-[#39bcba] text-white shadow-lg shadow-[#39bcba]/30 scale-105'
+                  ? 'bg-[#39bcba] text-white shadow-lg shadow-[#39bcba]/30'
                   : 'bg-gray-100 dark:bg-[#1e1e1e] text-gray-700 dark:text-gray-300 hover:bg-[#39bcba]/20 hover:text-[#39bcba] border border-gray-200 dark:border-gray-700/50'
                 }`}
             >
@@ -167,29 +175,41 @@ export default function EpisodePicker({
 
   return (
     <div className="w-full">
-      {/* Nav: Prev / Current / Next + Search toggle */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
+      {/* Nav: Prev / Current (tap to expand) / Next + Search toggle */}
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
           <button
             onClick={handlePrev}
             disabled={!hasPrev}
-            className="p-2.5 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400 
-                       hover:bg-[#39bcba]/20 hover:text-[#39bcba] disabled:opacity-30 disabled:cursor-default 
-                       transition-all duration-200 border border-gray-200 dark:border-gray-700/50"
+            className="shrink-0 p-3 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400
+                       hover:bg-[#39bcba]/20 hover:text-[#39bcba] disabled:opacity-30 disabled:cursor-default
+                       transition-all duration-200 border border-gray-200 dark:border-gray-700/50 active:scale-95"
             aria-label="Предыдущая серия"
           >
             <FaChevronLeft size={13} />
           </button>
-          <div className="px-4 py-2 rounded-lg bg-[#39bcba]/10 border border-[#39bcba]/30 
-                          text-sm font-bold text-[#39bcba] min-w-[100px] text-center">
-            Серия {currentEpisode}
-          </div>
+
+          <button
+            onClick={() => { setExpanded(v => !v); setSearchQuery(''); setIsSearchOpen(false); }}
+            className="flex-1 min-w-0 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg
+                       bg-[#39bcba]/10 border border-[#39bcba]/30 text-sm font-bold text-[#39bcba]
+                       hover:bg-[#39bcba]/20 transition-all duration-200 active:scale-[0.98]"
+            aria-expanded={expanded}
+            aria-label="Показать список серий"
+          >
+            <span className="truncate">Серия {currentEpisode}</span>
+            <FaChevronDown
+              size={11}
+              className={`shrink-0 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+            />
+          </button>
+
           <button
             onClick={handleNext}
             disabled={!hasNext}
-            className="p-2.5 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400 
-                       hover:bg-[#39bcba]/20 hover:text-[#39bcba] disabled:opacity-30 disabled:cursor-default 
-                       transition-all duration-200 border border-gray-200 dark:border-gray-700/50"
+            className="shrink-0 p-3 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400
+                       hover:bg-[#39bcba]/20 hover:text-[#39bcba] disabled:opacity-30 disabled:cursor-default
+                       transition-all duration-200 border border-gray-200 dark:border-gray-700/50 active:scale-95"
             aria-label="Следующая серия"
           >
             <FaChevronRight size={13} />
@@ -197,8 +217,8 @@ export default function EpisodePicker({
         </div>
 
         <button
-          onClick={() => { setIsSearchOpen(!isSearchOpen); setSearchQuery(''); }}
-          className={`p-2.5 rounded-lg transition-all duration-200 border
+          onClick={() => { setIsSearchOpen(!isSearchOpen); setSearchQuery(''); if (!expanded) setExpanded(true); }}
+          className={`shrink-0 p-3 rounded-lg transition-all duration-200 border active:scale-95
             ${isSearchOpen
               ? 'bg-[#39bcba] text-white border-[#39bcba]'
               : 'bg-gray-100 dark:bg-[#1e1e1e] text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700/50 hover:bg-[#39bcba]/20 hover:text-[#39bcba]'
@@ -209,87 +229,89 @@ export default function EpisodePicker({
         </button>
       </div>
 
-      {/* Search bar */}
-      {isSearchOpen && (
-        <form onSubmit={handleSearchSubmit} className="mb-3">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={13} />
-            <input
-              type="text"
-              inputMode="numeric"
-              placeholder="Введите номер серии..."
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              autoFocus
-              className="w-full pl-9 pr-4 py-2.5 rounded-lg bg-gray-50 dark:bg-[#1a1a1a] 
-                         border border-gray-200 dark:border-gray-700 text-sm
-                         text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600
-                         focus:outline-none focus:ring-2 focus:ring-[#39bcba]/40 focus:border-[#39bcba]
-                         transition-all duration-200"
-            />
-          </div>
-        </form>
-      )}
+      {/* Collapsible body */}
+      {expanded && (
+        <>
+          {/* Search bar */}
+          {isSearchOpen && (
+            <form onSubmit={handleSearchSubmit} className="mb-3">
+              <div className="relative">
+                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={13} />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Введите номер серии..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  autoFocus
+                  className="w-full pl-9 pr-4 py-3 rounded-lg bg-gray-50 dark:bg-[#1a1a1a]
+                             border border-gray-200 dark:border-gray-700 text-sm
+                             text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600
+                             focus:outline-none focus:ring-2 focus:ring-[#39bcba]/40 focus:border-[#39bcba]
+                             transition-all duration-200"
+                />
+              </div>
+            </form>
+          )}
 
-      {/* Range tabs - only show if not searching and more than 1 range */}
-      {!searchQuery && ranges.length > 1 && (
-        <div
-          ref={rangeScrollRef}
-          className="flex gap-1.5 mb-3 overflow-x-auto scrollbar-hide pb-1"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {ranges.map((range, idx) => (
-            <button
-              key={range.start}
-              onClick={() => setActiveRangeIdx(idx)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200 shrink-0
-                ${idx === activeRangeIdx
-                  ? 'bg-[#39bcba] text-white shadow-md shadow-[#39bcba]/20'
-                  : 'bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400 hover:bg-[#39bcba]/15 hover:text-[#39bcba] border border-gray-200 dark:border-gray-700/50'
-                }`}
+          {/* Range tabs - only show if not searching and more than 1 range */}
+          {!searchQuery && ranges.length > 1 && (
+            <div
+              ref={rangeScrollRef}
+              className="flex gap-1.5 mb-3 overflow-x-auto scrollbar-hide pb-1"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {range.label}
-            </button>
-          ))}
-        </div>
-      )}
+              {ranges.map((range, idx) => (
+                <button
+                  key={range.start}
+                  onClick={() => setActiveRangeIdx(idx)}
+                  className={`px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 active:scale-95
+                    ${idx === activeRangeIdx
+                      ? 'bg-[#39bcba] text-white shadow-md shadow-[#39bcba]/20'
+                      : 'bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400 hover:bg-[#39bcba]/15 hover:text-[#39bcba] border border-gray-200 dark:border-gray-700/50'
+                    }`}
+                >
+                  {range.label}
+                </button>
+              ))}
+            </div>
+          )}
 
-      {/* Episode grid */}
-      <div
-        ref={gridRef}
-        className="grid gap-1.5 max-h-[280px] overflow-y-auto pr-1 scrollbar-thin"
-        style={{
-          gridTemplateColumns: 'repeat(auto-fill, minmax(48px, 1fr))',
-          scrollbarWidth: 'thin',
-        }}
-      >
-        {visibleEpisodes.map(num => (
-          <button
-            key={num}
-            data-ep={num}
-            onClick={() => {
-              onSelect(num);
-              if (searchQuery) {
-                setSearchQuery('');
-                setIsSearchOpen(false);
-              }
-            }}
-            className={`h-10 rounded-lg text-sm font-medium transition-all duration-150
-              ${num === currentEpisode
-                ? 'bg-[#39bcba] text-white shadow-lg shadow-[#39bcba]/30 ring-2 ring-[#39bcba]/50'
-                : 'bg-gray-50 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-[#39bcba]/20 hover:text-[#39bcba] border border-gray-200 dark:border-gray-700/40'
-              }`}
-            title={`Серия ${num}`}
+          {/* Episode grid */}
+          <div
+            ref={gridRef}
+            className="grid gap-1.5 max-h-[40vh] md:max-h-[280px] overflow-y-auto pr-1 scrollbar-thin overscroll-contain"
+            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(46px, 1fr))', scrollbarWidth: 'thin' }}
           >
-            {num}
-          </button>
-        ))}
-        {visibleEpisodes.length === 0 && searchQuery && (
-          <div className="col-span-full py-6 text-center text-gray-400 dark:text-gray-600 text-sm">
-            Серия {searchQuery} не найдена
+            {visibleEpisodes.map(num => (
+              <button
+                key={num}
+                data-ep={num}
+                onClick={() => {
+                  onSelect(num);
+                  if (searchQuery) {
+                    setSearchQuery('');
+                    setIsSearchOpen(false);
+                  }
+                }}
+                className={`h-11 rounded-lg text-sm font-medium transition-all duration-150 active:scale-95
+                  ${num === currentEpisode
+                    ? 'bg-[#39bcba] text-white shadow-lg shadow-[#39bcba]/30 ring-2 ring-[#39bcba]/50'
+                    : 'bg-gray-50 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-[#39bcba]/20 hover:text-[#39bcba] border border-gray-200 dark:border-gray-700/40'
+                  }`}
+                title={`Серия ${num}`}
+              >
+                {num}
+              </button>
+            ))}
+            {visibleEpisodes.length === 0 && searchQuery && (
+              <div className="col-span-full py-6 text-center text-gray-400 dark:text-gray-600 text-sm">
+                Серия {searchQuery} не найдена
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       {/* Episode count info */}
       <div className="mt-2 text-xs text-gray-400 dark:text-gray-600 text-right">

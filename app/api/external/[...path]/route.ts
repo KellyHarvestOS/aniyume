@@ -18,7 +18,10 @@ export async function handleProxy(
       "schedule",
     ];
 
-    const normalizedPath = pathStr.startsWith("public/")
+    // Authenticated anime sub-routes must NOT be rewritten to the public catalog.
+    const privateAnimeRoute = /^anime\/[^/]+\/(status|user-status|episodes-watched)(\/|$)/.test(pathStr);
+
+    const normalizedPath = pathStr.startsWith("public/") || privateAnimeRoute
       ? pathStr
       : publicPrefixes.some((prefix) => pathStr === prefix || pathStr.startsWith(`${prefix}/`))
         ? `public/${pathStr}`
