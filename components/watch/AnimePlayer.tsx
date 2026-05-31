@@ -36,8 +36,8 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
     progress: playbackProgress,
   });
 
-  const saveProgress = async (progress: number, completed = false) => {
-    if (!token || !currentEpisode?.id || progress < 1) return;
+  const saveProgress = async (progress: number, completed = false, episodeId = currentEpisode?.id) => {
+    if (!token || !episodeId || progress < 0) return;
 
     try {
       await fetch('/api/external/watch-history', {
@@ -48,7 +48,7 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
           Accept: 'application/json',
         },
         body: JSON.stringify({
-          episode_id: currentEpisode.id,
+          episode_id: episodeId,
           progress: Math.floor(progress),
           delta_time: 0,
           completed,
@@ -218,6 +218,7 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
       setPlaybackProgress(0);
       setHasResumed(false);
       setCurrentEpisode(ep);
+      saveProgress(0, false, ep.id);
       if (onEpisodeSelect) onEpisodeSelect(ep.episode_number);
     }
   };
