@@ -53,6 +53,7 @@ function normalizeSessionSummary(value: unknown): AiChatSessionSummary | null {
 
   return {
     session_id: value.session_id,
+    title: typeof value.title === 'string' || value.title === null ? value.title : undefined,
     created_at: typeof value.created_at === 'string' || value.created_at === null ? value.created_at : undefined,
     updated_at: typeof value.updated_at === 'string' || value.updated_at === null ? value.updated_at : undefined,
     last_message_at: typeof value.last_message_at === 'string' || value.last_message_at === null ? value.last_message_at : undefined,

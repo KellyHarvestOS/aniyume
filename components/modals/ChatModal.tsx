@@ -204,7 +204,7 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
             {isHistoryOpen && (
                 <div className="bg-white dark:bg-[#111] border-b border-slate-200 dark:border-white/5 p-3 space-y-2">
                     <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-black text-slate-700 dark:text-gray-200">AI chat history</span>
+                        <span className="text-xs font-black text-slate-700 dark:text-gray-200">История AI-чатов</span>
                         <button
                             type="button"
                             onClick={handleNewChat}
@@ -238,7 +238,7 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
                                     }`}
                             >
                                 <div className="flex items-center justify-between gap-2">
-                                    <span className="text-[11px] font-bold truncate">Чат {session.session_id.slice(0, 8)}</span>
+                                    <span className="text-[11px] font-bold truncate">{session.title || `Чат ${session.session_id.slice(0, 8)}`}</span>
                                     <span className="text-[10px] opacity-70 shrink-0">{formatSessionDate(session.last_message_at ?? session.updated_at ?? session.created_at)}</span>
                                 </div>
                                 <div className="text-[10px] opacity-70 mt-0.5">

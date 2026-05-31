@@ -120,4 +120,39 @@ jobs:
         run: |
           echo "Published release image tags:"
           echo "${{ steps.meta.outputs.tags }}"
-          echo "No production deployment is executed by this workflow."
+          echo "Production deployment runs after this job on push to release."
+
+  deploy:
+    name: Deploy frontend to production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: release-image
+    environment: production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/release'
+
+    steps:
+      - name: Deploy frontend over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_SSH_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            PROD_ROOT="${{ secrets.PROD_ROOT }}"
+            if [ -z "$PROD_ROOT" ]; then
+              PROD_ROOT="/opt/aniyume"
+            fi
+
+            cd "$PROD_ROOT/web"
+            git checkout release
+            if [ -n "$(git status --porcelain)" ]; then
+              git stash push -u -m "ci frontend deploy stash before ${{ github.sha }}"
+            fi
+            git pull --ff-only origin release
+
+            cd "$PROD_ROOT"
+            docker compose up -d --build web
