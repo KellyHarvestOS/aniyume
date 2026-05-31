@@ -178,17 +178,6 @@ const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
           </div>
         )}
       </div>
-
-      {showScrollTop && (
-        <button
-          type="button"
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 w-14 h-14 bg-brand text-white rounded-2xl shadow-2xl flex items-center justify-center text-xl transition-all hover:scale-110 active:scale-95 z-[60] group"
-        >
-          <div className="absolute inset-0 bg-brand rounded-2xl animate-ping opacity-20 group-hover:opacity-40" />
-          <FaChevronDown className="rotate-180" />
-        </button>
-      )}
     </section>
   );
 };

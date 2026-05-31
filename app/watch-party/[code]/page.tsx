@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useWatchParty } from '@/hooks/useWatchParty';
 import WatchPartyChat from '@/components/watch-party/WatchPartyChat';
 import ParticipantsList from '@/components/watch-party/ParticipantsList';
+import { IoPeople } from 'react-icons/io5';
 
 interface RoomData {
   id: number;
@@ -334,10 +335,10 @@ export default function WatchPartyPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#070b14] flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-[#111111] flex items-center justify-center transition-colors">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 rounded-full border-2 border-[#00E2C4]/30 border-t-[#00E2C4] animate-spin mx-auto" />
-          <p className="text-white/50">Подключение к комнате...</p>
+          <p className="text-gray-500 dark:text-white/50">Подключение к комнате...</p>
         </div>
       </div>
     );
@@ -345,7 +346,7 @@ export default function WatchPartyPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#070b14] flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-[#111111] flex items-center justify-center transition-colors">
         <div className="text-center space-y-4">
           <p className="text-red-400 text-lg">{error}</p>
           <button onClick={() => router.push('/')} className="text-[#00E2C4] hover:underline">
@@ -359,33 +360,33 @@ export default function WatchPartyPage() {
   if (!room) return null;
 
   return (
-    <div className="min-h-screen bg-[#070b14] flex flex-col">
+    <div className="min-h-screen bg-[#f8fafc] text-gray-900 dark:bg-[#111111] dark:text-gray-200 flex flex-col transition-colors">
       {/* Top Bar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-black/30 backdrop-blur-md">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-3 sm:px-4 py-3 border-b border-gray-200 dark:border-white/5 bg-white/90 dark:bg-[#0d0d0d]/90 backdrop-blur-md">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <button
             onClick={handleLeave}
-            className="flex items-center gap-1.5 text-white/50 hover:text-white text-sm transition-colors"
+            className="flex shrink-0 items-center gap-1.5 text-gray-500 hover:text-gray-900 dark:text-white/50 dark:hover:text-white text-sm transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
             Выйти
           </button>
-          <div className="w-px h-4 bg-white/10" />
+          <div className="w-px h-4 bg-gray-200 dark:bg-white/10" />
 
           {/* Room Info */}
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             {room.anime.poster_url && (
-              <img src={room.anime.poster_url} alt="" className="w-6 h-8 object-cover rounded" />
+              <img src={room.anime.poster_url} alt="" className="hidden xs:block w-6 h-8 object-cover rounded" />
             )}
-            <div>
-              <p className="text-sm font-semibold text-white leading-tight">{room.anime.title}</p>
-              <p className="text-xs text-white/40">Эпизод {room.episode_number}</p>
+            <div className="min-w-0">
+              <p className="max-w-[150px] truncate text-sm font-semibold text-gray-900 dark:text-white leading-tight sm:max-w-[260px] md:max-w-[360px]">{room.anime.title}</p>
+              <p className="text-xs text-gray-500 dark:text-white/40">Эпизод {room.episode_number}</p>
             </div>
           </div>
         </div>
 
         {/* Right Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           {/* Connection Status */}
           <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs ${isConnected ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
             }`}>
@@ -394,45 +395,40 @@ export default function WatchPartyPage() {
           </div>
 
           {/* Code Badge */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
-            <span className="text-xs text-white/50">Код:</span>
+          <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+            <span className="hidden sm:inline text-xs text-gray-500 dark:text-white/50">Код:</span>
             <span className="text-sm font-mono font-bold text-[#00E2C4] tracking-widest">{room.code}</span>
           </div>
 
           {/* Copy Link */}
           <button
             onClick={copyLink}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm text-white/70 hover:text-white transition-all"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-sm text-gray-600 hover:text-gray-900 dark:text-white/70 dark:hover:text-white transition-all"
           >
             {copied ? <Check className="w-4 h-4 text-[#00E2C4]" /> : <Link2 className="w-4 h-4" />}
-            {copied ? 'Скопировано!' : 'Ссылка'}
+            <span className="hidden sm:inline">{copied ? 'Скопировано!' : 'Ссылка'}</span>
           </button>
 
           {/* Invite Friends */}
           <button
             onClick={() => setShowFriends(!showFriends)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm text-white/70 hover:text-white transition-all"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-sm text-gray-600 hover:text-gray-900 dark:text-white/70 dark:hover:text-white transition-all"
           >
             <UserPlus className="w-4 h-4" />
-            Друзья
+            <span className="hidden sm:inline">Друзья</span>
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
         {/* Player */}
-        <div className="flex-1 flex flex-col bg-black relative">
-          {activeSource && (
-            <div className="absolute top-2 left-2 z-50 bg-black/80 text-[10px] text-green-500 p-1 pointer-events-none rounded">
-              [DEBUG] Type: {activeSource.type} | URL: {activeSource.url}
-            </div>
-          )}
+        <div className="relative flex aspect-video min-h-[220px] flex-none flex-col bg-black sm:min-h-[360px] lg:aspect-auto lg:min-h-0 lg:flex-1">
           {activeSource ? (
             activeSource.type === 'hls' ? (
               <video
                 ref={videoRef}
-                className="w-full h-full outline-none bg-black"
+                className="h-full w-full bg-black outline-none"
                 controls={isHost}
                 playsInline
                 onPlay={handleHostPlay}
@@ -444,10 +440,10 @@ export default function WatchPartyPage() {
             ) : (
               <iframe
                 src={activeSource.url?.startsWith('//') ? `https:${activeSource.url}` : activeSource.url}
-                className="w-full h-full bg-black block"
+                className="block h-full w-full bg-black"
                 allowFullScreen
                 allow="autoplay; fullscreen"
-                style={{ border: 'none', minHeight: '400px' }}
+                style={{ border: 'none' }}
               />
             )
           ) : (
@@ -463,7 +459,7 @@ export default function WatchPartyPage() {
 
           {/* Host badge */}
           {isHost && (
-            <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-medium">
+            <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-[11px] sm:text-xs font-medium">
               <Crown className="w-3 h-3" />
               Вы хост — управляете воспроизведением
             </div>
@@ -476,15 +472,15 @@ export default function WatchPartyPage() {
                 initial={{ opacity: 0, y: 20, x: '-50%' }}
                 animate={{ opacity: 1, y: 0, x: '-50%' }}
                 exit={{ opacity: 0, y: 20, x: '-50%' }}
-                className="absolute bottom-6 left-1/2 bg-[#0d1117] border border-white/10 rounded-2xl px-4 py-4 shadow-2xl min-w-72"
+                className="absolute bottom-4 left-1/2 w-[calc(100%-2rem)] max-w-sm bg-white dark:bg-[#0d1117] border border-gray-200 dark:border-white/10 rounded-2xl px-4 py-4 shadow-2xl"
               >
                 <div className="flex items-center gap-3">
                   <Bell className="w-5 h-5 text-[#00E2C4]" />
                   <div className="flex-1">
-                    <p className="text-sm text-white font-medium">
+                    <p className="text-sm text-gray-900 dark:text-white font-medium">
                       {friendInvitePopup.from_user_name} приглашает вас
                     </p>
-                    <p className="text-xs text-white/40">{friendInvitePopup.anime_title}</p>
+                    <p className="text-xs text-gray-500 dark:text-white/40">{friendInvitePopup.anime_title}</p>
                   </div>
                   <button
                     onClick={() => {
@@ -502,22 +498,22 @@ export default function WatchPartyPage() {
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-80 flex flex-col border-l border-white/5 bg-black/20">
+        <div className="flex h-[420px] w-full flex-col border-t border-gray-200 bg-white dark:border-white/5 dark:bg-[#0d0d0d] sm:h-[460px] lg:h-auto lg:w-80 lg:border-l lg:border-t-0 lg:bg-black/20 lg:dark:bg-black/20">
           {/* Tabs */}
-          <div className="flex border-b border-white/10">
+          <div className="flex border-b border-gray-200 dark:border-white/10">
             {([
               { id: 'chat', label: 'Чат', icon: null },
-              { id: 'participants', label: `👥 ${participants.length}`, icon: null },
+              { id: 'participants', label: `${participants.length}`, icon: <IoPeople className="h-4 w-4" /> },
             ] as const).map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setSidePanel(tab.id)}
                 className={`flex-1 py-3 text-sm font-medium transition-colors ${sidePanel === tab.id
                   ? 'text-[#00E2C4] border-b-2 border-[#00E2C4]'
-                  : 'text-white/40 hover:text-white'
+                  : 'text-gray-400 hover:text-gray-700 dark:text-white/40 dark:hover:text-white'
                   }`}
               >
-                {tab.label}
+                <span className="inline-flex items-center justify-center gap-1.5">{tab.icon}{tab.label}</span>
               </button>
             ))}
           </div>
@@ -550,28 +546,28 @@ export default function WatchPartyPage() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="fixed top-14 right-4 z-50 w-72 bg-[#0d1117] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+            className="fixed top-20 right-3 z-50 w-[calc(100vw-1.5rem)] max-w-72 bg-white dark:bg-[#0d1117] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden sm:top-14 sm:right-4"
           >
-            <div className="px-4 py-3 border-b border-white/10">
-              <p className="text-sm font-semibold text-white">Пригласить друзей</p>
+            <div className="px-4 py-3 border-b border-gray-200 dark:border-white/10">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">Пригласить друзей</p>
             </div>
             <div className="max-h-72 overflow-y-auto">
               {friends.length === 0 ? (
-                <p className="text-center text-white/30 text-sm py-6">Нет друзей для приглашения</p>
+                <p className="text-center text-gray-400 dark:text-white/30 text-sm py-6">Нет друзей для приглашения</p>
               ) : (
                 friends.map((f) => (
-                  <div key={f.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition-colors">
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-white/10">
+                  <div key={f.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 dark:bg-white/10">
                       {f.avatar ? (
                         <img src={f.avatar} alt={f.name} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs font-bold text-white/50">
+                        <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-500 dark:text-white/50">
                           {f.name[0]?.toUpperCase()}
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-white truncate">{f.name}</p>
+                      <p className="text-sm text-gray-900 dark:text-white truncate">{f.name}</p>
                       {f.is_online && <p className="text-[10px] text-green-400">В сети</p>}
                     </div>
                     <button

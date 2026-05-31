@@ -124,8 +124,8 @@ export default function EditProfilePage() {
 
           const avatar = user.avatar || user.avatar_url;
           if (avatar) {
-            const baseUrl = "/api-storage/";
-            const fullUrl = avatar.startsWith("http") ? avatar : `${baseUrl}${avatar}`;
+            const avatarPath = avatar.replace(/^\/+/, "").replace(/^storage\//, "");
+            const fullUrl = avatar.startsWith("http") ? avatar : `/api-storage/${avatarPath}`;
             setPreviewUrl(`${fullUrl}?t=${Date.now()}`);
           }
         }

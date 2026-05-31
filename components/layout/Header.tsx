@@ -52,7 +52,7 @@ export default function Header() {
         delete document.documentElement.dataset.premiumCursor;
         document.documentElement.style.removeProperty('--premium-cursor');
 
-        setLogoPaths({ light: '/images/logo0.png', dark: '/images/logo01.png' });
+        setLogoPaths({ light: '/images/logo01.png', dark: '/images/logo0.png' });
       }
 
       if (isPremium && themeValue) {
@@ -86,9 +86,10 @@ export default function Header() {
 
   const getAvatarUrl = () => {
     if (!user?.avatar) return null;
-    const baseUrl = "/api-storage/";
-    const fullPath = user.avatar.startsWith('http') ? user.avatar : `${baseUrl}${user.avatar}`;
-    return fullPath;
+    if (user.avatar.startsWith('http')) return user.avatar;
+
+    const avatarPath = user.avatar.replace(/^\/+/, '').replace(/^storage\//, '');
+    return `/api-storage/${avatarPath}`;
   };
 
   const avatarUrl = getAvatarUrl();
@@ -150,8 +151,8 @@ export default function Header() {
                     >
                       <span
                         className={`text-xl transition-transform group-hover:scale-110 ${isActive
-                          ? 'scale-110 text-[#2EC4B6]'
-                          : 'text-gray-400 group-hover:text-[#2EC4B6]'
+                          ? 'scale-110 icon-brand'
+                          : 'text-gray-400 group-hover:icon-brand'
                           }`}
                       >
                         {link.icon}
@@ -241,7 +242,7 @@ export default function Header() {
                       className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border transition-all ${isActive ? 'border-brand' : 'border-transparent'
                         } hover:border-brand`}
                     >
-                      <span className={`text-2xl ${isActive ? 'text-brand' : 'text-brand'}`}>{link.icon}</span>
+                      <span className={`text-2xl ${isActive ? 'icon-brand' : 'icon-brand'}`}>{link.icon}</span>
                       <span className={`text-sm font-bold ${isActive ? 'text-brand' : 'dark:text-gray-200'}`}>
                         {link.label}
                       </span>
