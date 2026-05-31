@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useAnimation, PanInfo } from 'framer-motion';
 import { IoClose, IoSend } from 'react-icons/io5';
+import { FaCopy } from 'react-icons/fa6';
 import { PiSoundcloudLogoFill } from "react-icons/pi";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -19,6 +20,7 @@ const createMessage = (direction: AiChatDirection, content: string): Message => 
     id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
     direction,
     content,
+    createdAt: new Date().toISOString(),
 });
 
 const toChatDirection = (message: AiChatHistoryMessage): AiChatDirection => {
@@ -71,6 +73,7 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
     const [isSessionsLoading, setIsSessionsLoading] = useState(false);
     const [isSessionLoading, setIsSessionLoading] = useState(false);
     const [historyUnavailable, setHistoryUnavailable] = useState(false);
+    const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -171,6 +174,18 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
             controls.start({ x: -(windowWidth - modalWidth - 48), transition: { type: 'spring', stiffness: 250, damping: 25 } });
         } else {
             controls.start({ x: 0, transition: { type: 'spring', stiffness: 250, damping: 25 } });
+        }
+    };
+
+    const handleCopyAssistantMessage = async (message: Message) => {
+        if (message.direction !== 'incoming') return;
+
+        try {
+            await navigator.clipboard.writeText(message.content);
+            setCopiedMessageId(message.id);
+            window.setTimeout(() => setCopiedMessageId(current => current === message.id ? null : current), 1500);
+        } catch (error) {
+            console.warn('Failed to copy AI chat message:', error);
         }
     };
 
@@ -279,11 +294,23 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
                             >
                                 {msg.content}
                             </ReactMarkdown>
-                            {(msg.role || msg.createdAt) && (
-                                <div className={`mt-1 text-[10px] opacity-60 ${msg.direction === 'outgoing' ? 'text-white' : 'text-slate-500 dark:text-gray-400'}`}>
+                            <div className={`mt-2 flex items-center gap-2 text-[10px] opacity-70 ${msg.direction === 'outgoing' ? 'justify-end text-white' : 'justify-between text-slate-500 dark:text-gray-400'}`}>
+                                <div>
                                     {[msg.role, formatMessageTime(msg.createdAt)].filter(Boolean).join(' · ')}
                                 </div>
-                            )}
+                                {msg.direction === 'incoming' && (
+                                    <button
+                                        type="button"
+                                        onClick={() => handleCopyAssistantMessage(msg)}
+                                        className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-slate-500 transition hover:bg-slate-100 hover:text-brand dark:text-gray-400 dark:hover:bg-white/10"
+                                        aria-label="Скопировать сообщение ассистента"
+                                        title="Скопировать"
+                                    >
+                                        <FaCopy size={11} />
+                                        <span>{copiedMessageId === msg.id ? 'Скопировано' : 'Копия'}</span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </motion.div>
                 ))}

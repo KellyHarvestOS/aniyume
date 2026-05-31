@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, MessageSquare, X } from 'lucide-react';
+import { Send, MessageSquare } from 'lucide-react';
 import type { ChatMessage } from '@/hooks/useWatchParty';
 
 interface WatchPartyChatProps {
@@ -39,18 +39,18 @@ export default function WatchPartyChat({ messages, onSend, currentUserId, classN
   };
 
   return (
-    <div className={`flex flex-col h-full bg-black/30 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden ${className}`}>
+    <div className={`flex flex-col h-full bg-white dark:bg-black/30 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 dark:border-white/10">
         <MessageSquare className="w-4 h-4 text-[#00E2C4]" />
-        <span className="text-sm font-semibold text-white">Чат комнаты</span>
+        <span className="text-sm font-semibold text-gray-900 dark:text-white">Чат комнаты</span>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2 scrollbar-thin scrollbar-thumb-white/10">
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-white/10">
         <AnimatePresence initial={false}>
           {messages.length === 0 && (
-            <div className="text-center text-white/30 text-sm py-8">
+            <div className="text-center text-gray-400 dark:text-white/30 text-sm py-8">
               Пока сообщений нет. Начните общение!
             </div>
           )}
@@ -62,7 +62,7 @@ export default function WatchPartyChat({ messages, onSend, currentUserId, classN
                   key={msg.id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-center text-white/40 text-xs py-1"
+                  className="text-center text-gray-400 dark:text-white/40 text-xs py-1"
                 >
                   {msg.message}
                 </motion.div>
@@ -77,11 +77,11 @@ export default function WatchPartyChat({ messages, onSend, currentUserId, classN
                 className={`flex gap-2 ${isOwn ? 'flex-row-reverse' : ''}`}
               >
                 {/* Avatar */}
-                <div className="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden bg-white/10 mt-0.5">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden bg-gray-100 dark:bg-white/10 mt-0.5">
                   {msg.user_avatar ? (
                     <img src={msg.user_avatar} alt={msg.user_name} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[10px] text-white/60 font-bold">
+                    <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-500 dark:text-white/60 font-bold">
                       {msg.user_name[0]?.toUpperCase()}
                     </div>
                   )}
@@ -90,16 +90,16 @@ export default function WatchPartyChat({ messages, onSend, currentUserId, classN
                 {/* Bubble */}
                 <div className={`max-w-[75%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col gap-0.5`}>
                   {!isOwn && (
-                    <span className="text-[10px] text-white/40 px-1">{msg.user_name}</span>
+                    <span className="text-[10px] text-gray-500 dark:text-white/40 px-1">{msg.user_name}</span>
                   )}
                   <div className={`px-3 py-2 rounded-2xl text-sm leading-tight break-words ${
                     isOwn
-                      ? 'bg-[#00E2C4]/20 text-white rounded-tr-sm border border-[#00E2C4]/30'
-                      : 'bg-white/10 text-white/90 rounded-tl-sm'
+                      ? 'bg-[#00E2C4]/15 text-gray-900 dark:text-white rounded-tr-sm border border-[#00E2C4]/30'
+                      : 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-white/90 rounded-tl-sm'
                   }`}>
                     {msg.message}
                   </div>
-                  <span className="text-[9px] text-white/25 px-1">{formatTime(msg.created_at)}</span>
+                  <span className="text-[9px] text-gray-400 dark:text-white/25 px-1">{formatTime(msg.created_at)}</span>
                 </div>
               </motion.div>
             );
@@ -109,7 +109,7 @@ export default function WatchPartyChat({ messages, onSend, currentUserId, classN
       </div>
 
       {/* Input */}
-      <div className="px-3 pb-3 pt-2 border-t border-white/10">
+      <div className="px-3 pb-3 pt-2 border-t border-gray-200 dark:border-white/10">
         <div className="flex gap-2 items-end">
           <textarea
             value={input}
@@ -117,7 +117,7 @@ export default function WatchPartyChat({ messages, onSend, currentUserId, classN
             onKeyDown={handleKey}
             placeholder="Сообщение..."
             rows={1}
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-[#00E2C4]/50 resize-none transition-colors"
+            className="flex-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/30 outline-none focus:border-[#00E2C4]/50 resize-none transition-colors"
             style={{ maxHeight: '80px', overflowY: 'auto' }}
           />
           <button

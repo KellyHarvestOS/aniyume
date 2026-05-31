@@ -244,17 +244,15 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
                   disabled={isRatingLoading}
-                  className={`transition-all duration-200 transform ${
-                    isRatingLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-125 active:scale-90'
-                  }`}
+                  className={`transition-all duration-200 transform ${isRatingLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-125 active:scale-90'
+                    }`}
                 >
                   <FaStar
                     size={22}
-                    className={`transition-colors duration-200 ${
-                      star <= (hoverRating || userRating)
+                    className={`transition-colors duration-200 ${star <= (hoverRating || userRating)
                         ? 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]'
                         : 'text-gray-200 dark:text-gray-700'
-                    }`}
+                      }`}
                   />
                 </button>
               ))}
@@ -275,12 +273,12 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
             </div>
           </div>
         </div>
-        
+
         {anime && currentEpisode && (
           <div className="mb-4 flex justify-end">
             <button
               onClick={() => setShowCreateRoom(true)}
-              className="bg-[#21D0B8] text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-105 hover:shadow-lg shadow-[#21D0B8]/20 transition-all active:scale-95"
+              className="bg-[#39bcba] text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-105 hover:shadow-lg shadow-[#21D0B8]/20 transition-all active:scale-95"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
               Включить вместе (Watch Party)
@@ -318,16 +316,16 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
       <hr className="border-gray-500 mb-10" />
 
       {showCreateRoom && anime && currentEpisode && (
-         <CreateRoomModal
-           anime={anime}
-           episodeNumber={currentEpisode.episode_number}
-           onClose={() => setShowCreateRoom(false)}
-           onCreated={(code) => {
-             if (router) {
-               router.push(`/watch-party/${code}`);
-             }
-           }}
-         />
+        <CreateRoomModal
+          anime={anime}
+          episodeNumber={currentEpisode.episode_number}
+          onClose={() => setShowCreateRoom(false)}
+          onCreated={(code) => {
+            if (router) {
+              router.push(`/watch-party/${code}`);
+            }
+          }}
+        />
       )}
     </div>
   );

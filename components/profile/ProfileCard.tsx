@@ -31,11 +31,10 @@ export const ProfileCard = ({
 }: ProfileCardProps) => {
   const getAvatarUrl = () => {
     if (!user.avatar) return null;
+    if (user.avatar.startsWith("http")) return user.avatar;
 
-    const baseUrl = "/api-storage/";
-    const fullPath = user.avatar.startsWith("http")
-      ? user.avatar
-      : `${baseUrl}${user.avatar}`;
+    const avatarPath = user.avatar.replace(/^\/+/, "").replace(/^storage\//, "");
+    const fullPath = `/api-storage/${avatarPath}`;
 
     return `${fullPath}${fullPath.includes("?") ? "&" : "?"}t=${Date.now()}`;
   };

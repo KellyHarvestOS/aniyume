@@ -62,7 +62,7 @@ export default function SchedulePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#111111] pb-20 relative transition-colors">
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#111111] pb-20 relative overflow-x-hidden transition-colors">
       <div className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col gap-4 bg-white/80 dark:bg-[#0d0d0d]/80 backdrop-blur-md p-3 rounded-full shadow-2xl border border-gray-200 dark:border-gray-800">
         {DAYS_INFO.map((day, index) => {
           const isToday = index === todayIndex;
@@ -89,9 +89,9 @@ export default function SchedulePage() {
       </div>
 
       <div className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-10 backdrop-blur-xl">
-        <div className="w-full px-6 pt-8">
-          <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
-            Расписание <span className="text-brand w-[20rem]">новых серий</span>
+        <div className="container mx-auto px-4 md:px-8 pt-8">
+          <h1 className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
+            Расписание <span className="text-brand w-70">новых серий</span>
           </h1>
         </div>
       </div>
@@ -122,8 +122,8 @@ export default function SchedulePage() {
                 key={index}
                 id={`day-${index}`}
                 className={`rounded-3xl transition-all duration-500 ${isToday
-                  ? 'bg-white dark:bg-[#0d0d0d] p-8 shadow-brand-soft border border-brand-dim relative overflow-hidden'
-                  : 'p-2'
+                  ? 'bg-white dark:bg-[#0d0d0d] p-4 sm:p-6 md:p-8 shadow-brand-soft border border-brand-dim relative overflow-hidden'
+                  : 'p-2 overflow-hidden'
                   }`}
               >
                 {isToday && (
@@ -143,14 +143,14 @@ export default function SchedulePage() {
                   {!isToday && <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800 ml-4"></div>}
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 relative z-10">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6 relative z-10 min-w-0">
                   {animeForDay.map(anime => (
                     <Link
                       href={`/anime/${anime.id}`}
                       key={anime.id}
-                      className="group flex flex-col gap-3"
+                      className="group flex min-w-0 max-w-full flex-col gap-3"
                     >
-                      <div className="relative w-full aspect-2/3 rounded-2xl overflow-hidden bg-gray-900 shadow-md group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-300">
+                      <div className="relative w-full max-w-full aspect-2/3 rounded-2xl overflow-hidden bg-gray-900 shadow-md group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-300">
                         <Image
                           src={anime.poster_url || '/placeholder.jpg'}
                           alt={anime.title}
@@ -169,7 +169,7 @@ export default function SchedulePage() {
                         </div>
                       </div>
 
-                      <div>
+                      <div className="min-w-0">
                         <h3 className="font-bold text-gray-800 dark:text-gray-200 text-sm line-clamp-1 group-hover:text-brand-gradient transition-colors">
                           {anime.title}
                         </h3>
