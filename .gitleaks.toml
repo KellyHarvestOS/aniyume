@@ -1,0 +1,5 @@
+[allowlist]
+description = "Known public/example values in historical commits"
+commits = [
+  "71578f1781611836d4ec74dc8592f122c5385135",
+]
