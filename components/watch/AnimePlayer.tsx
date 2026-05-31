@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
+import Hls from 'hls.js';
 import EpisodePicker from './EpisodePicker';
 import { Episode } from '@/types/anime';
 import { FaStar } from 'react-icons/fa';
@@ -21,13 +22,43 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
   const [userRating, setUserRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [isRatingLoading, setIsRatingLoading] = useState(false);
+  const [resumeProgress, setResumeProgress] = useState<number>(0);
+  const [playbackProgress, setPlaybackProgress] = useState<number>(0);
+  const [hasResumed, setHasResumed] = useState(false);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const hlsRef = React.useRef<Hls | null>(null);
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('userToken') : null;
 
   useWatchTracker({
     episodeId: currentEpisode?.id,
-    token: token
+    token: token,
+    progress: playbackProgress,
   });
+
+  const saveProgress = async (progress: number, completed = false) => {
+    if (!token || !currentEpisode?.id || progress < 1) return;
+
+    try {
+      await fetch('/api/external/watch-history', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          episode_id: currentEpisode.id,
+          progress: Math.floor(progress),
+          delta_time: 0,
+          completed,
+        }),
+        keepalive: true,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     const fetchRating = async () => {
@@ -84,9 +115,108 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
     }
   }, [uniqueEpisodes, currentEpisode]);
 
+  useEffect(() => {
+    if (!animeId || !token || uniqueEpisodes.length === 0) return;
+
+    const fetchLastProgress = async () => {
+      try {
+        const res = await fetch(`/api/external/watch-history/anime/${animeId}/last-episode`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store',
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const episode = uniqueEpisodes.find((ep) => ep.id === data.episode_id)
+          || uniqueEpisodes.find((ep) => ep.episode_number === data.last_episode);
+
+        if (episode) {
+          setCurrentEpisode(episode);
+          setResumeProgress(Number(data.progress || 0));
+          setPlaybackProgress(Number(data.progress || 0));
+          setHasResumed(false);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchLastProgress();
+  }, [animeId, token, uniqueEpisodes]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const playerUrl = currentEpisode?.player_url ? getVideoSrc(currentEpisode.player_url) : '';
+
+    if (!video || !playerUrl || !playerUrl.includes('.m3u8')) return;
+
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
+    if (Hls.isSupported()) {
+      const hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: false,
+        maxBufferLength: 60,
+        maxMaxBufferLength: 120,
+      });
+
+      hlsRef.current = hls;
+      hls.loadSource(playerUrl);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (!data.fatal) return;
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          hls.startLoad();
+        } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          hls.recoverMediaError();
+        } else {
+          hls.destroy();
+        }
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = playerUrl;
+    }
+
+    return () => {
+      hlsRef.current?.destroy();
+      hlsRef.current = null;
+    };
+  }, [currentEpisode?.id, currentEpisode?.player_url]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || hasResumed || resumeProgress < 5) return;
+
+    const seek = () => {
+      const safeProgress = video.duration && resumeProgress > video.duration - 30 ? 0 : resumeProgress;
+      if (safeProgress > 0) {
+        video.currentTime = safeProgress;
+      }
+      setHasResumed(true);
+    };
+
+    video.addEventListener('loadedmetadata', seek, { once: true });
+    video.addEventListener('canplay', seek, { once: true });
+
+    return () => {
+      video.removeEventListener('loadedmetadata', seek);
+      video.removeEventListener('canplay', seek);
+    };
+  }, [resumeProgress, hasResumed, currentEpisode?.id]);
+
   const handleEpisodeChange = (epNum: number) => {
     const ep = uniqueEpisodes.find(e => e.episode_number === epNum);
     if (ep) {
+      if (videoRef.current?.currentTime) {
+        saveProgress(videoRef.current.currentTime);
+      }
+      setResumeProgress(0);
+      setPlaybackProgress(0);
+      setHasResumed(false);
       setCurrentEpisode(ep);
       if (onEpisodeSelect) onEpisodeSelect(ep.episode_number);
     }
@@ -161,10 +291,13 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
           {currentEpisode?.player_url ? (
             currentEpisode.player_url.includes('.m3u8') ? (
               <video
+                ref={videoRef}
                 controls
                 className="absolute top-0 left-0 w-full h-full bg-black outline-none"
-                src={getVideoSrc(currentEpisode.player_url)}
                 crossOrigin="anonymous"
+                onTimeUpdate={(event) => setPlaybackProgress(event.currentTarget.currentTime)}
+                onPause={(event) => saveProgress(event.currentTarget.currentTime)}
+                onEnded={(event) => saveProgress(event.currentTarget.currentTime, true)}
               />
             ) : (
               <iframe

@@ -3,12 +3,18 @@ import { useEffect, useRef } from 'react';
 interface TrackerProps {
   episodeId: number | undefined;
   token: string | null;
+  progress: number;
 }
 
-export const useWatchTracker = ({ episodeId, token }: TrackerProps) => {
+export const useWatchTracker = ({ episodeId, token, progress }: TrackerProps) => {
   const bufferRef = useRef<number>(0);
   const lastTimestampRef = useRef<number | null>(null);
   const isSyncingRef = useRef<boolean>(false);
+  const progressRef = useRef<number>(0);
+
+  useEffect(() => {
+    progressRef.current = progress;
+  }, [progress]);
 
   useEffect(() => {
     if (!episodeId || !token) return;
@@ -40,7 +46,7 @@ export const useWatchTracker = ({ episodeId, token }: TrackerProps) => {
 
       const payload = {
         episode_id: episodeId,
-        progress: 0, 
+        progress: Math.max(0, Math.floor(progressRef.current)),
         delta_time: secondsToSend,
         completed: false
       };
