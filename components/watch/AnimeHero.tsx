@@ -18,10 +18,10 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  ongoing:   { label: 'Онгоинг',    color: 'bg-green-500/20 text-green-400 border-green-500/30' },
-  finished:  { label: 'Завершён',   color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-  completed: { label: 'Завершён',   color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-  announced: { label: 'Анонс',      color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
+  ongoing: { label: 'Онгоинг', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
+  finished: { label: 'Завершён', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+  completed: { label: 'Завершён', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+  announced: { label: 'Анонс', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
 };
 
 export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
@@ -31,7 +31,6 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
   const tagsList = anime.tags || anime.genres || [];
   const displayGenres = tagsList.slice(0, 3);
 
-  // Show imported banner when present; otherwise fall back to old Shikimori poster.
   const posterUrl = anime.poster_url || '/placeholder.jpg';
   const bannerUrl = anime.cover_url || posterUrl;
 
@@ -50,15 +49,28 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
 
   return (
     <div className="relative w-full min-h-[85vh] md:min-h-[60vh] flex items-center bg-white dark:bg-[#111111] transition-colors overflow-hidden">
-      <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
-        <img
-          src={bannerUrl}
-          alt=""
-          className="w-full h-full object-cover object-center scale-105"
-        />
-        <div className="absolute inset-0 bg-linear-to-r from-white via-white/70 to-transparent dark:from-[#111111] dark:via-[#111111]/80" />
+
+
+      <div className="absolute inset-0 z-0 overflow-hidden bg-white dark:bg-[#111111]" aria-hidden="true">
+
+        <div
+          className="absolute top-0 right-0 h-full w-full md:w-[75%] lg:w-[60%]"
+          style={{
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 35%)',
+            maskImage: 'linear-gradient(to right, transparent 0%, black 35%)'
+          }}
+        >
+          <img
+            src={bannerUrl}
+            alt=""
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
+
+        <div className="absolute inset-0 bg-linear-to-r from-white via-white/80 to-transparent dark:from-[#111111] dark:via-[#111111]/80" />
         <div className="absolute inset-0 bg-linear-to-t from-white via-transparent to-transparent dark:from-[#111111]" />
-        <div className="absolute top-0 right-0 w-[55%] h-full bg-teal-400/20 blur-[140px] opacity-60" />
+
+        <div className="absolute top-0 right-0 w-[55%] h-full bg-teal-400/20 blur-[140px] opacity-60 pointer-events-none" />
       </div>
 
       <div className="container mx-auto px-4 md:px-12 relative z-20 pt-20 pb-12">
