@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaEnvelope, FaLock, FaSignInAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
 import AuthBackground from '@/components/layout/AuthBackground';
-import Modal from '@/components/modals/ErrorModal';
+import AuthToast from '@/components/ui/AuthToast';
 import { useAuth } from '@/contexts/AuthContext';
 
 type AuthResponse = {
@@ -47,6 +47,8 @@ const readJson = async (res: Response): Promise<AuthResponse> => {
 
 const MOCK_LOGIN_EMAIL = 'vladjjjsss7@gmail.com';
 
+type LoginField = keyof Pick<LoginFormData, 'email' | 'password'>;
+
 const LoginPage = () => {
   const router = useRouter();
   const { login } = useAuth();
@@ -55,13 +57,13 @@ const LoginPage = () => {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const [modal, setModal] = useState({
+  const [toast, setToast] = useState({
     isOpen: false,
     title: '',
     message: '',
     type: 'success' as 'success' | 'danger',
-    onConfirm: () => { },
   });
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<LoginField, string>>>({});
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -73,21 +75,28 @@ const LoginPage = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
+    if (id === 'email' || id === 'password') {
+      setFieldErrors((prev) => ({ ...prev, [id]: undefined }));
+    }
   };
 
-  const openAlert = (title: string, message: string, type: 'success' | 'danger', action?: () => void) => {
-    setModal({
+  const showToast = (title: string, message: string, type: 'success' | 'danger') => {
+    setToast({
       isOpen: true,
       title,
       message,
       type,
-      onConfirm: action || (() => { }),
     });
+  };
+
+  const markLoginFieldsInvalid = (message: string) => {
+    setFieldErrors({ email: message, password: message });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setFieldErrors({});
 
     try {
       if (formData.email.trim().toLowerCase() === MOCK_LOGIN_EMAIL && formData.password === MOCK_LOGIN_EMAIL) {
@@ -99,9 +108,10 @@ const LoginPage = () => {
         }));
         window.dispatchEvent(new Event('authChange'));
 
-        openAlert('С возвращением!', 'Вы успешно вошли в тестовый аккаунт AniYume.', 'success', () => {
+        showToast('Успешный вход', 'Вы успешно вошли в тестовый аккаунт AniYume.', 'success');
+        window.setTimeout(() => {
           router.push('/');
-        });
+        }, 900);
         return;
       }
 
@@ -126,11 +136,14 @@ const LoginPage = () => {
 
       login(token, (user as LoginUser | undefined) || { id: 0, name: '', email: formData.email });
 
-      openAlert('С возвращением!', 'Вы успешно вошли в систему AniYume.', 'success', () => {
+      showToast('Успешный вход', 'Вы успешно вошли в систему AniYume.', 'success');
+      window.setTimeout(() => {
         router.push('/');
-      });
+      }, 900);
     } catch (error: unknown) {
-      openAlert('Ошибка входа', getErrorMessage(error), 'danger');
+      const message = getErrorMessage(error);
+      markLoginFieldsInvalid(message);
+      showToast('Ошибка входа', message, 'danger');
     } finally {
       setLoading(false);
     }
@@ -138,16 +151,7 @@ const LoginPage = () => {
 
   return (
     <AuthBackground>
-      <Modal
-        isOpen={modal.isOpen}
-        title={modal.title}
-        message={modal.message}
-        type={modal.type}
-        confirmText="Понятно"
-        cancelText="Закрыть"
-        onClose={() => setModal({ ...modal, isOpen: false })}
-        onConfirm={modal.onConfirm}
-      />
+      <AuthToast isOpen={toast.isOpen} title={toast.title} message={toast.message} type={toast.type} />
 
       <div className="w-full max-w-md rounded-xl border border-[#2EC4B6]/30 dark:border-gray-800 bg-white/10 dark:bg-[#0f0f0f]/40 p-10 shadow-2xl backdrop-blur-sm transition-colors">
         <h1 className="mb-2 flex items-center justify-center gap-3 text-center text-4xl font-black uppercase italic tracking-tighter text-[#2EC4B6]">
@@ -171,10 +175,15 @@ const LoginPage = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="EMAIL@EXAMPLE.COM"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 text-sm font-bold text-gray-700 outline-none transition focus:ring-2 focus:ring-[#2EC4B6]/50 dark:border-white/5 dark:bg-[#111111] dark:text-gray-200"
+                aria-invalid={!!fieldErrors.email}
+                className={`w-full rounded-xl border bg-gray-50 py-3.5 pl-12 pr-4 text-sm font-bold text-gray-700 outline-none transition focus:ring-2 dark:bg-[#111111] dark:text-gray-200 ${fieldErrors.email
+                  ? 'border-red-400 shadow-[0_0_0_3px_rgba(239,68,68,0.12)] focus:ring-red-400/30 dark:border-red-500/70'
+                  : 'border-gray-200 focus:ring-[#2EC4B6]/50 dark:border-white/5'
+                  }`}
                 required
               />
             </div>
+            {fieldErrors.email && <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-red-500">{fieldErrors.email}</p>}
           </div>
 
           <div>
@@ -189,7 +198,11 @@ const LoginPage = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-12 text-sm font-bold text-gray-700 outline-none transition focus:ring-2 focus:ring-[#2EC4B6]/50 dark:border-white/5 dark:bg-[#111111] dark:text-gray-200"
+                aria-invalid={!!fieldErrors.password}
+                className={`w-full rounded-xl border bg-gray-50 py-3.5 pl-12 pr-12 text-sm font-bold text-gray-700 outline-none transition focus:ring-2 dark:bg-[#111111] dark:text-gray-200 ${fieldErrors.password
+                  ? 'border-red-400 shadow-[0_0_0_3px_rgba(239,68,68,0.12)] focus:ring-red-400/30 dark:border-red-500/70'
+                  : 'border-gray-200 focus:ring-[#2EC4B6]/50 dark:border-white/5'
+                  }`}
                 required
               />
 
@@ -205,6 +218,7 @@ const LoginPage = () => {
                 )}
               </button>
             </div>
+            {fieldErrors.password && <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-red-500">{fieldErrors.password}</p>}
           </div>
 
           {/* Honeypot field for bot detection */}

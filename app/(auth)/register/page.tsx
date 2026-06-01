@@ -13,7 +13,7 @@ import {
   FaEyeSlash
 } from "react-icons/fa";
 import AuthBackground from "@/components/layout/AuthBackground";
-import Modal from "@/components/modals/ErrorModal";
+import AuthToast from "@/components/ui/AuthToast";
 import { useAuth } from '@/contexts/AuthContext';
 import DatePicker from "@/components/ui/DatePicker";
 
@@ -49,6 +49,25 @@ const readJson = async (res: Response): Promise<RegisterResponse> => {
 
 type RegisterUser = Parameters<ReturnType<typeof useAuth>['login']>[1];
 
+type RegisterField = "username" | "dateOfBirth" | "email" | "password" | "confirmPassword";
+
+const inputClassName = (hasError?: boolean, className = "") => `w-full h-[52px] rounded-xl border bg-gray-50 dark:bg-[#111111] text-gray-700 dark:text-gray-200 outline-none focus:ring-2 transition-all font-bold text-sm ${hasError
+  ? "border-red-400 shadow-[0_0_0_3px_rgba(239,68,68,0.12)] focus:ring-red-400/30 dark:border-red-500/70"
+  : "border-gray-200 dark:border-white/5 focus:ring-[#2EC4B6]/50"
+  } ${className}`;
+
+const backendFieldMap: Record<string, RegisterField> = {
+  name: "username",
+  username: "username",
+  age: "dateOfBirth",
+  dateOfBirth: "dateOfBirth",
+  birth_date: "dateOfBirth",
+  email: "email",
+  password: "password",
+  password_confirmation: "confirmPassword",
+  confirmPassword: "confirmPassword",
+};
+
 const RegisterPage = () => {
   const router = useRouter();
   const { login } = useAuth();
@@ -65,13 +84,13 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [modal, setModal] = useState({
+  const [toast, setToast] = useState({
     isOpen: false,
     title: "",
     message: "",
     type: "success" as "success" | "danger",
-    onConfirm: () => { },
   });
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<RegisterField, string>>>({});
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -83,21 +102,32 @@ const RegisterPage = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
+    if (id in formData) {
+      setFieldErrors((prev) => ({ ...prev, [id as RegisterField]: undefined }));
+    }
   };
 
   const handleDateChange = (value: string) => {
     setFormData((prev) => ({ ...prev, dateOfBirth: value }));
+    setFieldErrors((prev) => ({ ...prev, dateOfBirth: undefined }));
   };
 
-  const openAlert = (title: string, message: string, type: "success" | "danger", action?: () => void) => {
-    setModal({
+  const showToast = (title: string, message: string, type: "success" | "danger") => {
+    setToast({
       isOpen: true,
       title,
       message,
       type,
-      onConfirm: action || (() => { }),
     });
   };
+
+  const markFieldInvalid = (field: RegisterField, message: string) => {
+    setFieldErrors((prev) => ({ ...prev, [field]: message }));
+  };
+
+  const renderFieldError = (field: RegisterField) => fieldErrors[field]
+    ? <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-red-500">{fieldErrors[field]}</p>
+    : null;
 
   const calculateAge = (dob: string) => {
     if (!dob) return 0;
@@ -112,30 +142,44 @@ const RegisterPage = () => {
   };
 
   const validateForm = () => {
+    setFieldErrors({});
     if (!formData.username.trim()) {
-      openAlert("Ошибка", "Введите имя пользователя", "danger");
+      const message = "Введите имя пользователя";
+      markFieldInvalid("username", message);
+      showToast("Ошибка", message, "danger");
       return false;
     }
     if (!formData.dateOfBirth) {
-      openAlert("Ошибка", "Пожалуйста, выберите дату рождения", "danger");
+      const message = "Пожалуйста, выберите дату рождения";
+      markFieldInvalid("dateOfBirth", message);
+      showToast("Ошибка", message, "danger");
       return false;
     }
     const calculatedAge = calculateAge(formData.dateOfBirth);
     if (calculatedAge < 1 || calculatedAge > 100) {
-      openAlert("Неверный возраст", `Ваш вычисленный возраст: ${calculatedAge}. Значение должно быть от 1 до 100 лет.`, "danger");
+      const message = `Ваш вычисленный возраст: ${calculatedAge}. Значение должно быть от 1 до 100 лет.`;
+      markFieldInvalid("dateOfBirth", message);
+      showToast("Неверный возраст", message, "danger");
       return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      openAlert("Ошибка Email", "Введите корректный адрес электронной почты", "danger");
+      const message = "Введите корректный адрес электронной почты";
+      markFieldInvalid("email", message);
+      showToast("Ошибка Email", message, "danger");
       return false;
     }
     if (formData.password.length < 6) {
-      openAlert("Слабый пароль", "Пароль должен содержать минимум 6 символов", "danger");
+      const message = "Пароль должен содержать минимум 6 символов";
+      markFieldInvalid("password", message);
+      showToast("Слабый пароль", message, "danger");
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
-      openAlert("Ошибка пароля", "Пароли не совпадают. Проверьте правильность ввода.", "danger");
+      const message = "Пароли не совпадают. Проверьте правильность ввода.";
+      markFieldInvalid("password", message);
+      markFieldInvalid("confirmPassword", message);
+      showToast("Ошибка пароля", message, "danger");
       return false;
     }
     return true;
@@ -162,26 +206,34 @@ const RegisterPage = () => {
       if (!res.ok) {
         let errorMessage = responseData.message || "Ошибка регистрации";
         if (responseData.errors) {
+          Object.entries(responseData.errors).forEach(([field, value]) => {
+            const mappedField = backendFieldMap[field];
+            if (!mappedField) return;
+            const message = Array.isArray(value) ? value[0] : value;
+            markFieldInvalid(mappedField, message);
+          });
           const firstError = Object.values(responseData.errors)[0];
-          errorMessage = Array.isArray(firstError) ? firstError[0] : "Ошибка валидации";
+          errorMessage = Array.isArray(firstError) ? firstError[0] : firstError || "Ошибка валидации";
         }
-        openAlert("Регистрация отклонена", errorMessage, "danger");
+        showToast("Регистрация отклонена", errorMessage, "danger");
         return;
       }
       const token = responseData.data?.token || responseData.data?.access_token || responseData.token || responseData.access_token;
       const user = responseData.data?.user || responseData.user;
       if (token) {
         login(token, (user as RegisterUser | undefined) || { id: 0, name: formData.username, email: formData.email });
-        openAlert("Успех!", "Ваш аккаунт создан. Приятного просмотра аниме!", "success", () => {
+        showToast("Успех!", "Ваш аккаунт создан. Приятного просмотра аниме!", "success");
+        window.setTimeout(() => {
           router.push("/");
-        });
+        }, 900);
       } else {
-        openAlert("Почти готово", "Регистрация прошла успешно! Теперь войдите в свой аккаунт.", "success", () => {
+        showToast("Почти готово", "Регистрация прошла успешно! Теперь войдите в свой аккаунт.", "success");
+        window.setTimeout(() => {
           router.push("/login");
-        });
+        }, 900);
       }
     } catch (error: unknown) {
-      openAlert("Сбой сервера", getErrorMessage(error), "danger");
+      showToast("Сбой сервера", getErrorMessage(error), "danger");
     } finally {
       setLoading(false);
     }
@@ -189,16 +241,7 @@ const RegisterPage = () => {
 
   return (
     <AuthBackground>
-      <Modal
-        isOpen={modal.isOpen}
-        title={modal.title}
-        message={modal.message}
-        type={modal.type}
-        confirmText="Понятно"
-        cancelText="Закрыть"
-        onClose={() => setModal({ ...modal, isOpen: false })}
-        onConfirm={modal.onConfirm}
-      />
+      <AuthToast isOpen={toast.isOpen} title={toast.title} message={toast.message} type={toast.type} />
 
       <div className="bg-white/10 dark:bg-[#0f0f0f]/40 p-8 md:p-10 rounded-xl shadow-2xl w-full max-w-2xl border border-[#2EC4B6]/30 dark:border-gray-800 backdrop-blur-sm transition-colors mx-auto">
         <h1 className="text-4xl font-black italic tracking-tighter mb-2 text-center text-[#2EC4B6] flex items-center justify-center gap-3 uppercase">
@@ -224,16 +267,19 @@ const RegisterPage = () => {
                   value={formData.username}
                   onChange={handleChange}
                   placeholder="ВАШ НИКНЕЙМ"
-                  className="w-full h-[52px] pl-12 pr-4 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-[#111111] text-gray-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-[#2EC4B6]/50 transition-all font-bold text-sm"
+                  aria-invalid={!!fieldErrors.username}
+                  className={inputClassName(!!fieldErrors.username, "pl-12 pr-4")}
                 />
               </div>
+              {renderFieldError("username")}
             </div>
 
             <div className="md:col-span-4 flex flex-col">
               <label htmlFor="dateOfBirth" className="block text-[10px] font-black uppercase tracking-tight text-[#2EC4B6] mb-2 ml-1 h-4 whitespace-nowrap overflow-hidden">
                 Дата рождения
               </label>
-              <DatePicker id="dateOfBirth" value={formData.dateOfBirth} onChange={handleDateChange} />
+              <DatePicker id="dateOfBirth" value={formData.dateOfBirth} onChange={handleDateChange} hasError={!!fieldErrors.dateOfBirth} />
+              {renderFieldError("dateOfBirth")}
             </div>
 
             <div className="md:col-span-10 flex flex-col">
@@ -248,9 +294,11 @@ const RegisterPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="EMAIL@EXAMPLE.COM"
-                  className="w-full h-[52px] pl-12 pr-4 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-[#111111] text-gray-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-[#2EC4B6]/50 transition-all font-bold text-sm"
+                  aria-invalid={!!fieldErrors.email}
+                  className={inputClassName(!!fieldErrors.email, "pl-12 pr-4")}
                 />
               </div>
+              {renderFieldError("email")}
             </div>
 
             <div className="md:col-span-5 flex flex-col">
@@ -265,7 +313,8 @@ const RegisterPage = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full h-[52px] pl-12 pr-10 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-[#111111] text-gray-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-[#2EC4B6]/50 transition-all font-bold text-sm"
+                  aria-invalid={!!fieldErrors.password}
+                  className={inputClassName(!!fieldErrors.password, "pl-12 pr-10")}
                 />
                 <button
                   type="button"
@@ -275,6 +324,7 @@ const RegisterPage = () => {
                   {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                 </button>
               </div>
+              {renderFieldError("password")}
             </div>
 
             <div className="md:col-span-5 flex flex-col">
@@ -289,7 +339,8 @@ const RegisterPage = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full h-[52px] pl-12 pr-10 rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-[#111111] text-gray-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-[#2EC4B6]/50 transition-all font-bold text-sm"
+                  aria-invalid={!!fieldErrors.confirmPassword}
+                  className={inputClassName(!!fieldErrors.confirmPassword, "pl-12 pr-10")}
                 />
                 <button
                   type="button"
@@ -299,6 +350,7 @@ const RegisterPage = () => {
                   {showConfirmPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                 </button>
               </div>
+              {renderFieldError("confirmPassword")}
             </div>
           </div>
 

@@ -8,6 +8,7 @@ type DatePickerProps = {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  hasError?: boolean;
 };
 
 type PickerDropdownProps = {
@@ -101,7 +102,7 @@ function PickerDropdown({ value, options, onChange, className = "" }: PickerDrop
   );
 }
 
-export default function DatePicker({ id, value, onChange, placeholder = "ДД.ММ.ГГГГ" }: DatePickerProps) {
+export default function DatePicker({ id, value, onChange, placeholder = "ДД.ММ.ГГГГ", hasError = false }: DatePickerProps) {
   const selectedDate = parseDateValue(value);
   const [isOpen, setIsOpen] = useState(false);
   const currentDate = new Date();
@@ -155,7 +156,10 @@ export default function DatePicker({ id, value, onChange, placeholder = "ДД.М
         id={id}
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="group flex h-[52px] w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3 text-left text-xs font-bold text-gray-700 outline-none transition-all focus:ring-2 focus:ring-[#2EC4B6]/50 dark:border-white/5 dark:bg-[#111111] dark:text-gray-200"
+        className={`group flex h-[52px] w-full items-center justify-between rounded-xl border bg-gray-50 px-3 text-left text-xs font-bold text-gray-700 outline-none transition-all focus:ring-2 dark:bg-[#111111] dark:text-gray-200 ${hasError
+          ? "border-red-400 shadow-[0_0_0_3px_rgba(239,68,68,0.12)] focus:ring-red-400/30 dark:border-red-500/70"
+          : "border-gray-200 focus:ring-[#2EC4B6]/50 dark:border-white/5"
+          }`}
       >
         <span className={value ? "text-gray-700 dark:text-gray-200" : "text-gray-400"}>
           {formatDisplayValue(value) || placeholder}
