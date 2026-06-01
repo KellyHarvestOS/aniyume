@@ -11,6 +11,7 @@ import { MagnetIcon } from "lucide-react";
 import { GiMagicAxe } from "react-icons/gi";
 import { BsCursor } from "react-icons/bs";
 import { HiCursorClick } from "react-icons/hi";
+import { getAvatarUrl } from "@/lib/storage";
 
 const MAX_SOCIAL_LINKS = 10;
 
@@ -124,9 +125,7 @@ export default function EditProfilePage() {
 
           const avatar = user.avatar || user.avatar_url;
           if (avatar) {
-            const avatarPath = avatar.replace(/^\/+/, "").replace(/^storage\//, "");
-            const fullUrl = avatar.startsWith("http") ? avatar : `/api-storage/${avatarPath}`;
-            setPreviewUrl(`${fullUrl}?t=${Date.now()}`);
+            setPreviewUrl(getAvatarUrl(avatar));
           }
         }
       } catch (err) {

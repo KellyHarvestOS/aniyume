@@ -5,6 +5,7 @@ import Link from "next/link";
 import { RiVipCrownFill } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
 import { Heart, Star, MessageCircle, Users } from "lucide-react";
+import { getAvatarUrl } from "@/lib/storage";
 
 interface ProfileCardProps {
   user: {
@@ -29,17 +30,7 @@ export const ProfileCard = ({
   counts,
   onLogout,
 }: ProfileCardProps) => {
-  const getAvatarUrl = () => {
-    if (!user.avatar) return null;
-    if (user.avatar.startsWith("http")) return user.avatar;
-
-    const avatarPath = user.avatar.replace(/^\/+/, "").replace(/^storage\//, "");
-    const fullPath = `/api-storage/${avatarPath}`;
-
-    return `${fullPath}${fullPath.includes("?") ? "&" : "?"}t=${Date.now()}`;
-  };
-
-  const avatarUrl = getAvatarUrl();
+  const avatarUrl = getAvatarUrl(user.avatar);
 
   return (
     <div className="bg-white dark:bg-[#161616] rounded-lg shadow-sm border border-slate-100 dark:border-gray-800 text-center sticky top-24 relative overflow-hidden">

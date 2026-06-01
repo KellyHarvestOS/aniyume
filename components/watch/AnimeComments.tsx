@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { FaBold, FaItalic, FaSyncAlt, FaSmile, FaTrash, FaEdit, FaSave, FaTimes, FaLock } from 'react-icons/fa';
 import Modal from '@/components/modals/ErrorModal';
 import ReportButton from '@/components/reports/ReportButton';
+import { getStorageAssetUrl } from '@/lib/storage';
 
 const EMOJIS = ['😊', '😂', '😍', '🤔', '😎', '😭', '😮', '🔥', '✨', '👍', '👎', '❤️', '😱', '🙌', '👀'];
-const API = "/api-storage/";
 
 
 const BAD_WORDS = ["нах", "хуй", "пизд", "ебат", "ебал", "бля", "сук", "хуе", "пидо", "гандон", "ублюд", "курва", "шалав", "ебан", "мудил", "дроч", "залуп", "пидр", "трах", "член", "ссан", "гавно", "гавно", "говно", "пор", "конч", "залу"];
@@ -42,7 +42,7 @@ export default function AnimeComments({ animeId }: { animeId: string | number })
     return res.ok ? res.json() : Promise.reject();
   };
 
-  const getImg = (p: string) => p?.startsWith('http') ? p : p ? `${API}${p}` : null;
+  const getImg = (p: string) => getStorageAssetUrl(p);
 
   useEffect(() => {
     setUi(p => ({ ...p, m: true }));

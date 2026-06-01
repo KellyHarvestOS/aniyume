@@ -8,6 +8,7 @@ import FriendRequestsModal from '@/components/modals/FriendRequestsModal';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { getStorageAssetUrl } from '@/lib/storage';
 
 interface FriendUser {
     id: number;
@@ -142,10 +143,7 @@ export default function FriendsPage() {
 
     const getAvatar = (u: FriendUser | SearchUser) => {
         if (u.avatar) {
-            if (!u.avatar.startsWith('http') && !u.avatar.startsWith('//')) {
-                return `/api-storage/${u.avatar.replace(/^\//, '')}`;
-            }
-            return u.avatar;
+            return getStorageAssetUrl(u.avatar) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.id}`;
         }
         return `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.id}`;
     };

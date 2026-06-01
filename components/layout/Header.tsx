@@ -12,6 +12,7 @@ import { FaRankingStar } from "react-icons/fa6";
 import ThemeToggle from './ThemeToggle';
 import SearchBar from './SearchBar';
 import { useAuth } from '@/contexts/AuthContext';
+import { getStorageAssetUrl } from '@/lib/storage';
 
 export default function Header() {
   const pathname = usePathname();
@@ -84,15 +85,7 @@ export default function Header() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const getAvatarUrl = () => {
-    if (!user?.avatar) return null;
-    if (user.avatar.startsWith('http')) return user.avatar;
-
-    const avatarPath = user.avatar.replace(/^\/+/, '').replace(/^storage\//, '');
-    return `/api-storage/${avatarPath}`;
-  };
-
-  const avatarUrl = getAvatarUrl();
+  const avatarUrl = getStorageAssetUrl(user?.avatar);
   const isLoggedIn = !!user;
 
   const navLinks = [
