@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import AnimeCardSkeleton from '@/components/skeletons/AnimeCardSkeleton';
 import AnimeCard from '@/components/anime/AnimeCard';
@@ -44,6 +44,7 @@ const buildParams = (page: number, filters: AnimeListProps['filters'] = {}) => {
 };
 
 const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
+  const filterKey = useMemo(() => JSON.stringify(filters), [filters]);
   const [data, setData] = useState<AnimeData[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -55,6 +56,7 @@ const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
 
   useEffect(() => {
     let cancelled = false;
+    const stableFilters = JSON.parse(filterKey) as AnimeListProps['filters'];
 
     const fetchInitial = async () => {
       setLoading(true);
@@ -62,8 +64,9 @@ const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
       setHasMore(true);
 
       try {
-        const params = buildParams(1, filters);
+        const params = buildParams(1, stableFilters);
         const res = await fetch(`/api/external/public/anime?${params.toString()}`);
+        if (!res.ok) throw new Error(`Anime fetch failed with status ${res.status}`);
         const json = await res.json();
         const items = normalizeAnimeData(json.data || json);
 
@@ -87,7 +90,7 @@ const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
     return () => {
       cancelled = true;
     };
-  }, [filters]);
+  }, [filterKey]);
 
   const fetchNextPage = useCallback(async () => {
     if (loadingNext || loading || !hasMore) return;
@@ -96,8 +99,10 @@ const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
     const nextPage = page + 1;
 
     try {
-      const params = buildParams(nextPage, filters);
+      const stableFilters = JSON.parse(filterKey) as AnimeListProps['filters'];
+      const params = buildParams(nextPage, stableFilters);
       const res = await fetch(`/api/external/public/anime?${params.toString()}`);
+      if (!res.ok) throw new Error(`Anime fetch failed with status ${res.status}`);
       const json = await res.json();
       const items = normalizeAnimeData(json.data || json);
 
@@ -114,7 +119,7 @@ const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
     } finally {
       setLoadingNext(false);
     }
-  }, [filters, hasMore, loading, loadingNext, page]);
+  }, [filterKey, hasMore, loading, loadingNext, page]);
 
   useEffect(() => {
     const target = observerTarget.current;

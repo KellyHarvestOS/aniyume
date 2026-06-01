@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BASE_URL = process.env.BACKEND_URL || "http://localhost:8000/api/v1";
+const BASE_URL = (process.env.BACKEND_URL || "http://127.0.0.1:8000/api/v1").replace(/\/$/, "");
 
 export async function handleProxy(
   req: NextRequest,
