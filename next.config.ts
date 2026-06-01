@@ -1,8 +1,5 @@
 import type { NextConfig } from 'next';
 
-const backendBaseUrl = process.env.BACKEND_URL?.replace(/\/api\/v1\/?$/, '');
-const storageProxyUrl = process.env.STORAGE_PROXY_URL || backendBaseUrl || 'http://127.0.0.1:8000';
-
 const nextConfig: NextConfig = {
   reactStrictMode: false,
   images: {
@@ -29,14 +26,6 @@ const nextConfig: NextConfig = {
       },
     ],
     unoptimized: true,
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/api-storage/:path*',
-        destination: `${storageProxyUrl}/storage/:path*`,
-      },
-    ];
   },
   async headers() {
     return [
