@@ -1,77 +1,289 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
-import { motion } from 'framer-motion';
-import { BiBug, BiEnvelope, BiMessageDetail, BiRocket, BiSend } from 'react-icons/bi';
+import React, { FormEvent, useState, useRef, useEffect } from 'react';
 import { submitContactMessage } from '@/lib/api';
+import {
+  FaBug,
+  FaLightbulb,
+  FaCommentDots,
+  FaClapperboard,
+  FaWandMagicSparkles,
+  FaPaperPlane,
+  FaChevronDown,
+  FaImage,
+  FaXmark
+} from 'react-icons/fa6';
 
 const categories = [
-  { value: 'bug', label: 'Баг / ошибка', icon: <BiBug /> },
-  { value: 'idea', label: 'Идея', icon: <BiRocket /> },
-  { value: 'feedback', label: 'Обратная связь', icon: <BiMessageDetail /> },
-  { value: 'content', label: 'Контент', icon: <BiEnvelope /> },
-  { value: 'other', label: 'Другое', icon: <BiMessageDetail /> },
+  { value: 'bug', label: 'Баг / ошибка', icon: <FaBug /> },
+  { value: 'idea', label: 'Идея', icon: <FaLightbulb /> },
+  { value: 'feedback', label: 'Обратная связь', icon: <FaCommentDots /> },
+  { value: 'content', label: 'Контент', icon: <FaClapperboard /> },
+  { value: 'other', label: 'Другое', icon: <FaWandMagicSparkles /> },
 ];
 
+interface ContactForm {
+  name: string;
+  email: string;
+  category: string;
+  subject: string;
+  message: string;
+  attachment: File | null;
+}
+
 export default function ContactsPage() {
-  const [form, setForm] = useState({ name: '', email: '', category: 'bug', subject: '', message: '' });
+  const [form, setForm] = useState<ContactForm>({
+    name: '',
+    email: '',
+    category: 'bug',
+    subject: '',
+    message: '',
+    attachment: null
+  });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [notice, setNotice] = useState('');
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus('loading');
     setNotice('');
+
     try {
       const result = await submitContactMessage(form);
       setStatus('success');
       setNotice(result.message ?? 'Сообщение отправлено. Спасибо!');
-      setForm({ name: '', email: '', category: 'bug', subject: '', message: '' });
+      setForm({ name: '', email: '', category: 'bug', subject: '', message: '', attachment: null });
     } catch (error) {
       setStatus('error');
       setNotice(error instanceof Error ? error.message : 'Не удалось отправить сообщение');
     }
   }
 
-  return (
-    <div className="min-h-screen w-full bg-white dark:bg-[#111111] text-gray-900 dark:text-gray-200 py-16 px-4 md:px-8 relative overflow-hidden transition-colors duration-500">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[420px] bg-brand/10 rounded-full blur-[150px] pointer-events-none -z-10" />
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-start">
-        <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="sticky top-24">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-brand/10 rounded-3xl mb-8 text-brand shadow-lg shadow-brand/5">
-            <BiEnvelope className="text-5xl" />
-          </div>
-          <p className="text-brand font-black uppercase tracking-[0.25em] text-sm mb-4">feedback hub</p>
-          <h1 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white mb-6">
-            Контакты <span className="text-brand">AniYume</span>
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-lg md:text-xl font-medium leading-relaxed italic">
-            Нашёл баг, хочешь предложить фичу или написать разработчикам? Отправь сообщение сюда — оно попадёт прямо в админку команде AniYume.
-          </p>
-          <div className="mt-10 grid gap-4">
-            {categories.slice(0, 4).map((item) => (
-              <button key={item.value} onClick={() => setForm({ ...form, category: item.value })} className={`flex items-center gap-4 rounded-2xl border-2 p-5 text-left transition-all ${form.category === item.value ? 'border-brand bg-brand/10 text-brand' : 'border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#171717] text-slate-600 dark:text-gray-400 hover:border-brand/40'}`}>
-                <span className="text-3xl">{item.icon}</span>
-                <span className="font-black uppercase italic">{item.label}</span>
-              </button>
-            ))}
-          </div>
-        </motion.section>
+  const selectedCategory = categories.find(c => c.value === form.category) || categories[0];
 
-        <motion.form initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} onSubmit={submit} className="rounded-[3rem] border-2 border-brand/20 bg-slate-50/80 dark:bg-[#181818]/90 p-6 md:p-10 shadow-2xl shadow-brand/5 backdrop-blur">
-          <div className="grid md:grid-cols-2 gap-5">
-            <label className="grid gap-2"><span className="font-black uppercase text-sm text-gray-500 dark:text-gray-400">Имя</span><input className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111] px-5 py-4 outline-none focus:border-brand" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Как к тебе обращаться" /></label>
-            <label className="grid gap-2"><span className="font-black uppercase text-sm text-gray-500 dark:text-gray-400">Email</span><input className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111] px-5 py-4 outline-none focus:border-brand" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="для ответа (необязательно)" type="email" /></label>
+  return (
+    <section className="min-h-screen w-full bg-white dark:bg-[#111111] text-gray-800 dark:text-gray-200 py-10 md:py-16 relative overflow-hidden transition-colors duration-300">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand/10 rounded-full blur-[120px] pointer-events-none -z-10" />
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+        <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 items-start">
+          <div className="sticky  flex flex-col items-center lg:items-start text-center lg:text-left">
+            <h1 className="text-4xl sm:text-6xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-gray-100 mb-6">
+              Контакты <span className="text-brand w-[20rem]">AniYume</span>
+            </h1>
+
+            <div className="w-24 h-1.5 bg-brand rounded-full mb-6 shadow-lg shadow-brand/20 lg:mx-0 mx-auto" />
+
+            <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base font-medium leading-relaxed mb-10 max-w-md">
+              Нашёл баг, хочешь предложить фичу или написать разработчикам? Отправь сообщение сюда — оно попадёт прямо к команде AniYume.
+            </p>
+
+            <div className="grid gap-3 w-full max-w-md">
+              {categories.slice(0, 4).map((item) => {
+                const isActive = form.category === item.value;
+                return (
+                  <button
+                    key={item.value}
+                    type="button"
+                    onClick={() => setForm({ ...form, category: item.value })}
+                    className={`group flex items-center gap-4 rounded-xl border-2 p-4 text-left transition-all duration-300 ${isActive
+                        ? 'border-brand bg-brand text-white dark:text-gray-900 shadow-lg shadow-brand/20'
+                        : 'border-transparent bg-gray-50 dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:border-brand/50'
+                      }`}
+                  >
+                    <span className={`text-2xl transition-transform duration-300 group-hover:scale-110 ${isActive ? '' : 'group-hover:text-brand'}`}>
+                      {item.icon}
+                    </span>
+                    <span className="font-bold uppercase tracking-wider text-sm">
+                      {item.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <label className="grid gap-2 mt-5"><span className="font-black uppercase text-sm text-gray-500 dark:text-gray-400">Категория</span><select className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111] px-5 py-4 outline-none focus:border-brand" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>{categories.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
-          <label className="grid gap-2 mt-5"><span className="font-black uppercase text-sm text-gray-500 dark:text-gray-400">Тема</span><input required maxLength={180} className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111] px-5 py-4 outline-none focus:border-brand" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} placeholder="Например: не работает плеер на странице..." /></label>
-          <label className="grid gap-2 mt-5"><span className="font-black uppercase text-sm text-gray-500 dark:text-gray-400">Сообщение</span><textarea required minLength={10} maxLength={5000} rows={9} className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111] px-5 py-4 outline-none focus:border-brand resize-none" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Опиши проблему, шаги воспроизведения, устройство/браузер или идею для улучшения." /></label>
-          {notice ? <div className={`mt-5 rounded-2xl border p-4 font-bold ${status === 'success' ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-500' : 'border-rose-400/30 bg-rose-400/10 text-rose-500'}`}>{notice}</div> : null}
-          <button disabled={status === 'loading'} className="mt-8 inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-brand px-8 py-5 text-lg font-black uppercase italic tracking-widest text-white shadow-2xl shadow-brand/30 transition hover:brightness-110 active:scale-95 disabled:opacity-60" type="submit">
-            <BiSend className="text-2xl" /> {status === 'loading' ? 'Отправляем...' : 'Отправить разработчикам'}
-          </button>
-        </motion.form>
+
+          <form
+            onSubmit={submit}
+            className="rounded-3xl border border-gray-200 dark:border-[#232323] bg-white/80 dark:bg-[#151515]/80 p-6 md:p-8 shadow-xl backdrop-blur-md"
+          >
+            <div className="grid sm:grid-cols-2 gap-5 mb-5">
+              <label className="flex flex-col gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">Имя</span>
+                <input
+                  required
+                  className="rounded-xl border border-gray-200 dark:border-[#232323] bg-gray-50 dark:bg-[#111111] px-4 py-3 outline-none focus:border-brand dark:focus:border-brand transition-colors text-sm"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="Как к тебе обращаться"
+                />
+              </label>
+
+              <label className="flex flex-col gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">Email</span>
+                <input
+                  type="email"
+                  className="rounded-xl border border-gray-200 dark:border-[#232323] bg-gray-50 dark:bg-[#111111] px-4 py-3 outline-none focus:border-brand dark:focus:border-brand transition-colors text-sm"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="Для ответа (необязательно)"
+                />
+              </label>
+            </div>
+
+            <div className="flex flex-col gap-2 mb-5 relative" ref={dropdownRef}>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">Категория</span>
+
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className={`flex items-center justify-between rounded-xl border px-4 py-3 outline-none transition-colors text-sm ${isDropdownOpen
+                    ? 'border-brand bg-white dark:bg-[#111111]'
+                    : 'border-gray-200 dark:border-[#232323] bg-gray-50 dark:bg-[#111111] hover:border-brand/50 dark:hover:border-brand/50'
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-400 text-base">{selectedCategory.icon}</span>
+                  <span className="text-gray-800 dark:text-gray-200">{selectedCategory.label}</span>
+                </div>
+                <FaChevronDown
+                  className={`text-gray-400 text-xs transition-transform duration-300 ${isDropdownOpen ? 'rotate-180 text-brand' : ''}`}
+                />
+              </button>
+
+              <div
+                className={`absolute top-[72px] left-0 w-full z-50 bg-white dark:bg-[#181818] border border-gray-200 dark:border-[#232323] rounded-xl shadow-2xl overflow-hidden transition-all duration-200 origin-top ${isDropdownOpen ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'
+                  }`}
+              >
+                <div className="py-2">
+                  {categories.map((item) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => {
+                        setForm({ ...form, category: item.value });
+                        setIsDropdownOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${form.category === item.value
+                          ? 'bg-brand/10 text-brand font-bold'
+                          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-200'
+                        }`}
+                    >
+                      <span className={`text-base ${form.category === item.value ? 'text-brand' : 'text-gray-400'}`}>
+                        {item.icon}
+                      </span>
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <label className="flex flex-col gap-2 mb-5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">Тема</span>
+              <input
+                required
+                maxLength={180}
+                className="rounded-xl border border-gray-200 dark:border-[#232323] bg-gray-50 dark:bg-[#111111] px-4 py-3 outline-none focus:border-brand dark:focus:border-brand transition-colors text-sm"
+                value={form.subject}
+                onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                placeholder="Например: не работает плеер..."
+              />
+            </label>
+
+            <label className="flex flex-col gap-2 mb-5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">Сообщение</span>
+              <textarea
+                required
+                minLength={10}
+                maxLength={5000}
+                rows={7}
+                className="rounded-xl border border-gray-200 dark:border-[#232323] bg-gray-50 dark:bg-[#111111] px-4 py-3 outline-none focus:border-brand dark:focus:border-brand transition-colors text-sm resize-none"
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                placeholder="Опиши проблему, шаги воспроизведения, устройство/браузер или идею для улучшения."
+              />
+            </label>
+
+            <div className="mb-6">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1 block mb-2">Скриншот / Фото</span>
+              {!form.attachment ? (
+                <label className="flex items-center justify-center gap-3 w-full rounded-xl border border-dashed border-gray-300 dark:border-[#333] hover:border-brand dark:hover:border-brand bg-gray-50/50 dark:bg-[#111]/50 px-4 py-4 cursor-pointer transition-colors text-sm text-gray-500 hover:text-brand">
+                  <FaImage className="text-xl" />
+                  <span>Прикрепить изображение</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setForm({ ...form, attachment: e.target.files[0] });
+                      }
+                      e.target.value = '';
+                    }}
+                  />
+                </label>
+              ) : (
+                <div className="flex items-center justify-between rounded-xl border border-brand/50 bg-brand/5 px-4 py-3 text-sm">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <FaImage className="text-brand flex-shrink-0 text-xl" />
+                    <span className="truncate font-medium text-gray-800 dark:text-gray-200">
+                      {form.attachment.name}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, attachment: null })}
+                    className="text-gray-400 hover:text-red-500 transition-colors p-1 flex-shrink-0"
+                  >
+                    <FaXmark className="text-xl" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {notice && (
+              <div className={`mb-6 rounded-xl border px-4 py-3 text-sm font-bold flex items-center justify-center text-center ${status === 'success'
+                  ? 'border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400'
+                  : 'border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400'
+                }`}>
+                {notice}
+              </div>
+            )}
+
+            <button
+              disabled={status === 'loading'}
+              type="submit"
+              className="w-full bg-brand hover:bg-brand-hover text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg shadow-brand/20 active:scale-95 disabled:opacity-70 disabled:active:scale-100 dark:text-gray-900 uppercase tracking-widest text-sm"
+            >
+              {status === 'loading' ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 dark:border-gray-900/30 border-t-white dark:border-t-gray-900 rounded-full animate-spin" />
+                  <span>Отправляем...</span>
+                </>
+              ) : (
+                <>
+                  <FaPaperPlane className="text-lg" />
+                  <span>Отправить разработчикам</span>
+                </>
+              )}
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

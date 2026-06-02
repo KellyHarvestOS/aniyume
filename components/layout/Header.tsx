@@ -5,10 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { FaUserPlus, FaUserCircle } from 'react-icons/fa';
-import { HiAdjustmentsHorizontal, HiMiniBookmark } from "react-icons/hi2";
+import { HiAdjustmentsHorizontal, HiMiniBookmark, HiFire } from "react-icons/hi2";
 import { CgMenuRightAlt, CgMenuRight } from "react-icons/cg";
 import { IoCalendarNumberSharp } from "react-icons/io5";
-import { FaRankingStar } from "react-icons/fa6";
 import ThemeToggle from './ThemeToggle';
 import SearchBar from './SearchBar';
 import { useAuth } from '@/contexts/AuthContext';
@@ -89,7 +88,7 @@ export default function Header() {
   const isLoggedIn = !!user;
 
   const navLinks = [
-    { href: '/popular', label: 'Популярное', icon: <FaRankingStar /> },
+    { href: '/popular', label: 'Популярное', icon: <HiFire /> },
     { href: '/schedule', label: 'Расписание', icon: <IoCalendarNumberSharp /> },
     { href: '/filter', label: 'Фильтр', icon: <HiAdjustmentsHorizontal /> },
     { href: '/bookmarks', label: 'Закладки', icon: <HiMiniBookmark /> },

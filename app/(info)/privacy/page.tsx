@@ -1,62 +1,51 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
   FaUserLock,
   FaDatabase,
   FaServer,
   FaFingerprint,
-  FaEnvelopeOpenText,
-  FaShieldAlt,
-  FaTrashAlt,
-} from 'react-icons/fa';
+} from 'react-icons/fa6';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { y: 0, opacity: 1 },
+};
 
 export default function PrivacyPage() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-    },
-  };
-
   return (
-    <div className="min-h-screen w-full bg-white dark:bg-[#111111] text-gray-900 dark:text-gray-200 py-16 px-4 sm:px-6 lg:px-8 overflow-hidden relative transition-colors duration-500">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-brand/10 rounded-full blur-[140px] -z-10 pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand/5 rounded-full blur-[140px] -z-10 pointer-events-none" />
+    <section className="min-h-screen w-full bg-white dark:bg-[#111111] text-gray-800 dark:text-gray-200 py-10 md:py-16 relative overflow-hidden transition-colors duration-300">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand/10 rounded-full blur-[120px] pointer-events-none -z-10" />
 
       <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="max-w-5xl mx-auto"
+        className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl"
       >
-        <motion.div variants={itemVariants} className="text-center mb-16">
-          <div className="inline-flex items-center justify-center p-4 bg-brand/10 rounded-3xl mb-6 text-brand">
-            <FaShieldAlt className="text-4xl" />
-          </div>
-          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic text-gray-900 dark:text-white mb-6">
+        <motion.div variants={itemVariants} className="flex flex-col items-center text-center mb-12 sm:mb-16">
+          <h1 className="text-4xl sm:text-6xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-gray-100 mb-6">
             Политика <span className="text-brand">конфиденциальности</span>
           </h1>
-          <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-medium leading-relaxed">
+
+          <div className="w-24 h-1.5 bg-brand rounded-full mb-6 shadow-lg shadow-brand/20 mx-auto" />
+
+          <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto">
             Ваша приватность — наш приоритет. Мы собираем только те данные, которые необходимы для полноценной работы сервиса.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           <PolicySection
             variants={itemVariants}
             icon={<FaUserLock />}
@@ -89,36 +78,8 @@ export default function PrivacyPage() {
             AniYume <strong>не продает</strong> и не передает ваши персональные данные третьим лицам. Мы используем публичные API (Kodik, Shikimori) только для отображения контента. Ваш профиль на AniYume остается полностью изолированным.
           </PolicySection>
         </div>
-
-        <motion.div
-          variants={itemVariants}
-          className="bg-gray-50 dark:bg-[#161616] border border-gray-100 dark:border-white/5 rounded-3xl p-8 md:p-12"
-        >
-          <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="flex-1 text-center md:text-left">
-              <h3 className="text-2xl font-bold dark:text-white mb-4 italic uppercase">Управление данными</h3>
-              <p className="text-gray-600 dark:text-gray-400 font-medium">
-                Вы имеете полное право в любой момент изменить данные своего профиля или полностью удалить аккаунт через настройки. При удалении аккаунта все связанные с ним данные стираются безвозвратно.
-              </p>
-            </div>
-            <div className="flex flex-col gap-4 min-w-[200px]">
-              <Link
-                href="/profile"
-                className="flex items-center justify-center gap-2 bg-brand text-white px-6 py-3 rounded-2xl font-bold hover:brightness-110 shadow-lg shadow-brand/10 transition-all"
-              >
-                Настройки профиля
-              </Link>
-              <Link
-                href="mailto:privacy@aniyume.com"
-                className="flex items-center justify-center gap-2 border border-gray-200 dark:border-white/10 dark:text-gray-200 px-6 py-3 rounded-2xl font-bold hover:bg-white dark:hover:bg-white/5 transition-all text-sm"
-              >
-                <FaEnvelopeOpenText /> Вопросы по данным
-              </Link>
-            </div>
-          </div>
-        </motion.div>
       </motion.div>
-    </div>
+    </section>
   );
 }
 
@@ -126,17 +87,17 @@ function PolicySection({ icon, title, children, variants }: { icon: React.ReactN
   return (
     <motion.div
       variants={variants}
-      className="group p-8 bg-white dark:bg-[#111111] border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm hover:shadow-xl hover:border-brand/20 transition-all duration-300"
+      className="group flex flex-col rounded-3xl border border-gray-200 dark:border-[#232323] bg-white/80 dark:bg-[#151515]/80 p-6 md:p-8 shadow-xl backdrop-blur-md transition-all duration-300 hover:border-brand/50 dark:hover:border-brand/50"
     >
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-12 h-12 flex items-center justify-center bg-brand/10 rounded-xl text-brand text-xl group-hover:bg-brand group-hover:text-white transition-all duration-300">
+        <span className="text-3xl text-gray-400 group-hover:text-brand transition-all duration-300 group-hover:scale-110">
           {icon}
-        </div>
-        <h2 className="text-xl font-black italic uppercase tracking-tight text-gray-900 dark:text-white">
+        </span>
+        <h2 className="text-lg sm:text-xl font-bold uppercase tracking-wider text-gray-900 dark:text-gray-100">
           {title}
         </h2>
       </div>
-      <div className="text-gray-500 dark:text-gray-400 leading-relaxed font-bold text-base">
+      <div className="text-gray-500 dark:text-gray-400 text-sm sm:text-base font-medium leading-relaxed">
         {children}
       </div>
     </motion.div>
