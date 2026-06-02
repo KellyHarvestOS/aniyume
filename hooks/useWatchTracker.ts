@@ -4,9 +4,10 @@ interface TrackerProps {
   episodeId: number | undefined;
   token: string | null;
   progress: number;
+  isPlaying?: boolean;
 }
 
-export const useWatchTracker = ({ episodeId, token, progress }: TrackerProps) => {
+export const useWatchTracker = ({ episodeId, token, progress, isPlaying = true }: TrackerProps) => {
   const bufferRef = useRef<number>(0);
   const lastTimestampRef = useRef<number | null>(null);
   const isSyncingRef = useRef<boolean>(false);
@@ -20,7 +21,7 @@ export const useWatchTracker = ({ episodeId, token, progress }: TrackerProps) =>
     if (!episodeId || !token) return;
 
     const startTracking = () => {
-      if (document.visibilityState === 'visible' && lastTimestampRef.current === null) {
+      if (document.visibilityState === 'visible' && isPlaying && lastTimestampRef.current === null) {
         lastTimestampRef.current = performance.now();
       }
     };
@@ -76,10 +77,10 @@ export const useWatchTracker = ({ episodeId, token, progress }: TrackerProps) =>
       }
     };
 
-    startTracking();
+    if (isPlaying) startTracking();
 
     const interval = setInterval(() => syncData(), 60000);
-    const handleVisibility = () => document.visibilityState === 'visible' ? startTracking() : stopTracking();
+    const handleVisibility = () => document.visibilityState === 'visible' && isPlaying ? startTracking() : stopTracking();
     const handleUnload = () => syncData(true);
 
     document.addEventListener('visibilitychange', handleVisibility);
@@ -92,5 +93,5 @@ export const useWatchTracker = ({ episodeId, token, progress }: TrackerProps) =>
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('beforeunload', handleUnload);
     };
-  }, [episodeId, token]);
+  }, [episodeId, token, isPlaying]);
 };
