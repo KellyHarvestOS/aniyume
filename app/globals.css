@@ -558,3 +558,28 @@ label .text-brand {
     color: white !important;
     -webkit-text-fill-color: white !important;
 }
+
+.brand-bg {
+    background-color: var(--brand-main) !important;
+}
+
+.brand-text {
+    color: var(--brand-main) !important;
+}
+
+.brand-border {
+    border-color: var(--brand-main) !important;
+}
+
+.brand-ring {
+    --tw-ring-color: color-mix(in srgb, var(--brand-main), transparent 50%) !important;
+}
+
+.brand-bg-soft {
+    background-color: color-mix(in srgb, var(--brand-main), transparent 85%) !important;
+}
+
+.brand-focus:focus {
+    border-color: var(--brand-main) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand-main), transparent 70%) !important;
+}

@@ -31,7 +31,7 @@ export const RecentActivity = ({
   };
 
   return (
-    <div className="bg-white dark:bg-[#161616] rounded-lg p-6 shadow-sm border border-slate-200 dark:border-white/5 transition-colors">
+    <div className="bg-white dark:bg-[#161616] rounded-lx p-6 shadow-sm border border-slate-200 dark:border-white/5 transition-colors">
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-bold text-gray-800 dark:text-gray-200">
           Недавние активности
@@ -47,7 +47,7 @@ export const RecentActivity = ({
             <div
               key={idx}
               onClick={() => router.push(`/anime/${item.anime_id}`)}
-              className="flex items-center gap-4 p-3 rounded-2xl cursor-pointer transition
+              className="flex items-center gap-4 p-3 rounded-xl cursor-pointer transition
                          bg-transparent
                          hover:bg-slate-100 dark:hover:bg-white/5
                          border border-transparent
@@ -77,15 +77,15 @@ export const RecentActivity = ({
                   {formatDate(item.last_watched_at)}
                 </p>
                 <p className="text-[10px] text-slate-300 dark:text-gray-600 font-medium uppercase mt-0.5">
-                 {(() => {
-                   const d = new Date(item.last_watched_at);
-                   d.setHours(d.getHours() + 5);
-                   return d.toLocaleTimeString("ru-RU", {
-                     hour: "2-digit",
-                     minute: "2-digit",
-                });
-        })()}
-                </p> 
+                  {(() => {
+                    const d = new Date(item.last_watched_at);
+                    d.setHours(d.getHours() + 5);
+                    return d.toLocaleTimeString("ru-RU", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    });
+                  })()}
+                </p>
               </div>
             </div>
           ))

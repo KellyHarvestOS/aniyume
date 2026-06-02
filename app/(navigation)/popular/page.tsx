@@ -154,7 +154,7 @@ export default function PopularPage() {
 
         {!isLoading && animeList.length > 0 && (
           <div className="text-center mt-8 text-gray-400 dark:text-gray-500 text-sm">
-            Показано топ-20 аниме
+            Показан рейтинг аниме
           </div>
         )}
       </div>

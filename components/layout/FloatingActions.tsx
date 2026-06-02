@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
-import { LuBot } from "react-icons/lu";
+import { RiRobot2Line } from "react-icons/ri";
 import ChatModal from '@/components/modals/ChatModal';
 import { AnimatePresence } from 'framer-motion';
 
@@ -58,7 +58,7 @@ export default function FloatingActions() {
             ${isChatOpen ? 'rotate-10 shadow-inner' : ''} 
           `}
         >
-          <LuBot className="w-6 h-6 dark:text-gray-800" />
+          <RiRobot2Line className="w-6 h-6 dark:text-gray-800" />
         </button>
       </div>
 

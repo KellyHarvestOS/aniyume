@@ -132,7 +132,7 @@ export default function PremiumAuthPage() {
                                 className="w-full mt-4"
                             >
                                 <Link
-                                    href="/premium/checkout"
+                                    href="https://boosty.to/aniyume"
                                     className="block w-full bg-white text-[#168a7f] py-5 rounded-2xl font-black uppercase tracking-[0.15em] shadow-xl transition-all relative overflow-hidden group text-center"
                                 >
                                     <span className="relative z-10 flex items-center justify-center gap-2">
