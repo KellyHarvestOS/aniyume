@@ -6,6 +6,8 @@ import { RiVipCrownFill } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
 import { Heart, Star, MessageCircle, Users } from "lucide-react";
 import { getAvatarUrl } from "@/lib/storage";
+import ProfileLevelBadge, { ProfileWatchTime } from "@/components/profile/ProfileLevelBadge";
+import { getAvatarFrameFit } from "@/lib/avatarFrames";
 
 interface ProfileCardProps {
   user: {
@@ -22,15 +24,33 @@ interface ProfileCardProps {
     comments: number;
     friends: number;
   };
+  watchTime?: ProfileWatchTime | null;
   onLogout: () => void;
 }
 
 export const ProfileCard = ({
   user,
   counts,
+  watchTime,
   onLogout,
 }: ProfileCardProps) => {
   const avatarUrl = getAvatarUrl(user.avatar);
+  const [avatarFramePath, setAvatarFramePath] = React.useState<string | null>(null);
+  const [avatarFrameKey, setAvatarFrameKey] = React.useState("none");
+  const hasAvatarFrame = Boolean(avatarFramePath);
+  const avatarFrameFit = getAvatarFrameFit(avatarFrameKey);
+
+  React.useEffect(() => {
+    const syncAvatarFrame = () => {
+      setAvatarFramePath(localStorage.getItem("profile_avatar_frame_path"));
+      setAvatarFrameKey(localStorage.getItem("profile_avatar_frame_key") || "none");
+    };
+
+    syncAvatarFrame();
+    window.addEventListener("storage", syncAvatarFrame);
+
+    return () => window.removeEventListener("storage", syncAvatarFrame);
+  }, []);
 
   return (
     <div className="bg-white dark:bg-[#161616] rounded-lg shadow-sm border border-slate-100 dark:border-gray-800 text-center sticky top-24 relative overflow-hidden">
@@ -38,6 +58,8 @@ export const ProfileCard = ({
       {user.is_premium && (
         <div className="absolute top-0 left-0 w-full h-[230px] bg-brand z-0" />
       )}
+
+      <ProfileLevelBadge watchTime={watchTime} className="absolute left-3 top-3 z-20" />
 
       <div className="relative z-10 p-6">
         <svg className="absolute w-0 h-0">
@@ -66,14 +88,38 @@ export const ProfileCard = ({
             <img
               src={avatarUrl!}
               alt="avatar"
-              className={`w-full h-full rounded-full object-cover border-4 dark:border-[#1d1d1d] shadow-lg ${user.is_premium
-                ? "border-white"
-                : "border-white dark:border-gray-800"
+              className={`w-full h-full rounded-full object-cover shadow-lg ${hasAvatarFrame
+                ? "border-0"
+                : `border-4 dark:border-[#1d1d1d] ${user.is_premium
+                  ? "border-white"
+                  : "border-white dark:border-gray-800"
+                }`
                 }`}
             />
           ) : (
-            <div className="w-full h-full rounded-full bg-brand flex items-center justify-center text-white text-5xl font-bold shadow-lg border-4! border-white! dark:border-black/80!">
+            <div className={`w-full h-full rounded-full bg-brand flex items-center justify-center text-white text-5xl font-bold shadow-lg ${hasAvatarFrame ? "border-0" : "border-4! border-white! dark:border-black/80!"}`}>
               {user.name ? user.name[0].toUpperCase() : "?"}
+            </div>
+          )}
+
+          {avatarFramePath && (
+            <div
+              className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
+              style={{
+                height: avatarFrameFit.height || avatarFrameFit.size,
+                width: avatarFrameFit.width || avatarFrameFit.size,
+                marginLeft: avatarFrameFit.x || "0px",
+                marginTop: avatarFrameFit.y || "0px",
+              }}
+            >
+              <img
+                src={avatarFramePath}
+                alt=""
+                className="h-full w-full object-contain"
+                onError={(event) => {
+                  event.currentTarget.style.display = "none";
+                }}
+              />
             </div>
           )}
 

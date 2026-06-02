@@ -80,6 +80,7 @@ export default function ProfilePage() {
             <ProfileCard
               user={user}
               counts={counts}
+              watchTime={data.watch_time || { days: 0, hours: 0, minutes: 0 }}
               onLogout={handleLogout}
             />
           </div>
