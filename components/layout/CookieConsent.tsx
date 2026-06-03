@@ -37,6 +37,7 @@ export default function CookieConsent() {
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDragging) return;
+    
     setPosition({
       x: e.clientX - dragInfo.current.startX,
       y: e.clientY - dragInfo.current.startY,
@@ -45,6 +46,9 @@ export default function CookieConsent() {
 
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     setIsDragging(false);
+    // Возвращаем в исходную позицию (эффект пружины)
+    setPosition({ x: 0, y: 0 });
+    
     if (e.currentTarget) {
       e.currentTarget.releasePointerCapture(e.pointerId);
     }
@@ -57,13 +61,17 @@ export default function CookieConsent() {
       className="fixed z-[60] bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100vw-2rem)] max-w-[320px]"
       style={{ 
         transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
+        // Если не тащим — включаем "пружинистую" анимацию возврата
+        transition: isDragging 
+          ? 'none' 
+          : 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)' 
       }}
     >
       <style dangerouslySetInnerHTML={{
         __html: `
           @keyframes slideInBottomRight {
-            0% { opacity: 0; transform: translate(20px, 20px); }
-            100% { opacity: 1; transform: translate(0, 0); }
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
           }
         `
       }} />
@@ -74,12 +82,17 @@ export default function CookieConsent() {
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className={`[--shadow:rgba(60,64,67,0.3)_0_1px_2px_0,rgba(60,64,67,0.15)_0_2px_6px_2px] w-full rounded-2xl bg-white [box-shadow:var(--shadow)] transition-opacity duration-300 select-none ${isDragging ? 'cursor-grabbing scale-[1.02] shadow-2xl' : 'cursor-grab'}`}
-          style={{ touchAction: 'none' }}
+          className={`
+            w-full rounded-2xl p-px
+            bg-white dark:bg-zinc-900 
+            shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.6)]
+            select-none touch-none
+            ${isDragging ? 'cursor-grabbing scale-[1.02]' : 'cursor-grab'}
+          `}
         >
-          <div className="flex flex-col items-center pt-9 px-6 pb-6 relative pointer-events-none">
+          <div className="flex flex-col items-center pt-9 px-6 pb-6 relative">
             
-            <span className="relative mx-auto -mt-16 mb-6">
+            <span className="relative mx-auto -mt-16 mb-6 pointer-events-none">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" height="46" width="65">
                 <path stroke="#000" fill="#EAB789" d="M49.157 15.69L44.58.655l-12.422 1.96L21.044.654l-8.499 2.615-6.538 5.23-4.576 9.153v11.114l4.576 8.5 7.846 5.23 10.46 1.96 7.845-2.614 9.153 2.615 11.768-2.615 7.846-7.846 1.96-5.884.655-7.191-7.846-1.308-6.537-3.922z"></path>
                 <path fill="#9C6750" d="M32.286 3.749c-6.94 3.65-11.69 11.053-11.69 19.591 0 8.137 4.313 15.242 10.724 19.052a20.513 20.513 0 01-8.723 1.937c-11.598 0-21-9.626-21-21.5 0-11.875 9.402-21.5 21-21.5 3.495 0 6.79.874 9.689 2.42z" clipRule="evenodd" fillRule="evenodd"></path>
@@ -93,17 +106,16 @@ export default function CookieConsent() {
               </svg>
             </span>
 
-            <h5 className="w-full text-sm font-semibold text-zinc-700 mb-2 pointer-events-auto">
-              Ваша конфиденциальность важна для нас
+            <h5 className="w-full text-sm font-semibold text-zinc-700 dark:text-zinc-100 mb-2 pointer-events-auto">
+              Ваша конфиденциальность важна
             </h5>
 
-            <p className="w-full text-sm text-zinc-600 leading-relaxed mb-6 pointer-events-auto">
-              Мы обрабатываем вашу личную информацию для измерения и улучшения наших сайтов и
-              сервисов, помощи нашим кампаниям и предоставления персонализированного контента.
+            <p className="w-full text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6 pointer-events-auto">
+              Мы используем куки для улучшения работы сайта.
               <br />
               <a
                 href="/privacy"
-                className="inline-block mt-2 font-semibold underline underline-offset-2 transition-colors hover:text-[#634647]"
+                className="inline-block mt-2 font-semibold underline underline-offset-2 transition-colors hover:text-[#634647] dark:hover:text-[#ddad81]"
               >
                 Политика конфиденциальности
               </a>
@@ -111,10 +123,13 @@ export default function CookieConsent() {
 
             <button
               onClick={accept}
-              className="w-full py-2.5 text-sm font-semibold rounded-lg transition-colors bg-[#ddad81] text-[#634647] hover:bg-[#634647] hover:text-[#ddad81] pointer-events-auto"
+              className="w-full py-2.5 text-sm font-semibold rounded-lg transition-all 
+                         bg-[#ddad81] text-[#634647] 
+                         hover:bg-[#634647] hover:text-[#ddad81] 
+                         active:scale-[0.97] pointer-events-auto"
               type="button"
             >
-              Принять
+              Принять всё
             </button>
 
           </div>
