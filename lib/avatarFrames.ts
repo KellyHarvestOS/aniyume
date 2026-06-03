@@ -16,6 +16,11 @@ export const AVATAR_FRAME_FIT: Record<string, AvatarFrameFit> = {
   'ramka51-60lvl': { size: '126%' },
   'ramka61-70lvl': { size: '173%', width: '181%', height: '166%', x: '0px', y: '1px' },
   ramka67: { size: '136%' },
+  'ramka+5friends': { size: '136%' },
+  'ramka+10friends': { size: '136%' },
+  'ramka+25friends': { size: '136%' },
+  ramkaShark: { size: '136%' },
+  ramkaUborka: { size: '165%', width: '160%', height: '170%', x: '-1.5px', y: '9px' },
 };
 
 export const DEFAULT_AVATAR_FRAME_FIT: AvatarFrameFit = { size: '136%', x: '0px', y: '0px' };
