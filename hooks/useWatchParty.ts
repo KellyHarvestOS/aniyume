@@ -37,6 +37,7 @@ export interface PlayerState {
 interface UseWatchPartyOptions {
   roomCode: string;
   isHost: boolean;
+  initialParticipants?: Participant[];
   onPlayerSync?: (state: PlayerState) => void;
   onRoomClosed?: () => void;
   onFriendInvite?: (data: any) => void;
@@ -56,6 +57,7 @@ interface UseWatchPartyReturn {
 export function useWatchParty({
   roomCode,
   isHost,
+  initialParticipants = [],
   onPlayerSync,
   onRoomClosed,
   onFriendInvite,
@@ -66,6 +68,16 @@ export function useWatchParty({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const syncThrottleRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (initialParticipants.length === 0) return;
+
+    setParticipants(prev => {
+      const merged = new Map<number, Participant>();
+      [...initialParticipants, ...prev].forEach(participant => merged.set(participant.id, participant));
+      return Array.from(merged.values());
+    });
+  }, [initialParticipants]);
 
   // Инициализация Echo
   useEffect(() => {

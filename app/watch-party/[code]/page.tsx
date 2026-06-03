@@ -1,15 +1,16 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Play, Pause, SkipForward, Link2, Users, Crown,
-  LogOut, Copy, Check, Bell, Wifi, WifiOff, ChevronLeft, UserPlus
+  Play, Link2, Crown,
+  Check, Bell, Wifi, WifiOff, ChevronLeft, UserPlus, SkipBack, SkipForward
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
-import { useWatchParty } from '@/hooks/useWatchParty';
+import { useWatchParty, type Participant } from '@/hooks/useWatchParty';
+import { useWatchTracker } from '@/hooks/useWatchTracker';
 import WatchPartyChat from '@/components/watch-party/WatchPartyChat';
 import ParticipantsList from '@/components/watch-party/ParticipantsList';
 import { IoPeople } from 'react-icons/io5';
@@ -29,12 +30,19 @@ interface RoomData {
     poster_url: string;
     slug: string;
   };
+  episode_id?: number | null;
   host: {
     id: number;
     name: string;
     avatar: string | null;
   };
   participants: { id: number; name: string; avatar: string | null }[];
+}
+
+interface EpisodeOption {
+  id: number;
+  episode_number: number;
+  title?: string | null;
 }
 
 export default function WatchPartyPage() {
@@ -52,10 +60,16 @@ export default function WatchPartyPage() {
   const [invitedIds, setInvitedIds] = useState<number[]>([]);
   const [sidePanel, setSidePanel] = useState<'chat' | 'participants'>('chat');
   const [friendInvitePopup, setFriendInvitePopup] = useState<any>(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [episodeOptions, setEpisodeOptions] = useState<EpisodeOption[]>([]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
+  const roomRef = useRef<RoomData | null>(null);
+  const pendingPlayerStateRef = useRef<{ current_time: number; is_playing: boolean } | null>(null);
   const isHost = room?.host?.id === user?.id;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('userToken') : null;
+  const [playbackProgress, setPlaybackProgress] = useState(0);
   const isSyncingRef = useRef(false);
 
   // Virtual time reference for guests to prevent stuttering
@@ -65,6 +79,55 @@ export default function WatchPartyPage() {
     isPlaying: false,
     active: false,
   });
+
+  useEffect(() => {
+    roomRef.current = room;
+  }, [room]);
+
+  const loadEpisodeSources = async (animeId: number, episodeNumber: number) => {
+    const epRes = await api.get(`/public/anime/${animeId}/episodes/${episodeNumber}/sources`);
+    if (!epRes.ok) {
+      setActiveSource(null);
+      return null;
+    }
+
+    const epData = await epRes.json();
+    const nextSource = epData?.data?.sources?.[0]
+      ?? { type: 'iframe', url: epData?.player_url || '' };
+
+    setActiveSource(nextSource);
+    return nextSource;
+  };
+
+  const loadEpisodeOptions = async (animeId: number) => {
+    try {
+      const res = await api.get(`/public/anime/${animeId}/episodes`);
+      if (!res.ok) return;
+
+      const data = await res.json();
+      const grouped = data?.data ?? {};
+      const byNumber = new Map<number, EpisodeOption>();
+
+      Object.values(grouped).forEach((group) => {
+        if (!Array.isArray(group)) return;
+
+        group.forEach((episode: any) => {
+          const number = Number(episode?.episode_number);
+          if (!Number.isFinite(number) || byNumber.has(number)) return;
+
+          byNumber.set(number, {
+            id: Number(episode.id),
+            episode_number: number,
+            title: episode.title ?? null,
+          });
+        });
+      });
+
+      setEpisodeOptions(Array.from(byNumber.values()).sort((a, b) => a.episode_number - b.episode_number));
+    } catch (err) {
+      console.error('[WatchParty] Episodes load error:', err);
+    }
+  };
 
   // Загрузить данные комнаты
   useEffect(() => {
@@ -82,16 +145,10 @@ export default function WatchPartyPage() {
         const joinData = await joinRes.json();
         setRoom(joinData.room);
 
-        // Load episode sources
-        const epRes = await api.get(`/public/anime/${joinData.room.anime.id}/episodes/${joinData.room.episode_number}/sources`);
-        if (epRes.ok) {
-          const epData = await epRes.json();
-          if (epData?.data?.sources?.length > 0) {
-            setActiveSource(epData.data.sources[0]);
-          } else {
-            setActiveSource({ type: 'iframe', url: epData?.player_url || '' });
-          }
-        }
+        await Promise.all([
+          loadEpisodeSources(joinData.room.anime.id, joinData.room.episode_number),
+          loadEpisodeOptions(joinData.room.anime.id),
+        ]);
       } catch {
         setError('Ошибка загрузки комнаты');
       } finally {
@@ -118,6 +175,22 @@ export default function WatchPartyPage() {
     }).catch(() => { });
   }, [code]);
 
+  const roomParticipants = useMemo<Participant[]>(() => {
+    if (!room) return [];
+
+    return room.participants.map(participant => ({
+      ...participant,
+      is_host: participant.id === room.host.id,
+    }));
+  }, [room]);
+
+  useWatchTracker({
+    episodeId: room?.episode_id ?? undefined,
+    token,
+    progress: playbackProgress,
+    isPlaying: activeSource?.type === 'hls' && isVideoPlaying,
+  });
+
   // WebSocket через useWatchParty
   const {
     participants,
@@ -130,8 +203,37 @@ export default function WatchPartyPage() {
   } = useWatchParty({
     roomCode: code as string,
     isHost,
+    initialParticipants: roomParticipants,
     currentUserId: user?.id,
     onPlayerSync: (state) => {
+      const currentRoom = roomRef.current;
+      if (currentRoom && state.episode_number !== currentRoom.episode_number) {
+        pendingPlayerStateRef.current = {
+          current_time: state.current_time,
+          is_playing: state.is_playing,
+        };
+
+        setIsVideoPlaying(false);
+        setPlaybackProgress(0);
+        hostVirtualTimeRef.current = { time: 0, lastUpdate: 0, isPlaying: false, active: false };
+
+        setRoom(prev => prev ? {
+          ...prev,
+          episode_number: state.episode_number,
+          current_time: state.current_time,
+          is_playing: state.is_playing,
+          episode_id: null,
+        } : prev);
+
+        void loadEpisodeSources(currentRoom.anime.id, state.episode_number).then((source) => {
+          if (source?.id) {
+            setRoom(prev => prev ? { ...prev, episode_id: Number(source.id) } : prev);
+          }
+        });
+
+        return;
+      }
+
       if (!isHost && videoRef.current) {
         const v = videoRef.current;
         isSyncingRef.current = true;
@@ -178,6 +280,7 @@ export default function WatchPartyPage() {
   const allMessages = [...initialMessages, ...wsMessages].filter(
     (m, i, arr) => arr.findIndex(x => x.id === m.id) === i
   );
+  const visibleParticipants = participants.length > 0 ? participants : roomParticipants;
 
   const handleLeave = async () => {
     await leaveRoom();
@@ -297,14 +400,56 @@ export default function WatchPartyPage() {
     };
   }, [activeSource]);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    const pending = pendingPlayerStateRef.current;
+
+    if (!video || !activeSource || activeSource.type !== 'hls' || !pending) return;
+
+    const applyPendingState = () => {
+      const state = pendingPlayerStateRef.current;
+      if (!state || !videoRef.current) return;
+
+      const v = videoRef.current;
+      v.currentTime = state.is_playing ? state.current_time + 0.25 : state.current_time;
+
+      if (state.is_playing) {
+        v.play().catch(() => { });
+        setIsVideoPlaying(true);
+      } else {
+        v.pause();
+        setIsVideoPlaying(false);
+      }
+
+      hostVirtualTimeRef.current = {
+        time: state.current_time,
+        lastUpdate: window.performance.now(),
+        isPlaying: state.is_playing,
+        active: true,
+      };
+
+      pendingPlayerStateRef.current = null;
+    };
+
+    video.addEventListener('loadedmetadata', applyPendingState, { once: true });
+    video.addEventListener('canplay', applyPendingState, { once: true });
+
+    return () => {
+      video.removeEventListener('loadedmetadata', applyPendingState);
+      video.removeEventListener('canplay', applyPendingState);
+    };
+  }, [activeSource]);
+
   // Host: sync events
   const handleHostPlay = () => {
+    setIsVideoPlaying(true);
     if (isHost && videoRef.current && !isSyncingRef.current) {
       console.log('[WatchParty] Host triggered PLAY', videoRef.current.currentTime);
       syncPlayer({ current_time: videoRef.current.currentTime, is_playing: true, episode_number: room?.episode_number || 1 });
     }
   };
   const handleHostPause = () => {
+    setIsVideoPlaying(false);
     if (isHost && videoRef.current && !isSyncingRef.current) {
       console.log('[WatchParty] Host triggered PAUSE', videoRef.current.currentTime);
       syncPlayer({ current_time: videoRef.current.currentTime, is_playing: false, episode_number: room?.episode_number || 1 });
@@ -316,6 +461,46 @@ export default function WatchPartyPage() {
       syncPlayer({ current_time: videoRef.current.currentTime, is_playing: !videoRef.current.paused, episode_number: room?.episode_number || 1 });
     }
   };
+
+  const handleTimeUpdate = (event: React.SyntheticEvent<HTMLVideoElement>) => {
+    setPlaybackProgress(event.currentTarget.currentTime);
+  };
+
+  const switchEpisode = async (episodeNumber: number) => {
+    if (!room || !isHost || episodeNumber === room.episode_number) return;
+
+    const wasPlaying = videoRef.current ? !videoRef.current.paused : false;
+    const nextSource = await loadEpisodeSources(room.anime.id, episodeNumber);
+
+    setIsVideoPlaying(false);
+    setPlaybackProgress(0);
+    hostVirtualTimeRef.current = { time: 0, lastUpdate: 0, isPlaying: false, active: false };
+
+    setRoom(prev => prev ? {
+      ...prev,
+      episode_number: episodeNumber,
+      current_time: 0,
+      is_playing: wasPlaying,
+      episode_id: nextSource?.id ? Number(nextSource.id) : null,
+    } : prev);
+
+    pendingPlayerStateRef.current = {
+      current_time: 0,
+      is_playing: wasPlaying,
+    };
+
+    await syncPlayer({
+      current_time: 0,
+      is_playing: wasPlaying,
+      episode_number: episodeNumber,
+    });
+  };
+
+  const currentEpisodeIndex = episodeOptions.findIndex(ep => ep.episode_number === room?.episode_number);
+  const previousEpisode = currentEpisodeIndex > 0 ? episodeOptions[currentEpisodeIndex - 1] : null;
+  const nextEpisode = currentEpisodeIndex >= 0 && currentEpisodeIndex < episodeOptions.length - 1
+    ? episodeOptions[currentEpisodeIndex + 1]
+    : null;
 
   // Periodic host sync (every 5 seconds) to ensure guests don't drift
   useEffect(() => {
@@ -372,6 +557,39 @@ export default function WatchPartyPage() {
             Выйти
           </button>
           <div className="w-px h-4 bg-gray-200 dark:bg-white/10" />
+
+          {isHost && episodeOptions.length > 1 && (
+            <div className="hidden sm:flex items-center gap-1 rounded-xl border border-gray-200 bg-gray-100 p-1 dark:border-white/10 dark:bg-white/5">
+              <button
+                onClick={() => previousEpisode && switchEpisode(previousEpisode.episode_number)}
+                disabled={!previousEpisode}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-white hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-30 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
+                title="Предыдущий эпизод"
+              >
+                <SkipBack className="h-4 w-4" />
+              </button>
+              <select
+                value={room.episode_number}
+                onChange={(event) => switchEpisode(Number(event.target.value))}
+                className="h-7 max-w-32 rounded-lg border-0 bg-transparent px-2 text-xs font-semibold text-gray-700 outline-none dark:text-white"
+                title="Переключить эпизод у всех"
+              >
+                {episodeOptions.map((episode) => (
+                  <option key={episode.episode_number} value={episode.episode_number}>
+                    Серия {episode.episode_number}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={() => nextEpisode && switchEpisode(nextEpisode.episode_number)}
+                disabled={!nextEpisode}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-white hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-30 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
+                title="Следующий эпизод"
+              >
+                <SkipForward className="h-4 w-4" />
+              </button>
+            </div>
+          )}
 
           {/* Room Info */}
           <div className="flex min-w-0 items-center gap-2">
@@ -434,6 +652,7 @@ export default function WatchPartyPage() {
                 onPlay={handleHostPlay}
                 onPause={handleHostPause}
                 onSeeked={handleHostSeeked}
+                onTimeUpdate={handleTimeUpdate}
                 onError={(e) => e.stopPropagation()}
                 onAbort={(e) => e.stopPropagation()}
               />
@@ -503,7 +722,7 @@ export default function WatchPartyPage() {
           <div className="flex border-b border-gray-200 dark:border-white/10">
             {([
               { id: 'chat', label: 'Чат', icon: null },
-              { id: 'participants', label: `${participants.length}`, icon: <IoPeople className="h-4 w-4" /> },
+              { id: 'participants', label: `${visibleParticipants.length}`, icon: <IoPeople className="h-4 w-4" /> },
             ] as const).map(tab => (
               <button
                 key={tab.id}
@@ -529,7 +748,7 @@ export default function WatchPartyPage() {
               />
             ) : (
               <ParticipantsList
-                participants={participants}
+                participants={visibleParticipants}
                 hostId={room.host.id}
                 currentUserId={user?.id}
                 maxParticipants={room.max_participants}
