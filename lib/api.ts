@@ -25,6 +25,10 @@ export interface Episode {
   video_url?: string;
   player_url?: string;
   image?: string;
+  translator?: string | null;
+  translation_type?: string | null;
+  source?: string | null;
+  priority?: number | null;
 }
 
 // ─── Core client ────────────────────────────────────────────────────────────
@@ -171,8 +175,31 @@ export async function submitContactMessage(payload: {
   category: string;
   subject: string;
   message: string;
+  attachment?: File | null;
 }) {
-  const response = await api.post('/contacts', payload);
+  let response: Response;
+
+  if (payload.attachment) {
+    const form = new FormData();
+    if (payload.name) form.set('name', payload.name);
+    if (payload.email) form.set('email', payload.email);
+    form.set('category', payload.category);
+    form.set('subject', payload.subject);
+    form.set('message', payload.message);
+    form.set('photo', payload.attachment);
+
+    const headers: HeadersInit = { Accept: 'application/json' };
+    const token = getToken();
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    response = await fetch(`${API_BASE}/contacts`, {
+      method: 'POST',
+      headers,
+      body: form,
+    });
+  } else {
+    response = await api.post('/contacts', payload);
+  }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new Error(data.message || 'Не удалось отправить сообщение');

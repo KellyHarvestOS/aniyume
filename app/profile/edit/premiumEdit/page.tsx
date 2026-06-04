@@ -82,6 +82,21 @@ export default function PremiumEditPage() {
                 setWatchTime(data.watch_time || { days: 0, hours: 0, minutes: 0 });
                 setPreviewUserName(user?.name || "?");
                 setPreviewAvatarUrl(getAvatarUrl(user?.avatar || user?.avatar_url));
+                if (user?.selected_profile_frame) {
+                    setAvatarFrameKey(user.selected_profile_frame);
+                    localStorage.setItem("profile_avatar_frame_key", user.selected_profile_frame);
+                    const selected = avatarFrames.find((frame) => frame.key === user.selected_profile_frame);
+                    if (selected?.imagePath) localStorage.setItem("profile_avatar_frame_path", selected.imagePath);
+                    else localStorage.removeItem("profile_avatar_frame_path");
+                }
+                if (Array.isArray(data.profile_frames)) {
+                    const unlockedDates = data.profile_frames.reduce((acc: Record<string, string>, frame: any) => {
+                        if (frame.unlocked) acc[frame.key] = frame.obtained_at || new Date().toISOString();
+                        return acc;
+                    }, {});
+                    setFrameObtainedDates((prev) => ({ ...unlockedDates, ...prev }));
+                    localStorage.setItem("profile_avatar_frame_obtained_dates", JSON.stringify({ ...unlockedDates, ...frameObtainedDates }));
+                }
             })
             .catch(() => { });
     }, [router, updateGlobalStyles]);
@@ -127,7 +142,18 @@ export default function PremiumEditPage() {
         } else {
             localStorage.removeItem("profile_avatar_frame_path");
         }
-        
+
+        const token = localStorage.getItem("userToken");
+        fetch("/api/external/profile/me/frames/select", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({ frame_key: frame.key }),
+        }).catch(() => {});
+
         window.dispatchEvent(new Event("storage"));
     };
 

@@ -12,8 +12,11 @@ export interface Episode {
   episode_number: number;
   season_number: number;
   title: string | null;
-  player_url: string | null; 
-  translator: string;
+  player_url: string | null;
+  translator: string | null;
+  translation_type?: string | null;
+  source?: string | null;
+  priority?: number | null;
   thumbnail_url?: string | null;
 }
 
@@ -35,4 +38,4 @@ export interface AnimeDetails {
   genres?: Genre[];
   tags?: Genre[];
   favorites_count?: number;
-}
+}

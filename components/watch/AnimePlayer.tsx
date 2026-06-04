@@ -19,6 +19,7 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
   const [showCreateRoom, setShowCreateRoom] = useState(false);
   const router = typeof window !== 'undefined' ? useRouter() : null;
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
+  const [selectedSourceKey, setSelectedSourceKey] = useState<string | null>(null);
   const [userRating, setUserRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [isRatingLoading, setIsRatingLoading] = useState(false);
@@ -126,15 +127,58 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
     }
   };
 
-  const uniqueEpisodes = useMemo(() => {
-    const map = new Map<number, Episode>();
-    episodes.forEach((ep) => {
-      if (!map.has(ep.episode_number) && ep.player_url) {
-        map.set(ep.episode_number, ep);
+  const sourceRank = (ep: Episode) => {
+    if (ep.source === 'anilibria') return 0;
+    if (ep.source === 'videocdn') return 1;
+    if (ep.source === 'kodik') return 2;
+    return 3;
+  };
+
+  const sourceKey = (ep: Episode) => `${ep.source ?? 'unknown'}::${ep.translator ?? 'Без озвучки'}::${ep.translation_type ?? ''}`;
+
+  const sourceLabel = (ep: Episode) => {
+    const source = ep.source === 'anilibria' ? 'AniLibria' : ep.source === 'kodik' ? 'Kodik' : ep.source === 'videocdn' ? 'VideoCDN' : ep.source ?? 'Источник';
+    const translator = ep.translator && ep.translator !== source ? ` · ${ep.translator}` : '';
+    const ads = ep.source === 'kodik' ? ' · возможна реклама' : ep.source === 'anilibria' ? ' · без рекламы' : '';
+    return `${source}${translator}${ads}`;
+  };
+
+  const sourceOptions = useMemo(() => {
+    const map = new Map<string, Episode>();
+    episodes.filter((ep) => ep.player_url).forEach((ep) => {
+      const key = sourceKey(ep);
+      const current = map.get(key);
+      if (!current || sourceRank(ep) < sourceRank(current) || (ep.priority ?? 999) < (current.priority ?? 999)) {
+        map.set(key, ep);
       }
     });
-    return Array.from(map.values()).sort((a, b) => a.episode_number - b.episode_number);
+    return Array.from(map.values()).sort((a, b) => sourceRank(a) - sourceRank(b) || (a.priority ?? 999) - (b.priority ?? 999));
   }, [episodes]);
+
+  useEffect(() => {
+    if (!selectedSourceKey && sourceOptions.length > 0) {
+      setSelectedSourceKey(sourceKey(sourceOptions[0]));
+    }
+  }, [sourceOptions, selectedSourceKey]);
+
+  const uniqueEpisodes = useMemo(() => {
+    const map = new Map<number, Episode>();
+    const preferredKey = selectedSourceKey ?? (sourceOptions[0] ? sourceKey(sourceOptions[0]) : null);
+    const sortedEpisodes = [...episodes].filter((ep) => ep.player_url).sort((a, b) => sourceRank(a) - sourceRank(b) || (a.priority ?? 999) - (b.priority ?? 999));
+
+    sortedEpisodes.forEach((ep) => {
+      if (preferredKey && sourceKey(ep) !== preferredKey) return;
+      if (!map.has(ep.episode_number)) map.set(ep.episode_number, ep);
+    });
+
+    if (map.size === 0) {
+      sortedEpisodes.forEach((ep) => {
+        if (!map.has(ep.episode_number)) map.set(ep.episode_number, ep);
+      });
+    }
+
+    return Array.from(map.values()).sort((a, b) => a.episode_number - b.episode_number);
+  }, [episodes, selectedSourceKey, sourceOptions]);
 
   useEffect(() => {
     if (uniqueEpisodes.length > 0 && !currentEpisode) {
@@ -253,6 +297,22 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
     }
   };
 
+  const handleSourceChange = (key: string) => {
+    setSelectedSourceKey(key);
+    const currentNumber = currentEpisode?.episode_number ?? uniqueEpisodes[0]?.episode_number;
+    const next = episodes.find((ep) => ep.player_url && ep.episode_number === currentNumber && sourceKey(ep) === key)
+      || episodes.find((ep) => ep.player_url && sourceKey(ep) === key);
+
+    if (next) {
+      if (videoRef.current?.currentTime) void saveProgress(videoRef.current.currentTime);
+      setResumeProgress(0);
+      setPlaybackProgress(0);
+      setHasResumed(false);
+      setCurrentEpisode(next);
+      if (onEpisodeSelect) onEpisodeSelect(next.episode_number);
+    }
+  };
+
   const getVideoSrc = (url: string | null) => {
     if (!url) return '';
     return url.startsWith('//') ? `https:${url}` : url;
@@ -351,6 +411,15 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
                 />
               )}
             </div>
+            {sourceOptions.length > 1 && (
+              <select
+                className="w-full sm:w-[320px] bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-3 text-sm font-bold outline-none"
+                value={selectedSourceKey ?? ''}
+                onChange={(event) => handleSourceChange(event.target.value)}
+              >
+                {sourceOptions.map((ep) => <option key={sourceKey(ep)} value={sourceKey(ep)}>{sourceLabel(ep)}</option>)}
+              </select>
+            )}
           </div>
         </div>
 
