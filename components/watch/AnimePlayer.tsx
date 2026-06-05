@@ -131,13 +131,14 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
     if (ep.source === 'anilibria') return 0;
     if (ep.source === 'videocdn') return 1;
     if (ep.source === 'kodik') return 2;
-    return 3;
+    if (ep.source === 'allanime') return 3;
+    return 4;
   };
 
   const sourceKey = (ep: Episode) => `${ep.source ?? 'unknown'}::${ep.translator ?? 'Без озвучки'}::${ep.translation_type ?? ''}`;
 
   const sourceLabel = (ep: Episode) => {
-    const source = ep.source === 'anilibria' ? 'AniLibria' : ep.source === 'kodik' ? 'Kodik' : ep.source === 'videocdn' ? 'VideoCDN' : ep.source ?? 'Источник';
+    const source = ep.source === 'anilibria' ? 'AniLibria' : ep.source === 'kodik' ? 'Kodik' : ep.source === 'videocdn' ? 'VideoCDN' : ep.source === 'allanime' ? 'AllAnime' : ep.source ?? 'Источник';
     const translator = ep.translator && ep.translator !== source ? ` · ${ep.translator}` : '';
     const ads = ep.source === 'kodik' ? ' · возможна реклама' : ep.source === 'anilibria' ? ' · без рекламы' : '';
     return `${source}${translator}${ads}`;
