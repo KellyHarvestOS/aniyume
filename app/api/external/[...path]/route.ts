@@ -65,9 +65,17 @@ export async function handleProxy(
       return NextResponse.json(data, { status: response.status });
     }
 
+    const forwardedFor = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+    const fingerprintId =
+      req.headers.get("x-fingerprint-id") ||
+      forwardedFor ||
+      req.headers.get("x-real-ip") ||
+      "web-proxy";
+
     const headers: Record<string, string> = {
       Accept: "application/json",
       "X-Requested-With": "XMLHttpRequest",
+      "X-Fingerprint-ID": fingerprintId,
       ...(token ? { Authorization: token } : {}),
     };
 
