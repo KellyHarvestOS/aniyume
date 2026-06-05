@@ -86,7 +86,9 @@ export async function handleProxy(
     let revalidateTime = 0;
 
     if (req.method === "GET" && !isPrivate) {
-      if (normalizedPath.includes("search")) {
+      if (normalizedPath.includes("stream/")) {
+        revalidateTime = 0;
+      } else if (normalizedPath.includes("search")) {
         revalidateTime = 300;
       } else if (normalizedPath.includes("schedule")) {
         revalidateTime = 1800;
@@ -112,6 +114,17 @@ export async function handleProxy(
     }
 
     const response = await fetch(finalUrl, options);
+
+    if (normalizedPath.includes("stream/")) {
+      const body = await response.arrayBuffer();
+      const streamResponse = new NextResponse(body, { status: response.status });
+      const contentType = response.headers.get("content-type");
+      if (contentType) streamResponse.headers.set("Content-Type", contentType);
+      streamResponse.headers.set("Access-Control-Allow-Origin", "*");
+      streamResponse.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+      return streamResponse;
+    }
+
     const text = await response.text();
 
     let data;
