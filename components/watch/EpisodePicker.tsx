@@ -161,7 +161,7 @@ export default function EpisodePicker({
               onClick={() => onSelect(num)}
               className={`h-11 rounded-lg text-sm font-medium transition-all duration-200 active:scale-95
                 ${num === currentEpisode
-                  ? 'brand-bg text-white shadow-lg'
+                  ? 'bg-brand text-white shadow-lg'
                   : 'bg-gray-100 dark:bg-[#1e1e1e] text-gray-700 dark:text-gray-300 hover:brand-bg-soft hover:brand-text border border-gray-200 dark:border-gray-700/50'
                 }`}
             >

@@ -138,9 +138,9 @@ export const avatarFrames = [
 
 export const gradients = [
     { name: "Лазурный поток", value: "from-[#34dccb] to-[#007492]", logoKey: "AzureFlow", cursorKey: "default", cursorPath: "/images/cursor/Mouse-cursor.png" },
-    { name: "Неоновая страсть", value: "from-[#b80016] to-[#f8079c]", logoKey: "NeonPassion", cursorKey: "red", cursorPath: "/images/cursor/redMouse-cursor.png" },
-    { name: "Космический разлом", value: "from-[#9a00b6] to-[#1500ff]", logoKey: "SpaceRift", cursorKey: "purple", cursorPath: "/images/cursor/purpleMouse-cursor.png" },
-    { name: "Солнечный импульс", value: "from-[#d76800] to-[#e1eb22]", logoKey: "SolarImpulse", cursorKey: "yellow", cursorPath: "/images/cursor/yellowMouse-cursor.png" },
-    { name: "Тропический яд", value: "from-[#039e00] to-[#c1ff31]", logoKey: "TropicalPoison", cursorKey: "green", cursorPath: "/images/cursor/greenMouse-cursor.png" },
-    { name: "Пустотная энергия", value: "from-[#230236] to-[#aed7d7]", logoKey: "VoidEnergy", cursorKey: "gray", cursorPath: "/images/cursor/grayMouse-cursor.png" }
+    { name: "Неоновая страсть", value: "from-[#b80016] to-[#c435ac]", logoKey: "NeonPassion", cursorKey: "red", cursorPath: "/images/cursor/redMouse-cursor.png" },
+    { name: "Космический разлом", value: "from-[#9a00b6] to-[#4362d1]", logoKey: "SpaceRift", cursorKey: "purple", cursorPath: "/images/cursor/purpleMouse-cursor.png" },
+    { name: "Солнечный импульс", value: "from-[#d76800] to-[#d7de4e]", logoKey: "SolarImpulse", cursorKey: "yellow", cursorPath: "/images/cursor/yellowMouse-cursor.png" },
+    { name: "Тропический яд", value: "from-[#039e00] to-[#a4d14f]", logoKey: "TropicalPoison", cursorKey: "green", cursorPath: "/images/cursor/greenMouse-cursor.png" },
+    { name: "Пустотная энергия", value: "from-[#230236] to-[#858585]", logoKey: "VoidEnergy", cursorKey: "gray", cursorPath: "/images/cursor/grayMouse-cursor.png" }
 ];
