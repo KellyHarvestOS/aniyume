@@ -41,7 +41,7 @@ export default function AddFriendModal({ isOpen, onClose }: AddFriendModalProps)
                                         ДОБАВИТЬ <span className="text-brand">ДРУГА</span>
                                     </h2>
                                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-2 uppercase tracking-widest">
-                                        Поиск по уникальному ID
+                                        Поиск по уникальному имени пользователя, включая символы
                                     </p>
                                 </div>
 
@@ -89,7 +89,7 @@ export default function AddFriendModal({ isOpen, onClose }: AddFriendModalProps)
                             </button>
 
                             <p className="mt-6 text-center text-xs text-gray-400 dark:text-gray-500 font-medium">
-                                Убедитесь, что ID введен корректно, включая символы
+                                Убедитесь, что имя введено корректно, включая символы
                             </p>
                         </div>
                     </motion.div>

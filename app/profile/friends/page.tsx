@@ -207,7 +207,6 @@ export default function FriendsPage() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        {/* Кнопка входящих заявок с счётчиком */}
                         <button
                             onClick={() => setIsRequestModalOpen(true)}
                             className="relative w-12 h-12 rounded-2xl bg-gray-100 dark:bg-white/5 flex items-center justify-center text-gray-500 hover:text-brand border border-transparent hover:border-brand-simple transition-all group shadow-inner"
@@ -225,7 +224,7 @@ export default function FriendsPage() {
                             onClick={() => setIsModalOpen(true)}
                             className="bg-brand text-white px-6 py-3 rounded-xl font-black uppercase italic tracking-tighter text-xs hover:scale-105 transition-transform active:scale-95 shadow-lg shadow-brand/20 flex items-center justify-center gap-2"
                         >
-                            <FaPlus size={10} /> Добавить по ID
+                            <FaPlus size={10} /> Добавить друга
                         </button>
                     </div>
                 </div>
@@ -238,7 +237,7 @@ export default function FriendsPage() {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="ПОИСК ПО ИМЕНИ ИЛИ ID..."
+                        placeholder="Поиск по имени"
                         className="w-full bg-transparent pt-4 pb-3 pl-12 pr-10 text-sm font-black uppercase italic tracking-widest text-gray-900 dark:text-white border-2 rounded-xl border-gray-100 dark:border-white/10 outline-none transition-all placeholder:text-gray-500 focus:border-brand"
                     />
                     {searchQuery && (
@@ -258,7 +257,6 @@ export default function FriendsPage() {
 
             <div className="container mx-auto px-4 md:px-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 <AnimatePresence mode='popLayout'>
-                    {/* Входящие заявки (не в режиме поиска) */}
                     {!isSearchMode && incoming.map((u) => (
                         <motion.div
                             layout
@@ -376,7 +374,6 @@ export default function FriendsPage() {
                                     );
                                 }
                             } else {
-                                // Друг — кнопка Watch Party
                                 actionButton = (
                                     <button
                                         onClick={() => router.push('/watch')}
@@ -400,7 +397,7 @@ export default function FriendsPage() {
                                     className="custom-glass rounded-lg p-8 border border-white/5 hover:border-brand/30 transition-all duration-300 relative group"
                                 >
                                     <div className="absolute top-8 left-8">
-                                        <span className="text-[9px] font-black text-gray-500 dark:text-white/20">ID: {u.id}</span>
+                                        <span className="text-[9px] font-black text-gray-500 dark:text-white/20">Имя:</span>
                                     </div>
 
                                     <div className="absolute top-8 right-8 flex items-center">
@@ -416,7 +413,7 @@ export default function FriendsPage() {
                                         </div>
 
                                         <h3 className="text-2xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white mb-2 group-hover:text-brand transition-colors">
-                                            {u.name}
+                                            {u.name || "Пользователь"}
                                         </h3>
 
                                         <div className="flex items-center gap-4 mb-8">

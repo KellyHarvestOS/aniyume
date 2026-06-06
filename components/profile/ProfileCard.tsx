@@ -14,7 +14,6 @@ interface ProfileCardProps {
     name: string;
     avatar: string | null;
     custom_status: string | null;
-    bio?: string | null;
     created_at: string;
     is_premium?: boolean;
   };
@@ -126,15 +125,19 @@ export const ProfileCard = ({
           <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-4 border-white dark:border-black/70 rounded-full z-10" />
         </div>
 
+        <h2
+          className={`text-xl font-black mt-2 ${user.is_premium ? "text-white" : "text-slate-900 dark:text-white"
+            }`}
+        >
+          {user.name || "Пользователь"}
+        </h2>
+
         <p className={`text-sm w-40 mx-auto font-bold mt-1 text-black dark:text-gray-100 italic ${user.is_premium ? "text-white" : "text-black"}`}>
           {user.custom_status || "Cтатус отсутствует"}
         </p>
 
 
-        <p className={`text-xs mt-3 line-clamp-3 font-bold text-black dark:text-gray-100 px-2 ${user.is_premium ? "text-white" : "text-slate-400"
-          }`}>
-          {user.bio?.trim() ? user.bio : "Биография отсутствует"}
-        </p>
+
 
         <div className="grid grid-cols-2 gap-2 my-6">
           <Link

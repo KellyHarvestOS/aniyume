@@ -89,7 +89,6 @@ export default function EditProfilePage() {
 
   const [formData, setFormData] = useState({
     name: "",
-    bio: "",
     status_text: "",
   });
   const [socialLinks, setSocialLinks] = useState<string[]>([""]);
@@ -118,7 +117,7 @@ export default function EditProfilePage() {
           const user = data.user || data;
           setFormData({
             name: user.name || "",
-            bio: user.bio || "",
+
             status_text: user.custom_status || user.status_text || "",
           });
           setSocialLinks(normalizeSocialLinks(user.social_links || user.socials || readSavedSocialLinks()));
@@ -225,7 +224,7 @@ export default function EditProfilePage() {
       const profileRes = await fetch("/api/external/profile/me", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, Accept: "application/json" },
-        body: JSON.stringify({ name: formData.name, custom_status: formData.status_text, bio: formData.bio, social_links: normalizedSocialLinks }),
+        body: JSON.stringify({ name: formData.name, custom_status: formData.status_text, social_links: normalizedSocialLinks }),
       });
 
       if (!profileRes.ok) throw new Error("Ошибка обновления данных профиля");
@@ -337,12 +336,7 @@ export default function EditProfilePage() {
                 <input type="text" value={formData.status_text} onChange={(e) => setFormData({ ...formData, status_text: e.target.value })} className="w-full px-6 py-4 bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-white/5 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white dark:focus:bg-[#1a1a1a] transition-all shadow-sm" placeholder="Ваш статус" />
               </div>
 
-              <div className="md:col-span-2 space-y-3">
-                <label className="flex items-center gap-2 text-[11px] font-black text-slate-900 dark:text-gray-100 uppercase tracking-[0.15em] ml-1">
-                  <FaInfoCircle className="text-brand" /> О себе
-                </label>
-                <textarea value={formData.bio} onChange={(e) => setFormData({ ...formData, bio: e.target.value })} rows={5} className="w-full px-6 py-4 bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-white/5 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white dark:focus:bg-[#1a1a1a] transition-all shadow-sm resize-none" placeholder="Расскажите вашу историю..." />
-              </div>
+          
 
               <div className="md:col-span-2 space-y-3">
                 <div className="flex items-center justify-between gap-4">
