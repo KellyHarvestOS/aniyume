@@ -190,7 +190,7 @@ export const ProfileCard = ({
         </p>
 
         <Link href="/profile/edit">
-          <button className="w-full flex items-center justify-center gap-2 bg-brand text-white dark:text-gray-900 py-3 rounded-xl font-bold shadow hover:bg-teal-600 transition">
+          <button className="w-full flex items-center justify-center gap-2 bg-brand text-white dark:text-gray-900 py-3 rounded-xl font-bold shadow hover:bg-teal-600 transition hover:scale-[1.02] active:scale-[0.98]">
             <FaEdit className="text-lg" />
             Редактировать
           </button>

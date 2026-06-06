@@ -73,7 +73,7 @@ export default function SchedulePage() {
               className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 relative group 
     ${isToday
                   ? 'bg-brand text-white shadow-brand-glow scale-110'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 hover:bg-brand hover:text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 hover:bg-brand dark:hover:text-white hover:text-dark'
                 }`}
             >
               {day.short}
