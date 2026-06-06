@@ -124,7 +124,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
                 onClick={() => document.getElementById('player')?.scrollIntoView({ behavior: 'smooth' })}
                 className="group relative overflow-hidden bg-brand text-white dark:text-[#111111] text-lg font-bold py-3.5 px-10 rounded-lg flex items-center gap-3 transition transform hover:scale-105 shadow-lg hover:shadow-brand/30 hover:brightness-110 active:scale-95"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full " />
                 <FaPlay className="text-sm relative z-10" />
                 <span className="relative z-10">СМОТРЕТЬ</span>
               </button>
@@ -172,7 +172,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
                 {isLong && (
                   <button
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="text-brand text-sm font-bold uppercase tracking-wider transition-colors hover:brightness-125 mt-3 flex items-center gap-2 group"
+                    className="text-brand text-sm font-bold uppercase tracking-wider transition-colors  mt-3 flex items-center gap-2 group"
                   >
                     {isExpanded ? 'Свернуть текст' : 'Читать далее'}
                     <FaChevronDown 

@@ -14,7 +14,7 @@ const STATUS_MAP: Record<
 > = {
   not_watching: {
     label: 'Не смотрю',
-    color: 'bg-[#111111] hover:bg-[#1a202c] text-white',
+    color: 'bg-[#303030]  hover:bg-[#1a202c] text-white',
     dot: 'bg-gray-400',
   },
   watching: {

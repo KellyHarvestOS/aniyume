@@ -717,7 +717,7 @@ export default function WatchPartyPage() {
         </div>
 
         {/* Right Sidebar */}
-        <div className="flex h-[420px] w-full flex-col border-t border-gray-200 bg-white dark:border-white/5 dark:bg-[#0d0d0d] sm:h-[460px] lg:h-auto lg:w-80 lg:border-l lg:border-t-0 lg:bg-black/20 lg:dark:bg-black/20">
+        <div className="flex h-[420px] w-full flex-col border-t border-gray-200 bg-white dark:border-white/5 dark:bg-[#0d0d0d] sm:h-[460px] lg:h-auto lg:w-80 lg:border-l lg:border-t-0 lg:bg-white/20 lg:dark:bg-black/20">
           {/* Tabs */}
           <div className="flex border-b border-gray-200 dark:border-white/10">
             {([
