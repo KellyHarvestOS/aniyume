@@ -1,7 +1,7 @@
 import React from 'react';
 
 const CommentCardSkeleton = () => (
-  <div className="rounded-3xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#161616] overflow-hidden animate-pulse shadow-sm">
+  <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#161616] overflow-hidden animate-pulse shadow-sm">
     <div className="p-5 flex gap-4 border-b border-slate-200 dark:border-white/5 bg-white/50 dark:bg-black/10">
       <div className="w-16 h-24 rounded-xl bg-slate-200 dark:bg-white/10 shrink-0" />
 

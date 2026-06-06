@@ -376,7 +376,7 @@ export default function ChatModal({ onClose }: { onClose: () => void }) {
             <div className="p-4 bg-white dark:bg-[#0f0f0f] border-t border-slate-200 dark:border-white/5">
                 {isAuthenticated && !isLoading && messages.length === 0 && (
                     <div className="flex flex-wrap gap-2 mb-3">
-                        {['Расписание', 'Проблемы с плеером', 'Помощь'].map((text) => (
+                        {['Помощь'].map((text) => (
                             <button
                                 key={text}
                                 onClick={() => handleSend(text)}

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaUserCheck, FaUserTimes, FaClock, FaTimes, FaUsers, FaFingerprint } from 'react-icons/fa';
+import { FaUserCheck, FaUserTimes, FaClock, FaTimes, FaUsers, FaFingerprint, FaCrown } from 'react-icons/fa';
 
 interface FriendRequest {
     id: number;
@@ -43,9 +43,9 @@ export default function FriendRequestsModal({ isOpen, onClose }: { isOpen: boole
                         initial={{ scale: 0.95, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                        className="relative w-full max-w-2xl h-[650px] bg-white dark:bg-[#111111] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl overflow-hidden flex flex-col"
+                        className="relative w-full max-w-3xl h-[650px] bg-white dark:bg-[#111111] rounded-3xl border border-gray-100 dark:border-white/5 shadow-2xl overflow-hidden flex flex-col"
                     >
-                        <div className="p-8 border-b border-gray-100 dark:border-white/5 flex justify-between items-center shrink-0">
+                        <div className="p-5 sm:p-8 border-b border-gray-100 dark:border-white/5 flex justify-between items-center shrink-0">
                             <div>
                                 <h2 className="text-3xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white leading-none">Запросы</h2>
                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2 flex items-center gap-2">
@@ -58,21 +58,27 @@ export default function FriendRequestsModal({ isOpen, onClose }: { isOpen: boole
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-gray-50/50 dark:bg-black/20">
+                        <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar bg-gray-50/50 dark:bg-black/20">
                             {requests.length > 0 ? (
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {requests.map((req) => (
                                         <motion.div
                                             layout
                                             key={req.id}
-                                            className="relative p-5 rounded-[2rem] bg-white dark:bg-[#161616] border border-gray-100 dark:border-white/5 hover:border-brand-simple transition-all flex flex-col group shadow-sm"
+                                            className="relative p-4 rounded-xl bg-white dark:bg-[#161616] border border-gray-100 dark:border-white/5 hover:border-brand-simple transition-all flex flex-col group shadow-sm"
                                         >
-                                            <div className="flex justify-between items-center mb-4">
-                                                {req.isPremium ? (
-                                                    <span className="text-[9px] font-black text-brand uppercase tracking-[0.2em]">PREMIUM</span>
-                                                ) : (
-                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">User</span>
-                                                )}
+                                            <div className="flex justify-between items-center mb-4 gap-3">
+                                                <div className="flex items-center gap-2 min-w-0">
+                                                    <span className="inline-flex items-center gap-1 rounded-xl border border-emerald-100 bg-emerald-50 px-1.5 py-1 text-[9px] font-black uppercase text-emerald-700 dark:border-emerald-800/70 dark:bg-emerald-950/50 dark:text-emerald-300">
+                                                        <span className="rounded-lg bg-white px-1.5 py-0.5 text-[10px] text-slate-900 dark:bg-black/30 dark:text-white">{req.level}</span>
+                                                        уровень
+                                                    </span>
+                                                    {req.isPremium && (
+                                                        <span className="inline-flex items-center gap-1 rounded-xl bg-brand/10 px-2 py-1 text-[9px] font-black uppercase tracking-widest text-brand">
+                                                            <FaCrown size={9} /> Premium
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <div className="flex items-center gap-1 text-[8px] font-black text-gray-400 uppercase">
                                                     <FaClock size={8} /> {req.time}
                                                 </div>
@@ -80,28 +86,25 @@ export default function FriendRequestsModal({ isOpen, onClose }: { isOpen: boole
 
                                             <div className="flex items-center gap-4 mb-4">
                                                 <div className="relative shrink-0">
-                                                    <div className="w-16 h-16 rounded-full border-2 border-brand-simple p-0.5">
+                                                    <div className="w-16 h-16 rounded-full border-2 border-brand-simple p-0.5 bg-white dark:bg-black/20">
                                                         <img src={req.avatar} alt="" className="w-full h-full rounded-full bg-gray-100 dark:bg-black" />
-                                                    </div>
-                                                    <div className="absolute -bottom-1 -right-1 bg-brand text-white dark:text-black text-[8px] font-black px-1.5 py-0.5 rounded-md border-2 border-white dark:border-[#161616]">
-                                                        {req.level}
                                                     </div>
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <h4 className="font-black text-sm text-gray-900 dark:text-white uppercase italic tracking-tight truncate">
+                                                    <h4 className="font-black text-base text-gray-900 dark:text-white uppercase italic tracking-tight truncate">
                                                         {req.name}
                                                     </h4>
-                                                    <div className="flex items-center gap-1 text-[9px] text-gray-500 font-bold uppercase">
+                                                    <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase mt-1">
                                                         <FaFingerprint size={8} className="icon-brand" /> ID: {req.id}
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="mb-6 flex-1">
-                                                <p className="text-[11px] text-gray-600 dark:text-gray-400 italic leading-relaxed line-clamp-2 mb-2 px-1">
+                                            <div className="mb-5 flex-1 rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-white/5 dark:bg-[#111111]">
+                                                <p className="text-xs text-gray-600 dark:text-gray-400 italic leading-relaxed line-clamp-2 mb-3">
                                                     "{req.bio}"
                                                 </p>
-                                                <div className="flex items-center gap-2 text-[9px] font-bold text-gray-400 uppercase">
+                                                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase">
                                                     <FaUsers size={10} className="icon-brand" /> {req.mutualFriends} общих друзей
                                                 </div>
                                             </div>
@@ -109,13 +112,13 @@ export default function FriendRequestsModal({ isOpen, onClose }: { isOpen: boole
                                             <div className="flex gap-2 shrink-0">
                                                 <button
                                                     onClick={() => handleAction(req.id)}
-                                                    className="flex-[2] h-10 rounded-lg bg-brand text-white dark:text-black text-[10px] font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-brand/20"
+                                                    className="flex-[2] h-10 rounded-xl bg-brand text-white dark:text-black text-[10px] font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-brand/20"
                                                 >
                                                     <FaUserCheck size={12} /> Принять
                                                 </button>
                                                 <button
                                                     onClick={() => handleAction(req.id)}
-                                                    className="flex-1 h-10 rounded-lg bg-red-500 text-white text-[10px] font-black uppercase flex items-center justify-center hover:bg-red-600 active:scale-95 transition-all"
+                                                    className="flex-1 h-10 rounded-xl bg-red-500/10 text-red-500 border border-red-500/20 text-[10px] font-black uppercase flex items-center justify-center hover:bg-red-500 hover:text-white active:scale-95 transition-all"
                                                 >
                                                     <FaUserTimes size={12} />
                                                 </button>

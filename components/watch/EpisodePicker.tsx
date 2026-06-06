@@ -134,7 +134,7 @@ export default function EpisodePicker({
             onClick={handlePrev}
             disabled={!hasPrev}
             className="p-2.5 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400
-                       hover:bg-[#39bcba]/20 hover:text-[#39bcba] disabled:opacity-30 disabled:cursor-default
+                       hover:brand-bg-soft hover:brand-text disabled:opacity-30 disabled:cursor-default
                        transition-all duration-200 active:scale-95"
             aria-label="Предыдущая серия"
           >
@@ -147,7 +147,7 @@ export default function EpisodePicker({
             onClick={handleNext}
             disabled={!hasNext}
             className="p-2.5 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400
-                       hover:bg-[#39bcba]/20 hover:text-[#39bcba] disabled:opacity-30 disabled:cursor-default
+                       hover:brand-bg-soft hover:brand-text disabled:opacity-30 disabled:cursor-default
                        transition-all duration-200 active:scale-95"
             aria-label="Следующая серия"
           >
@@ -161,8 +161,8 @@ export default function EpisodePicker({
               onClick={() => onSelect(num)}
               className={`h-11 rounded-lg text-sm font-medium transition-all duration-200 active:scale-95
                 ${num === currentEpisode
-                  ? 'bg-[#39bcba] text-white shadow-lg shadow-[#39bcba]/30'
-                  : 'bg-gray-100 dark:bg-[#1e1e1e] text-gray-700 dark:text-gray-300 hover:bg-[#39bcba]/20 hover:text-[#39bcba] border border-gray-200 dark:border-gray-700/50'
+                  ? 'brand-bg text-white shadow-lg'
+                  : 'bg-gray-100 dark:bg-[#1e1e1e] text-gray-700 dark:text-gray-300 hover:brand-bg-soft hover:brand-text border border-gray-200 dark:border-gray-700/50'
                 }`}
             >
               {num}
@@ -182,7 +182,7 @@ export default function EpisodePicker({
             onClick={handlePrev}
             disabled={!hasPrev}
             className="shrink-0 p-3 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400
-                       hover:bg-[#39bcba]/20 hover:text-[#39bcba] disabled:opacity-30 disabled:cursor-default
+                       hover:brand-bg-soft hover:brand-text disabled:opacity-30 disabled:cursor-default
                        transition-all duration-200 border border-gray-200 dark:border-gray-700/50 active:scale-95"
             aria-label="Предыдущая серия"
           >
@@ -192,8 +192,8 @@ export default function EpisodePicker({
           <button
             onClick={() => { setExpanded(v => !v); setSearchQuery(''); setIsSearchOpen(false); }}
             className="flex-1 min-w-0 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg
-                       bg-[#39bcba]/10 border border-[#39bcba]/30 text-sm font-bold text-[#39bcba]
-                       hover:bg-[#39bcba]/20 transition-all duration-200 active:scale-[0.98]"
+                       brand-bg-soft border brand-border text-sm font-bold brand-text
+                       hover:brand-bg-soft transition-all duration-200 active:scale-[0.98]"
             aria-expanded={expanded}
             aria-label="Показать список серий"
           >
@@ -208,7 +208,7 @@ export default function EpisodePicker({
             onClick={handleNext}
             disabled={!hasNext}
             className="shrink-0 p-3 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400
-                       hover:bg-[#39bcba]/20 hover:text-[#39bcba] disabled:opacity-30 disabled:cursor-default
+                       hover:brand-bg-soft hover:brand-text disabled:opacity-30 disabled:cursor-default
                        transition-all duration-200 border border-gray-200 dark:border-gray-700/50 active:scale-95"
             aria-label="Следующая серия"
           >
@@ -220,8 +220,8 @@ export default function EpisodePicker({
           onClick={() => { setIsSearchOpen(!isSearchOpen); setSearchQuery(''); if (!expanded) setExpanded(true); }}
           className={`shrink-0 p-3 rounded-lg transition-all duration-200 border active:scale-95
             ${isSearchOpen
-              ? 'bg-[#39bcba] text-white border-[#39bcba]'
-              : 'bg-gray-100 dark:bg-[#1e1e1e] text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700/50 hover:bg-[#39bcba]/20 hover:text-[#39bcba]'
+              ? 'brand-bg text-white brand-border'
+              : 'bg-gray-100 dark:bg-[#1e1e1e] text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700/50 hover:brand-bg-soft hover:brand-text'
             }`}
           aria-label="Поиск серии"
         >
@@ -247,7 +247,7 @@ export default function EpisodePicker({
                   className="w-full pl-9 pr-4 py-3 rounded-lg bg-gray-50 dark:bg-[#1a1a1a]
                              border border-gray-200 dark:border-gray-700 text-sm
                              text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600
-                             focus:outline-none focus:ring-2 focus:ring-[#39bcba]/40 focus:border-[#39bcba]
+                             focus:outline-none brand-focus
                              transition-all duration-200"
                 />
               </div>
@@ -267,8 +267,8 @@ export default function EpisodePicker({
                   onClick={() => setActiveRangeIdx(idx)}
                   className={`px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 active:scale-95
                     ${idx === activeRangeIdx
-                      ? 'bg-[#39bcba] text-white shadow-md shadow-[#39bcba]/20'
-                      : 'bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400 hover:bg-[#39bcba]/15 hover:text-[#39bcba] border border-gray-200 dark:border-gray-700/50'
+                      ? 'brand-bg text-white shadow-md'
+                      : 'bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400 hover:brand-bg-soft hover:brand-text border border-gray-200 dark:border-gray-700/50'
                     }`}
                 >
                   {range.label}
@@ -296,8 +296,8 @@ export default function EpisodePicker({
                 }}
                 className={`h-11 rounded-lg text-sm font-medium transition-all duration-150 active:scale-95
                   ${num === currentEpisode
-                    ? 'bg-[#39bcba] text-white shadow-lg shadow-[#39bcba]/30 ring-2 ring-[#39bcba]/50'
-                    : 'bg-gray-50 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-[#39bcba]/20 hover:text-[#39bcba] border border-gray-200 dark:border-gray-700/40'
+                    ? 'brand-bg text-white shadow-lg ring-2 brand-ring'
+                    : 'bg-gray-50 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:brand-bg-soft hover:brand-text border border-gray-200 dark:border-gray-700/40'
                   }`}
                 title={`Серия ${num}`}
               >

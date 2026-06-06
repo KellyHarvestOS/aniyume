@@ -48,7 +48,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
   };
 
   return (
-    <div className="relative w-full min-h-[85vh] md:min-h-[60vh] flex items-center bg-white dark:bg-[#111111] transition-colors overflow-hidden">
+    <div className="relative w-full min-h-[85vh] md:min-h-[60vh] lg:min-h-[100vh] flex items-center bg-white dark:bg-[#111111] transition-colors overflow-hidden">
 
 
       <div className="absolute inset-0 z-0 overflow-hidden bg-white dark:bg-[#111111]" aria-hidden="true">
@@ -67,13 +67,13 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
           />
         </div>
 
-        <div className="absolute inset-0 bg-linear-to-r from-white via-white/80 to-transparent dark:from-[#111111] dark:via-[#111111]/80" />
+        <div className="absolute inset-0 bg-linear-to-r from-white via-white/10 to-transparent dark:from-[#111111] dark:via-[#111111]/10" />
         <div className="absolute inset-0 bg-linear-to-t from-white via-transparent to-transparent dark:from-[#111111]" />
 
-        <div className="absolute top-0 right-0 w-[55%] h-full bg-teal-400/20 blur-[140px] opacity-60 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[55%] h-full  pointer-events-none" />
       </div>
 
-      <div className="container mx-auto px-4 md:px-12 relative z-20 pt-20 pb-12">
+      <div className="container mx-auto px-4 md:px-12 relative z-20 pb-12">
         <div className="max-w-3xl">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-wide text-black dark:text-gray-200 drop-shadow-lg">
             {anime.title}
@@ -89,7 +89,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
               {episodesCount > 0 && <li>• {episodesCount} эп.</li>}
             </ul>
             <div className="flex items-center gap-1 ml-2">
-              <FaStar className="text-teal-400 text-sm" />
+              <FaStar className="brand-text text-sm" />
               <span className="ml-1 text-gray-800 dark:text-gray-200 font-semibold">
                 {anime.rating || '—'} ({anime.popularity ? `${(anime.popularity / 1000).toFixed(0)}K` : '0'})
               </span>
@@ -112,7 +112,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
           <div className="flex items-center gap-4 mb-8">
             <button
               onClick={() => document.getElementById('player')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-teal-400 hover:bg-teal-500 text-black dark:text-[#111111] text-lg font-bold py-3 px-8 rounded flex items-center gap-3 transition transform hover:scale-105 shadow-lg"
+                className="brand-bg text-white dark:text-[#111111] text-lg font-bold py-3 px-8 rounded flex items-center gap-3 transition transform hover:scale-105 shadow-lg hover:brightness-110"
             >
               <FaPlay className="text-sm" /> СМОТРЕТЬ
             </button>
@@ -123,7 +123,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
                 title="Скопировать ссылку"
                 className={`w-12 h-12 flex items-center justify-center border-2 rounded transition bg-white/40 dark:bg-[#1a1a1a]/70 backdrop-blur-sm 
                   ${copied
-                    ? 'border-teal-500 text-teal-500'
+                    ? 'brand-border brand-text'
                     : 'border-gray-400 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:border-black dark:hover:border-gray-200'
                   }`}
               >
@@ -147,7 +147,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
               {isLong && (
                 <button
                   onClick={() => setIsExpanded((value) => !value)}
-                  className="text-teal-500 hover:text-teal-600 text-xs font-bold uppercase tracking-wider transition-colors"
+                  className="brand-text text-xs font-bold uppercase tracking-wider transition-colors hover:brightness-110"
                 >
                   {isExpanded ? 'Свернуть ↑' : 'Читать далее...'}
                 </button>

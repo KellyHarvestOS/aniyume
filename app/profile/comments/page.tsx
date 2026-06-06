@@ -37,7 +37,7 @@ const CommentCard = ({ c, onDelete, getPosterUrl }: { c: UserComment, onDelete: 
   }, [c.comment]);
 
   return (
-    <article className="group flex flex-col rounded-3xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#161616] overflow-hidden hover:border-[#39bcba]/30 transition-all duration-500 shadow-sm">
+    <article className="group flex flex-col rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-[#161616] overflow-hidden hover:border-[#39bcba]/30 transition-all duration-500 shadow-sm">
       <div className="p-5 flex gap-4 border-b border-slate-200 dark:border-white/5 bg-white/50 dark:bg-black/10">
         {c.anime && (
           <Link href={`/anime/${c.anime.id}`} className="shrink-0">

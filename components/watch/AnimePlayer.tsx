@@ -428,7 +428,7 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
           <div className="mb-4 flex justify-end">
             <button
               onClick={() => setShowCreateRoom(true)}
-              className="bg-[#39bcba] text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-105 hover:shadow-lg shadow-[#21D0B8]/20 transition-all active:scale-95"
+              className="brand-bg text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-105 hover:shadow-lg transition-all active:scale-95"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
               Включить вместе (Watch Party)
