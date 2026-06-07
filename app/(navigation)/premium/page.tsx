@@ -1,5 +1,5 @@
-'use client';
 
+'use client';
 import React from "react";
 import { motion } from "framer-motion";
 import { FaCheck, FaMagic, FaArrowLeft, FaShieldAlt } from "react-icons/fa";
@@ -8,7 +8,6 @@ import { HiGif } from "react-icons/hi2";
 import { RiVipCrownFill } from "react-icons/ri";
 import { HiCursorClick } from "react-icons/hi";
 import Link from "next/link";
-
 export default function PremiumAuthPage() {
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -22,7 +21,7 @@ export default function PremiumAuthPage() {
 
     return (
         <div className="relative min-h-dvh lg:h-dvh w-full bg-white dark:bg-[#0a0a0a] lg:bg-[#010606] lg:dark:bg-[#010606] overflow-x-hidden lg:overflow-hidden font-sans flex flex-col lg:block">
-            <Link href="/" className="absolute top-6 left-6 z-50 flex items-center gap-2 text-slate-400 hover:text-slate-900 dark:hover:text-white lg:hover:text-slate-500 transition-colors font-bold text-sm">
+            <Link href="/" className="absolute top-4 sm:top-6 left-4 sm:left-6 z-50 flex items-center gap-2 text-slate-400 hover:text-slate-900 dark:hover:text-white lg:hover:text-slate-500 transition-colors font-bold text-sm bg-white/50 dark:bg-black/50 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none px-3 py-2 rounded-full lg:p-0">
                 <FaArrowLeft /> На главную
             </Link>
 
@@ -71,16 +70,16 @@ export default function PremiumAuthPage() {
             </div>
 
             <div className="relative z-20 w-full h-full flex flex-col lg:flex-row">
-                <div className="w-full lg:w-[45%] min-h-[50vh] lg:min-h-full flex flex-col items-center justify-center p-8 lg:p-12 bg-white dark:bg-[#0a0a0a] lg:bg-transparent lg:dark:bg-transparent">
-                    <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }} className="max-w-md w-full space-y-10">
+                <div className="w-full lg:w-[45%] min-h-[50vh] lg:min-h-full flex flex-col items-center justify-center px-6 pt-24 pb-12 lg:p-12 bg-white dark:bg-[#0a0a0a] lg:bg-transparent lg:dark:bg-transparent">
+                    <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }} className="max-w-md w-full space-y-8 lg:space-y-10">
                         <div className="space-y-2">
                             <span className="inline-block py-1 px-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">Текущий тариф</span>
-                            <h2 className="text-6xl md:text-7xl font-black text-slate-900 dark:text-white tracking-tighter">FREE<span className="text-slate-400">.</span></h2>
+                            <h2 className="text-5xl sm:text-6xl md:text-7xl font-black text-slate-900 dark:text-white tracking-tighter">FREE<span className="text-slate-400">.</span></h2>
                             <p className="text-slate-500 font-medium">Базовые возможности для начала.</p>
                         </div>
-                        <ul className="space-y-6">
+                        <ul className="space-y-4 lg:space-y-6">
                             {["Full HD 1080p", "Стандартный плеер", "Общий каталог", "Стандартный стиль сайта", "Обычный никнейм"].map((item, i) => (
-                                <li key={i} className="flex items-center gap-4 text-slate-600 dark:text-slate-300 font-bold text-base">
+                                <li key={i} className="flex items-center gap-4 text-slate-600 dark:text-slate-300 font-bold text-sm sm:text-base">
                                     <div className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-500"><FaCheck className="text-sm" /></div>
                                     {item}
                                 </li>
@@ -89,38 +88,38 @@ export default function PremiumAuthPage() {
                     </motion.div>
                 </div>
 
-                <div className="w-full lg:flex-1 min-h-[50vh] lg:min-h-full flex flex-col items-center justify-center p-8 lg:p-12 bg-[#010606] lg:bg-transparent relative overflow-hidden lg:overflow-visible">
+                <div className="w-full lg:flex-1 min-h-[50vh] lg:min-h-full flex flex-col items-center justify-center px-6 py-12 lg:p-12 bg-[#010606] lg:bg-transparent relative overflow-hidden lg:overflow-visible">
                     <div className="relative z-10 max-w-md w-full text-white">
-                        <div className="space-y-8">
-                            <div className="flex items-center gap-5">
+                        <div className="space-y-6 lg:space-y-8">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
                                 <motion.div animate={{ y: [0, -9, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
-                                    <RiVipCrownFill className="text-white text-5xl drop-shadow-md" />
+                                    <RiVipCrownFill className="text-white text-4xl sm:text-5xl drop-shadow-md" />
                                 </motion.div>
                                 <div>
-                                    <h2 className="text-6xl font-black italic tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-white to-[#a7ffeb] w-[285px]!">
+                                    <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black italic tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-white to-[#a7ffeb] w-full sm:w-[285px]!">
                                         PREMIUM
                                     </h2>
-                                    <p className="text-white/80 font-bold tracking-widest text-xs uppercase mt-1">AniYume возможности</p>
+                                    <p className="text-white/80 font-bold tracking-widest text-[10px] sm:text-xs uppercase mt-1">AniYume возможности</p>
                                 </div>
                             </div>
 
-                            <p className="text-lg font-medium text-white/95 leading-relaxed">Разблокируй истинный потенциал своего профиля и смотри без границ.</p>
+                            <p className="text-base sm:text-lg font-medium text-white/95 leading-relaxed">Разблокируй истинный потенциал своего профиля и смотри без границ.</p>
 
-                            <motion.ul variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
+                            <motion.ul variants={containerVariants} initial="hidden" animate="show" className="space-y-5 lg:space-y-6">
                                 {[
                                     { icon: <HiGif />, t: "GIF Аватарки", d: "Живой профиль" },
-                                    { icon: <BsFillPeopleFill />, t: "Увеличенный совместный просмотр", d: "До 10 человек одновременно" },
+                                    { icon: <BsFillPeopleFill />, t: "Совместный просмотр", d: "До 10 человек одновременно" },
                                     { icon: <FaMagic />, t: "Свои темы", d: "Персональный стиль сайта" },
                                     { icon: <HiCursorClick />, t: "Уникальные курсоры мыши", d: "Выделяйся в каждом клике" },
                                     { icon: <FaShieldAlt />, t: "Приоритетная поддержка", d: "Помощь в первую очередь" },
                                 ].map((item, i) => (
-                                    <motion.li key={i} variants={itemVariants} className="flex items-center gap-5 group">
-                                        <div className="shrink-0 p-3 rounded-full bg-white/10 text-[#fdfefe] shadow-lg group-hover:bg-[#f1f1f1] group-hover:text-[#16758a] transition-all duration-300">
-                                            <div className="text-xl">{item.icon}</div>
+                                    <motion.li key={i} variants={itemVariants} className="flex items-center gap-4 sm:gap-5 group">
+                                        <div className="shrink-0 p-2.5 sm:p-3 rounded-full bg-white/10 text-[#fdfefe] shadow-lg group-hover:bg-[#f1f1f1] group-hover:text-[#16758a] transition-all duration-300">
+                                            <div className="text-lg sm:text-xl">{item.icon}</div>
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-lg font-bold text-white tracking-tight leading-none">{item.t}</span>
-                                            <span className="text-sm font-medium text-white/60 mt-1">{item.d}</span>
+                                            <span className="text-base sm:text-lg font-bold text-white tracking-tight leading-none">{item.t}</span>
+                                            <span className="text-xs sm:text-sm font-medium text-white/60 mt-1">{item.d}</span>
                                         </div>
                                     </motion.li>
                                 ))}
@@ -129,14 +128,14 @@ export default function PremiumAuthPage() {
                             <motion.div
                                 whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(0,0,0,0.3)" }}
                                 whileTap={{ scale: 0.98 }}
-                                className="w-full mt-4"
+                                className="w-full mt-6 lg:mt-4"
                             >
                                 <Link
                                     href="https://boosty.to/aniyume"
-                                    className="block w-full bg-white text-[#168a7f] py-5 rounded-2xl font-black uppercase tracking-[0.15em] shadow-xl transition-all relative overflow-hidden group text-center"
+                                    className="block w-full bg-white text-[#168a7f] py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.15em] shadow-xl transition-all relative overflow-hidden group text-center"
                                 >
-                                    <span className="relative z-10 flex items-center justify-center gap-2">
-                                        Получить за 199₽ <span className="text-xs opacity-60">/ мес</span>
+                                    <span className="relative z-10 flex items-center justify-center gap-1 sm:gap-2">
+                                        Получить за 199₽ <span className="text-[10px] sm:text-xs opacity-60">/ мес</span>
                                     </span>
                                     <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-black/5 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
                                 </Link>
@@ -148,9 +147,9 @@ export default function PremiumAuthPage() {
 
             <style dangerouslySetInnerHTML={{
                 __html: `
-                @keyframes shimmer { 100% { transform: translateX(100%); } }
-                @keyframes gradient-xy { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-            `}} />
+            @keyframes shimmer { 100% { transform: translateX(100%); } }
+            @keyframes gradient-xy { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        `}} />
         </div>
     );
 }
