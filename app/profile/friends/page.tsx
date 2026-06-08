@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlay, FaPlus, FaUsers, FaSearch, FaTimes } from 'react-icons/fa';
+import { FaPlay, FaPlus, FaUsers, FaSearch, FaTimes, FaCommentAlt } from 'react-icons/fa';
 import AddFriendModal from '@/components/modals/AddFriendModal';
 import FriendRequestsModal from '@/components/modals/FriendRequestsModal';
 import { useRouter } from 'next/navigation';
@@ -343,14 +343,23 @@ export default function FriendsPage() {
                                         {u.name}
                                     </button>
 
-                                    <button
-                                        onClick={() => router.push('/watch')}
-                                        className="w-full h-[54px] bg-brand text-white dark:text-black rounded-2xl relative overflow-hidden transition-all active:scale-95 shadow-lg shadow-brand/10 hover:brightness-110 flex items-center justify-center gap-3"
-                                    >
-                                        <span className="relative z-10 flex items-center justify-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] italic">
-                                            <FaPlay size={8} className="fill-current" /> Пригласить
-                                        </span>
-                                    </button>
+                                    <div className="flex gap-2 w-full mt-2">
+                                        <button
+                                            onClick={() => router.push(`/chat/${u.id}`)}
+                                            className="flex-1 h-[48px] bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-900 dark:text-white rounded-xl relative overflow-hidden transition-all active:scale-95 flex items-center justify-center gap-2 border border-transparent hover:border-brand/30 group"
+                                        >
+                                            <FaCommentAlt size={12} className="text-gray-400 group-hover:text-brand transition-colors" />
+                                            <span className="text-[10px] font-black uppercase tracking-[0.1em] italic">Чат</span>
+                                        </button>
+
+                                        <button
+                                            onClick={() => router.push('/watch')}
+                                            className="flex-[1.5] h-[48px] bg-brand text-white dark:text-black rounded-xl relative overflow-hidden transition-all active:scale-95 shadow-lg shadow-brand/20 hover:brightness-110 flex items-center justify-center gap-2"
+                                        >
+                                            <FaPlay size={10} className="fill-current" />
+                                            <span className="text-[10px] font-black uppercase tracking-[0.1em] italic">Позвать</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </motion.div>
                         ))
