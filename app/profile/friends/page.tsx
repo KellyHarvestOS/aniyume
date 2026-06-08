@@ -345,7 +345,7 @@ export default function FriendsPage() {
 
                                     <div className="flex gap-2 w-full mt-2">
                                         <button
-                                            onClick={() => router.push(`/chat/${u.id}`)}
+                                            onClick={() => router.push(`/profile/friends/chat/${u.id}`)}
                                             className="flex-1 h-[48px] bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-900 dark:text-white rounded-xl relative overflow-hidden transition-all active:scale-95 flex items-center justify-center gap-2 border border-transparent hover:border-brand/30 group"
                                         >
                                             <FaCommentAlt size={12} className="text-gray-400 group-hover:text-brand transition-colors" />
