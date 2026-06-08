@@ -12,6 +12,7 @@ import { GiMagicAxe } from "react-icons/gi";
 import { BsCursor } from "react-icons/bs";
 import { HiCursorClick } from "react-icons/hi";
 import { getAvatarUrl } from "@/lib/storage";
+import { getAvatarFrameFit } from "@/lib/avatarFrames";
 
 const MAX_SOCIAL_LINKS = 10;
 
@@ -98,6 +99,27 @@ export default function EditProfilePage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [tempImage, setTempImage] = useState<string | null>(null);
   const [isCropOpen, setIsCropOpen] = useState(false);
+
+  const [avatarFramePath, setAvatarFramePath] = useState<string | null>(null);
+  const [avatarFrameKey, setAvatarFrameKey] = useState("none");
+  const avatarFrameFit = getAvatarFrameFit(avatarFrameKey);
+
+  useEffect(() => {
+    const syncAvatarFrame = () => {
+      setAvatarFramePath(localStorage.getItem("profile_avatar_frame_path"));
+      setAvatarFrameKey(
+        localStorage.getItem("profile_avatar_frame_key") || "none"
+      );
+    };
+
+    syncAvatarFrame();
+
+    window.addEventListener("storage", syncAvatarFrame);
+
+    return () => {
+      window.removeEventListener("storage", syncAvatarFrame);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchCurrentData = async () => {
@@ -279,47 +301,93 @@ export default function EditProfilePage() {
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col relative overflow-y-auto custom-scrollbar border-b border-slate-300 dark:border-white/15">
           <div className="max-w-4xl w-full mx-auto p-6 md:p-12 space-y-12">
 
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 pb-10 border-b border-slate-100 dark:border-white/5">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
-                <div className="relative group">
-                  <div className="absolute -inset-2 bg-brand rounded-full blur opacity-10 group-hover:opacity-30 transition duration-700"></div>
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
+              <div className="relative group">
+                <div className="absolute -inset-2 bg-brand rounded-full blur opacity-10 group-hover:opacity-30 transition duration-700"></div>
+
+                <div className="relative w-32 h-32">
                   <div className="relative w-32 h-32 rounded-full overflow-hidden ring-4 ring-brand shadow-xl">
                     {previewUrl ? (
-                      <img src={previewUrl} className="w-full h-full object-cover" alt="avatar" />
+                      <img
+                        src={previewUrl}
+                        className="w-full h-full object-cover"
+                        alt="avatar"
+                      />
                     ) : (
                       <div className="w-full h-full bg-slate-100 dark:bg-[#1a1a1a] flex items-center justify-center text-slate-400 dark:text-white text-4xl font-bold">
                         {formData.name[0]?.toUpperCase()}
                       </div>
                     )}
-                    <button type="button" onClick={() => fileInputRef.current?.click()} className="absolute inset-0 bg-slate-900/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute inset-0 bg-slate-900/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
+                    >
                       <FaPencilAlt className="text-brand w-6 h-6 mb-1" />
-                      <span className="text-[10px] font-black text-white uppercase">Изменить</span>
+                      <span className="text-[10px] font-black text-white uppercase">
+                        Изменить
+                      </span>
                     </button>
                   </div>
-                  <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
+
+                  {avatarFramePath && (
+                    <div
+                      className="pointer-events-none absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2"
+                      style={{
+                        height: avatarFrameFit.height || avatarFrameFit.size,
+                        width: avatarFrameFit.width || avatarFrameFit.size,
+                        marginLeft: avatarFrameFit.x || "0px",
+                        marginTop: avatarFrameFit.y || "0px",
+                      }}
+                    >
+                      <img
+                        src={avatarFramePath}
+                        alt=""
+                        className="h-full w-full object-contain"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
 
-                <div className="space-y-1">
-                  <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-                    Фото профиля
-                    {isPremium && (
-                      <span className="text-[10px] bg-gray-200 text-brand border border-gray-300 px-2 py-0.5 rounded-full uppercase tracking-tighter">Premium</span>
-                    )}
-                  </h3>
-                  <p className="text-sm text-slate-500 dark:text-gray-400 max-w-sm">
-                    Используйте уникальное изображение. <br className="hidden md:block" />
-                    Поддерживаются <span className="text-brand font-bold">JPG • PNG {isPremium && "• GIF"}</span>.
-                  </p>
-                </div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                  accept="image/*"
+                />
               </div>
 
-              {isPremium && (
-                <Link href="/profile/edit/premiumEdit" className="flex items-center gap-3 px-8 py-4 bg-brand text-white dark:text-black rounded-lg font-black text-[11px] uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-xl shadow-black/10 whitespace-nowrap">
-                  <SiCodemagic className="text-white dark:text-black text-lg" />
-                  Кастомизация
-                </Link>
-              )}
+              <div className="space-y-1">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  Фото профиля
+                  {isPremium && (
+                    <span className="text-[10px] bg-gray-200 text-brand border border-gray-300 px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                      Premium
+                    </span>
+                  )}
+                </h3>
+
+                <p className="text-sm text-slate-500 dark:text-gray-400 max-w-sm">
+                  Используйте уникальное изображение.
+                  <br className="hidden md:block" />
+                  Поддерживаются{" "}
+                  <span className="text-brand font-bold">
+                    JPG • PNG {isPremium && "• GIF"}
+                  </span>
+                </p>
+              </div>
             </div>
+            {isPremium && (
+              <Link href="/profile/edit/premiumEdit" className="flex items-center gap-3 px-8 py-4 bg-brand text-white dark:text-black rounded-lg font-black text-[11px] uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-xl shadow-black/10 whitespace-nowrap">
+                <SiCodemagic className="text-white dark:text-black text-lg" />
+                Кастомизация
+              </Link>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
               <div className="space-y-3">
@@ -336,7 +404,7 @@ export default function EditProfilePage() {
                 <input type="text" value={formData.status_text} onChange={(e) => setFormData({ ...formData, status_text: e.target.value })} className="w-full px-6 py-4 bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-white/5 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white dark:focus:bg-[#1a1a1a] transition-all shadow-sm" placeholder="Ваш статус" />
               </div>
 
-          
+
 
               <div className="md:col-span-2 space-y-3">
                 <div className="flex items-center justify-between gap-4">
@@ -452,7 +520,7 @@ export default function EditProfilePage() {
             </div>
           </div>
         </form>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
