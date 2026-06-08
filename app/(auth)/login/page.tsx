@@ -10,6 +10,8 @@ import { useAuth } from '@/contexts/AuthContext';
 
 type AuthResponse = {
   message?: string;
+  ban_reason?: string | null;
+  ban_expires_at?: string | null;
   token?: string;
   access_token?: string;
   user?: unknown;
@@ -32,6 +34,12 @@ const getErrorMessage = (error: unknown) => {
   if (error instanceof Error) return error.message;
   if (typeof error === 'string') return error;
   return 'Не удалось войти. Попробуйте позже.';
+};
+
+const formatBanMessage = (response: AuthResponse) => {
+  if (!response.ban_reason && !response.ban_expires_at) return response.message || 'Аккаунт заблокирован.';
+  const until = response.ban_expires_at ? ` Срок: до ${new Date(response.ban_expires_at).toLocaleString('ru-RU')}.` : ' Срок: навсегда.';
+  return `${response.message || 'Аккаунт заблокирован.'}${response.ban_reason ? ` Причина: ${response.ban_reason}.` : ''}${until}`;
 };
 
 const readJson = async (res: Response): Promise<AuthResponse> => {
@@ -124,7 +132,7 @@ const LoginPage = () => {
       const responseData = await readJson(res);
 
       if (!res.ok) {
-        throw new Error(responseData.message || 'Неверный логин или пароль');
+        throw new Error(res.status === 403 ? formatBanMessage(responseData) : responseData.message || 'Неверный логин или пароль');
       }
 
       const token = responseData.data?.token || responseData.data?.access_token || responseData.token || responseData.access_token;

@@ -64,6 +64,15 @@ async function apiClient(path: string, options: RequestInit = {}): Promise<Respo
 
   try {
     const response = await fetch(url, { ...options, headers });
+
+    if (response.status === 403 && typeof window !== 'undefined') {
+      const errorBody = await response.clone().json().catch(() => null) as { message?: string; ban_reason?: string | null; ban_expires_at?: string | null } | null;
+      if (errorBody?.message?.toLowerCase().includes('заблокирован')) {
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('isPremium');
+        window.dispatchEvent(new CustomEvent('auth:banned', { detail: errorBody }));
+      }
+    }
     
     if (process.env.NODE_ENV === 'development') {
       if (!response.ok) {

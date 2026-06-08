@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlay, FaPlus, FaUsers, FaChartLine, FaSearch, FaTimes, FaClock } from 'react-icons/fa';
+import { FaPlay, FaPlus, FaUsers, FaSearch, FaTimes } from 'react-icons/fa';
 import AddFriendModal from '@/components/modals/AddFriendModal';
 import FriendRequestsModal from '@/components/modals/FriendRequestsModal';
 import { useRouter } from 'next/navigation';
@@ -16,15 +16,7 @@ interface FriendUser {
     avatar: string | null;
     custom_status: string | null;
     is_online: boolean;
-    watching?: string;
-    progress?: number;
-}
-
-type FriendStatus = 'none' | 'pending' | 'accepted';
-
-interface SearchUser extends FriendUser {
-    friendship_status?: FriendStatus;
-    is_sender?: boolean;
+    selected_profile_frame?: string | null;
 }
 
 export default function FriendsPage() {
@@ -39,8 +31,6 @@ export default function FriendsPage() {
     const [friends, setFriends] = useState<FriendUser[]>([]);
     const [incoming, setIncoming] = useState<FriendUser[]>([]);
     const [outgoing, setOutgoing] = useState<FriendUser[]>([]);
-    const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
-    const [isSearching, setIsSearching] = useState(false);
     const [loadingIds, setLoadingIds] = useState<number[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -54,62 +44,44 @@ export default function FriendsPage() {
         }
     }, [user, authLoading, router]);
 
-    useEffect(() => {
-        const loadData = async () => {
-            setIsLoading(true);
-            try {
-                const [friendsRes, requestsRes] = await Promise.all([
-                    api.get('/friends').then(r => r.json()),
-                    api.get('/friends/requests').then(r => r.json()),
-                ]);
-                if (Array.isArray(friendsRes)) setFriends(friendsRes);
-                if (requestsRes?.incoming) setIncoming(requestsRes.incoming);
-                if (requestsRes?.outgoing) setOutgoing(requestsRes.outgoing);
-            } catch (err) {
-                console.error("Failed to load friends", err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+    const loadData = async () => {
+        setIsLoading(true);
+        try {
+            const [friendsRes, requestsRes] = await Promise.all([
+                api.get('/friends').then(r => r.json()),
+                api.get('/friends/requests').then(r => r.json()),
+            ]);
+            if (Array.isArray(friendsRes)) setFriends(friendsRes);
+            if (requestsRes?.incoming) setIncoming(requestsRes.incoming);
+            if (requestsRes?.outgoing) setOutgoing(requestsRes.outgoing);
+        } catch (err) {
+            console.error("Failed to load friends", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
+    useEffect(() => {
         if (user) loadData();
     }, [user]);
 
-    // Поиск пользователей с debounce
-    useEffect(() => {
-        if (searchQuery.length < 2) {
-            setSearchResults([]);
-            return;
-        }
-        setIsSearching(true);
-        const timer = setTimeout(async () => {
-            try {
-                const res = await api.get(`/users/search?q=${encodeURIComponent(searchQuery)}`);
-                const data = await res.json();
-                if (Array.isArray(data)) setSearchResults(data);
-            } catch {
-            } finally {
-                setIsSearching(false);
-            }
-        }, 400);
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
+    // Добавление нового друга по точному нику (через модалку)
+    const sendRequestByNickname = async (nickname: string) => {
+        const res = await api.post('/friends/by-nickname', { nickname });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Не удалось отправить запрос');
 
-    const sendRequest = async (userId: number) => {
-        setLoading(userId, true);
-        try {
-            await api.post(`/friends/${userId}`, {});
-            setOutgoing(prev => [...prev, searchResults.find(u => u.id === userId)!].filter(Boolean));
-            setSearchResults(prev => prev.map(u => u.id === userId ? { ...u, friendship_status: 'pending', is_sender: true } : u));
-        } finally {
-            setLoading(userId, false);
-        }
+        await loadData();
     };
 
     const acceptRequest = async (userId: number) => {
         setLoading(userId, true);
         try {
-            await api.post(`/friends/${userId}/accept`, {});
+            const res = await api.post(`/friends/${userId}/accept`, {});
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.message || 'Не удалось принять заявку');
+            }
             const accepted = incoming.find(u => u.id === userId);
             if (accepted) {
                 setFriends(prev => [...prev, accepted]);
@@ -123,7 +95,11 @@ export default function FriendsPage() {
     const declineRequest = async (userId: number) => {
         setLoading(userId, true);
         try {
-            await api.post(`/friends/${userId}/decline`, {});
+            const res = await api.post(`/friends/${userId}/decline`, {});
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.message || 'Не удалось удалить');
+            }
             setIncoming(prev => prev.filter(u => u.id !== userId));
             setFriends(prev => prev.filter(u => u.id !== userId));
         } finally {
@@ -134,22 +110,33 @@ export default function FriendsPage() {
     const cancelOutgoing = async (userId: number) => {
         setLoading(userId, true);
         try {
-            await api.post(`/friends/${userId}/decline`, {});
+            const res = await api.post(`/friends/${userId}/decline`, {});
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.message || 'Не удалось отменить заявку');
+            }
             setOutgoing(prev => prev.filter(u => u.id !== userId));
         } finally {
             setLoading(userId, false);
         }
     };
 
-    const getAvatar = (u: FriendUser | SearchUser) => {
+    const openProfile = (userId: number) => {
+        router.push(`/users/${userId}`);
+    };
+
+    const getAvatar = (u: FriendUser) => {
         if (u.avatar) {
             return getStorageAssetUrl(u.avatar) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.id}`;
         }
         return `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.id}`;
     };
 
-    const isSearchMode = searchQuery.length >= 2;
-    const gridItems = isSearchMode ? searchResults : friends;
+    const isSearchMode = searchQuery.trim().length > 0;
+    const query = searchQuery.trim().toLowerCase();
+    const filteredFriends = isSearchMode
+        ? friends.filter(f => f.name.toLowerCase().includes(query) || String(f.id) === query)
+        : friends;
 
     return (
         <div className="min-h-screen bg-white dark:bg-[#111111] transition-colors pb-12 overflow-hidden relative">
@@ -174,13 +161,6 @@ export default function FriendsPage() {
                     margin-right: 6px;
                 }
 
-                .progress-bar {
-                    height: 3px;
-                    background: rgba(var(--brand-main-rgb, 33 208 184) / 0.1);
-                    border-radius: 10px;
-                    overflow: hidden;
-                }
-
                 .search-input:focus + .search-line {
                     width: 100%;
                 }
@@ -198,8 +178,8 @@ export default function FriendsPage() {
             <div className="container mx-auto px-4 md:px-20 pt-5 mb-8 relative z-10">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-gray-100 dark:border-white/5 pb-5">
                     <div>
-                        <h1 className="text-5xl font-black uppercase  tracking-tighter text-gray-900 dark:text-white leading-none">
-                            {isSearchMode ? 'Поиск ' : 'Мои '} <span className="text-brand">{isSearchMode ? 'Людей' : 'Друзья'}</span>
+                        <h1 className="text-5xl font-black uppercase tracking-tighter text-gray-900 dark:text-white leading-none">
+                            Мои <span className="text-brand">Друзья</span>
                         </h1>
                         <p className="mt-3 text-gray-400 font-bold uppercase tracking-[0.5em] text-[10px] ml-1">
                             {friends.filter(f => f.is_online).length} ОНЛАЙН • {friends.length} ВСЕГО
@@ -207,6 +187,7 @@ export default function FriendsPage() {
                     </div>
 
                     <div className="flex items-center gap-4">
+                        {/* Кнопка входящих заявок с счётчиком */}
                         <button
                             onClick={() => setIsRequestModalOpen(true)}
                             className="relative w-12 h-12 rounded-2xl bg-gray-100 dark:bg-white/5 flex items-center justify-center text-gray-500 hover:text-brand border border-transparent hover:border-brand-simple transition-all group shadow-inner"
@@ -248,15 +229,13 @@ export default function FriendsPage() {
                             <FaTimes size={14} />
                         </button>
                     )}
-                    {isSearching && (
-                        <div className="absolute right-10 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 border-brand/30 border-t-brand animate-spin" />
-                    )}
                     <div className="search-line absolute bottom-0 left-0 h-0.5 w-0 bg-brand transition-all duration-500" />
                 </div>
             </div>
 
             <div className="container mx-auto px-4 md:px-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 <AnimatePresence mode='popLayout'>
+                    {/* Входящие заявки (не в режиме поиска) */}
                     {!isSearchMode && incoming.map((u) => (
                         <motion.div
                             layout
@@ -271,12 +250,12 @@ export default function FriendsPage() {
                             </div>
 
                             <div className="flex flex-col items-center mt-6">
-                                <div className="w-24 h-24 rounded-full border-2 border-brand/30 p-1.5 mb-6">
+                                <button type="button" onClick={() => openProfile(u.id)} className="w-24 h-24 rounded-full border-2 border-brand/30 p-1.5 mb-6">
                                     <img src={getAvatar(u)} alt={u.name} className="w-full h-full rounded-full object-cover bg-gray-50 dark:bg-white/5" />
-                                </div>
-                                <h3 className="text-2xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white mb-6">
+                                </button>
+                                <button type="button" onClick={() => openProfile(u.id)} className="text-2xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white mb-6">
                                     {u.name}
-                                </h3>
+                                </button>
 
                                 <div className="flex gap-2 w-full">
                                     <button
@@ -311,12 +290,12 @@ export default function FriendsPage() {
                             </div>
 
                             <div className="flex flex-col items-center mt-6">
-                                <div className="w-24 h-24 rounded-full border border-gray-400/30 p-1.5 mb-6 grayscale">
+                                <button type="button" onClick={() => openProfile(u.id)} className="w-24 h-24 rounded-full border border-gray-400/30 p-1.5 mb-6 grayscale">
                                     <img src={getAvatar(u)} alt={u.name} className="w-full h-full rounded-full object-cover bg-gray-50 dark:bg-white/5" />
-                                </div>
-                                <h3 className="text-2xl font-black uppercase italic tracking-tighter text-gray-500 mb-6">
+                                </button>
+                                <button type="button" onClick={() => openProfile(u.id)} className="text-2xl font-black uppercase italic tracking-tighter text-gray-500 mb-6">
                                     {u.name}
-                                </h3>
+                                </button>
 
                                 <button
                                     onClick={() => cancelOutgoing(u.id)}
@@ -328,53 +307,42 @@ export default function FriendsPage() {
                         </motion.div>
                     ))}
 
-                    {/* Основная сетка: друзья или результаты поиска */}
+                    {/* Основная сетка: друзья (с учётом локального поиска) */}
                     {isLoading && !isSearchMode ? (
                         <div className="col-span-full py-20 text-center">
                             <div className="w-12 h-12 rounded-full border-4 border-brand/30 border-t-brand animate-spin mx-auto" />
                         </div>
-                    ) : gridItems.length > 0 ? (
-                        gridItems.map((u) => {
-                            const isSearchItem = 'friendship_status' in u;
+                    ) : filteredFriends.length > 0 ? (
+                        filteredFriends.map((u) => (
+                            <motion.div
+                                layout
+                                key={u.id}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                whileHover={{ y: -8 }}
+                                className="custom-glass rounded-lg p-8 border border-white/5 hover:border-brand/30 transition-all duration-300 relative group"
+                            >
+                                <div className="absolute top-8 left-8">
+                                    <span className="text-[9px] font-black text-gray-500 dark:text-white/20">ID: {u.id}</span>
+                                </div>
 
-                            let actionButton = null;
+                                <div className="absolute top-8 right-8 flex items-center">
+                                    <span className={`status-dot ${u.is_online ? 'bg-brand' : 'bg-gray-400'}`} />
+                                    <span className="text-[9px] font-black uppercase text-gray-400 tracking-tighter">
+                                        {u.is_online ? 'В сети' : (u.custom_status || 'Оффлайн')}
+                                    </span>
+                                </div>
 
-                            if (isSearchItem) {
-                                const searchUser = u as SearchUser;
-                                const isFriend = friends.some(f => f.id === u.id);
-                                const isPendingOutgoing = outgoing.some(f => f.id === u.id) || (searchUser.friendship_status === 'pending' && searchUser.is_sender);
-                                const isPendingIncoming = incoming.some(f => f.id === u.id);
+                                <div className="flex flex-col items-center">
+                                    <button type="button" onClick={() => openProfile(u.id)} className="w-24 h-24 rounded-full border border-gray-100 dark:border-white/5 p-1.5 mb-6 mt-4">
+                                        <img src={getAvatar(u)} alt={u.name} className="w-full h-full rounded-full object-cover bg-gray-50 dark:bg-white/5" />
+                                    </button>
 
-                                if (isFriend) {
-                                    actionButton = (
-                                        <button className="w-full h-12 bg-white/5 text-emerald-400 rounded-2xl font-bold text-xs italic tracking-widest cursor-default">
-                                            УЖЕ В ДРУЗЬЯХ
-                                        </button>
-                                    );
-                                } else if (isPendingIncoming) {
-                                    actionButton = (
-                                        <button onClick={() => acceptRequest(u.id)} className="w-full h-12 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-500/30 transition-all">
-                                            ПРИНЯТЬ ЗАЯВКУ
-                                        </button>
-                                    );
-                                } else if (isPendingOutgoing) {
-                                    actionButton = (
-                                        <button className="w-full h-12 bg-white/5 text-gray-400 rounded-2xl font-bold text-xs uppercase tracking-widest cursor-default flex items-center justify-center gap-2">
-                                            <FaClock /> ЗАЯВКА ОТПРАВЛЕНА
-                                        </button>
-                                    );
-                                } else {
-                                    actionButton = (
-                                        <button
-                                            onClick={() => sendRequest(u.id)}
-                                            disabled={loadingIds.includes(u.id)}
-                                            className="w-full h-12 bg-transparent border-2 border-brand text-brand hover:bg-brand hover:text-white rounded-2xl font-bold text-xs uppercase tracking-widest transition-all disabled:opacity-50">
-                                            ДОБАВИТЬ
-                                        </button>
-                                    );
-                                }
-                            } else {
-                                actionButton = (
+                                    <button type="button" onClick={() => openProfile(u.id)} className="text-2xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white mb-8 group-hover:text-brand transition-colors">
+                                        {u.name}
+                                    </button>
+
                                     <button
                                         onClick={() => router.push('/watch')}
                                         className="w-full h-[54px] bg-brand text-white dark:text-black rounded-2xl relative overflow-hidden transition-all active:scale-95 shadow-lg shadow-brand/10 hover:brightness-110 flex items-center justify-center gap-3"
@@ -383,87 +351,17 @@ export default function FriendsPage() {
                                             <FaPlay size={8} className="fill-current" /> Пригласить
                                         </span>
                                     </button>
-                                );
-                            }
-
-                            return (
-                                <motion.div
-                                    layout
-                                    key={u.id}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    whileHover={{ y: -8 }}
-                                    className="custom-glass rounded-lg p-8 border border-white/5 hover:border-brand/30 transition-all duration-300 relative group"
-                                >
-                                    <div className="absolute top-8 left-8">
-                                        <span className="text-[9px] font-black text-gray-500 dark:text-white/20">Имя:</span>
-                                    </div>
-
-                                    <div className="absolute top-8 right-8 flex items-center">
-                                        <span className={`status-dot ${u.is_online ? 'bg-brand' : 'bg-gray-400'}`} />
-                                        <span className="text-[9px] font-black uppercase text-gray-400 tracking-tighter">
-                                            {u.is_online ? 'В сети' : (u.custom_status || 'Оффлайн')}
-                                        </span>
-                                    </div>
-
-                                    <div className="flex flex-col items-center">
-                                        <div className="w-24 h-24 rounded-full border border-gray-100 dark:border-white/5 p-1.5 mb-6">
-                                            <img src={getAvatar(u)} alt={u.name} className="w-full h-full rounded-full object-cover bg-gray-50 dark:bg-white/5" />
-                                        </div>
-
-                                        <h3 className="text-2xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white mb-2 group-hover:text-brand transition-colors">
-                                            {u.name || "Пользователь"}
-                                        </h3>
-
-                                        <div className="flex items-center gap-4 mb-8">
-                                            <div className="flex items-center gap-1.5 text-gray-400">
-                                                <FaChartLine size={10} />
-                                                <span className="text-[10px] font-bold">УР 1</span>
-                                            </div>
-                                            <div className="w-1 h-1 bg-gray-300 dark:bg-white/10 rounded-full" />
-                                            <div className="flex items-center gap-1.5 text-gray-400">
-                                                <FaUsers size={10} />
-                                                <span className="text-[10px] font-bold">Активен</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="w-full space-y-3 mb-10 h-10">
-                                            {u.watching ? (
-                                                <>
-                                                    <div className="flex justify-between items-end">
-                                                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Смотрит</p>
-                                                        <p className="text-[10px] font-black text-brand">{u.progress || 0}%</p>
-                                                    </div>
-                                                    <p className="text-xs font-bold text-gray-800 dark:text-gray-200 italic truncate">
-                                                        {u.watching}
-                                                    </p>
-                                                    <div className="progress-bar">
-                                                        <motion.div
-                                                            initial={{ width: 0 }}
-                                                            animate={{ width: `${u.progress || 0}%` }}
-                                                            className="h-full bg-brand"
-                                                        />
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                <p className="text-xs text-center text-gray-500 italic pt-3 font-medium">Ничего не смотрит</p>
-                                            )}
-                                        </div>
-
-                                        {actionButton}
-                                    </div>
-                                </motion.div>
-                            );
-                        })
+                                </div>
+                            </motion.div>
+                        ))
                     ) : (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             className="col-span-full py-20 text-center"
                         >
-                            <p className="text-2xl font-black uppercase text-gray-400 tracking-tighter">
-                                {isSearchMode ? 'По вашему запросу ' : 'У вас пока нет '} <span className="text-brand">{isSearchMode ? 'ничего не найдено' : 'друзей'}</span>
+                            <p className="text-2xl font-black text-gray-400 tracking-tighter">
+                                {isSearchMode ? 'Среди друзей ' : 'У вас пока нет '} <span className="text-brand">{isSearchMode ? 'ничего не найдено' : 'друзей'}</span>
                             </p>
                         </motion.div>
                     )}
@@ -476,11 +374,19 @@ export default function FriendsPage() {
             <AddFriendModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                onSendByNickname={sendRequestByNickname}
             />
 
             <FriendRequestsModal
                 isOpen={isRequestModalOpen}
                 onClose={() => setIsRequestModalOpen(false)}
+                incoming={incoming}
+                outgoing={outgoing}
+                loadingIds={loadingIds}
+                getAvatar={getAvatar}
+                onAccept={acceptRequest}
+                onDecline={declineRequest}
+                onCancel={cancelOutgoing}
             />
         </div>
     );

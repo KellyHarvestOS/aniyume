@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Users, UserPlus, UserCheck, UserX, Clock, Check, X, Tv2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import JoinRoomModal from '@/components/watch-party/JoinRoomModal';
+import { getStorageAssetUrl } from '@/lib/storage';
 
 interface FriendUser {
   id: number;
@@ -23,16 +24,35 @@ interface SearchUser extends FriendUser {
   is_sender?: boolean;
 }
 
+interface FriendProfile {
+  user: SearchUser & {
+    is_premium?: boolean;
+    created_at?: string | null;
+  };
+  counts: {
+    friends: number;
+    comments: number;
+    ratings: number;
+    favorites: number;
+  };
+}
+
 export default function FriendsPage() {
   const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
+  const profileRequestSeq = useRef(0);
 
   const [friends, setFriends] = useState<FriendUser[]>([]);
   const [incoming, setIncoming] = useState<FriendUser[]>([]);
   const [outgoing, setOutgoing] = useState<FriendUser[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [nicknameError, setNicknameError] = useState('');
   const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
+  const [selectedProfile, setSelectedProfile] = useState<FriendProfile | null>(null);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [isSendingNickname, setIsSendingNickname] = useState(false);
   const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'search'>('friends');
   const [loadingIds, setLoadingIds] = useState<number[]>([]);
   const [showJoinModal, setShowJoinModal] = useState(false);
@@ -88,26 +108,56 @@ export default function FriendsPage() {
     setLoadingIds(prev => val ? [...prev, id] : prev.filter(x => x !== id));
   };
 
+  const responseError = async (res: Response, fallback: string) => {
+    const data = await res.json().catch(() => ({}));
+    return data?.message || fallback;
+  };
+
   const sendRequest = async (userId: number) => {
     setLoading(userId, true);
     try {
-      await api.post(`/friends/${userId}`, {});
-      setOutgoing(prev => [...prev, searchResults.find(u => u.id === userId)!].filter(Boolean));
+      const res = await api.post(`/friends/${userId}`, {});
+      if (!res.ok) throw new Error(await responseError(res, 'Не удалось отправить запрос'));
+      const found = searchResults.find(u => u.id === userId);
+      if (found) setOutgoing(prev => prev.some(u => u.id === userId) ? prev : [...prev, found]);
       setSearchResults(prev => prev.map(u => u.id === userId ? { ...u, friendship_status: 'pending', is_sender: true } : u));
     } finally {
       setLoading(userId, false);
     }
   };
 
+  const sendRequestByNickname = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const value = nickname.trim();
+    if (!value) return;
+
+    setIsSendingNickname(true);
+    setNicknameError('');
+    try {
+      const res = await api.post('/friends/by-nickname', { nickname: value });
+      if (!res.ok) throw new Error(await responseError(res, 'Не удалось отправить запрос'));
+      setNickname('');
+      setSearchQuery(value);
+      setActiveTab('requests');
+      await loadData();
+    } catch (err) {
+      setNicknameError(err instanceof Error ? err.message : 'Не удалось отправить запрос');
+    } finally {
+      setIsSendingNickname(false);
+    }
+  };
+
   const acceptRequest = async (userId: number) => {
     setLoading(userId, true);
     try {
-      await api.post(`/friends/${userId}/accept`, {});
+      const res = await api.post(`/friends/${userId}/accept`, {});
+      if (!res.ok) throw new Error(await responseError(res, 'Не удалось принять заявку'));
       const accepted = incoming.find(u => u.id === userId);
       if (accepted) {
-        setFriends(prev => [...prev, accepted]);
+        setFriends(prev => prev.some(u => u.id === userId) ? prev : [...prev, accepted]);
         setIncoming(prev => prev.filter(u => u.id !== userId));
       }
+      setSearchResults(prev => prev.map(u => u.id === userId ? { ...u, friendship_status: 'accepted', is_sender: false } : u));
     } finally {
       setLoading(userId, false);
     }
@@ -116,9 +166,11 @@ export default function FriendsPage() {
   const declineRequest = async (userId: number) => {
     setLoading(userId, true);
     try {
-      await api.post(`/friends/${userId}/decline`, {});
+      const res = await api.post(`/friends/${userId}/decline`, {});
+      if (!res.ok) throw new Error(await responseError(res, 'Не удалось удалить заявку'));
       setIncoming(prev => prev.filter(u => u.id !== userId));
       setFriends(prev => prev.filter(u => u.id !== userId));
+      setSearchResults(prev => prev.map(u => u.id === userId ? { ...u, friendship_status: 'none', is_sender: false } : u));
     } finally {
       setLoading(userId, false);
     }
@@ -127,11 +179,32 @@ export default function FriendsPage() {
   const cancelOutgoing = async (userId: number) => {
     setLoading(userId, true);
     try {
-      await api.post(`/friends/${userId}/decline`, {});
+      const res = await api.post(`/friends/${userId}/decline`, {});
+      if (!res.ok) throw new Error(await responseError(res, 'Не удалось отменить заявку'));
       setOutgoing(prev => prev.filter(u => u.id !== userId));
+      setSearchResults(prev => prev.map(u => u.id === userId ? { ...u, friendship_status: 'none', is_sender: false } : u));
     } finally {
       setLoading(userId, false);
     }
+  };
+
+  const openProfile = async (userId: number) => {
+    const requestSeq = profileRequestSeq.current + 1;
+    profileRequestSeq.current = requestSeq;
+    setIsProfileLoading(true);
+    try {
+      const res = await api.get(`/users/${userId}/profile`);
+      const data = await res.json();
+      if (res.ok && profileRequestSeq.current === requestSeq) setSelectedProfile(data);
+    } finally {
+      if (profileRequestSeq.current === requestSeq) setIsProfileLoading(false);
+    }
+  };
+
+  const closeProfile = () => {
+    profileRequestSeq.current += 1;
+    setSelectedProfile(null);
+    setIsProfileLoading(false);
   };
 
   const tabs = [
@@ -140,21 +213,64 @@ export default function FriendsPage() {
     { id: 'search' as const, label: 'Поиск', count: null },
   ];
 
-  const UserAvatar = ({ user, size = 10 }: { user: FriendUser | SearchUser; size?: number }) => (
-    <div className={`relative flex-shrink-0 w-${size} h-${size}`}>
-      <div className={`w-full h-full rounded-full overflow-hidden bg-white/10`}>
-        {user.avatar ? (
-          <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-base font-bold text-white/60">
-            {user.name[0]?.toUpperCase()}
-          </div>
+  const UserAvatar = ({ user, size = 10 }: { user: FriendUser | SearchUser; size?: number }) => {
+    const sizeClass = size === 16 ? 'w-16 h-16' : size === 12 ? 'w-12 h-12' : 'w-10 h-10';
+
+    return (
+      <div className={`relative flex-shrink-0 ${sizeClass}`}>
+        <div className="w-full h-full rounded-full overflow-hidden bg-white/10">
+          {user.avatar ? (
+            <img src={getStorageAssetUrl(user.avatar) || user.avatar} alt={user.name} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-base font-bold text-white/60">
+              {user.name[0]?.toUpperCase()}
+            </div>
+          )}
+        </div>
+        {user.is_online && (
+          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-[#070b14]" />
         )}
       </div>
-      {user.is_online && (
-        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-[#070b14]" />
+    );
+  };
+
+  const ProfileModal = () => (
+    <AnimatePresence>
+      {(selectedProfile || isProfileLoading) && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeProfile} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+          <motion.div initial={{ scale: 0.96, opacity: 0, y: 16 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.96, opacity: 0, y: 16 }} className="relative w-full max-w-md rounded-3xl border border-white/10 bg-[#070b14] shadow-2xl overflow-hidden">
+            <button type="button" onClick={closeProfile} className="absolute right-4 top-4 z-10 w-10 h-10 rounded-xl bg-white/5 text-white/50 hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center">
+              <X className="w-5 h-5" />
+            </button>
+            {isProfileLoading && !selectedProfile ? (
+              <div className="p-14 flex justify-center">
+                <div className="w-10 h-10 rounded-full border-2 border-[#00E2C4]/25 border-t-[#00E2C4] animate-spin" />
+              </div>
+            ) : selectedProfile ? (
+              <div className="p-8">
+                <div className="flex flex-col items-center text-center">
+                  <UserAvatar user={selectedProfile.user} size={16} />
+                  <h2 className="mt-5 text-2xl font-bold text-white">{selectedProfile.user.name}</h2>
+                  <p className={`mt-1 text-sm ${selectedProfile.user.is_online ? 'text-green-400' : 'text-white/40'}`}>
+                    {selectedProfile.user.custom_status || (selectedProfile.user.is_online ? 'В сети' : 'Не в сети')}
+                  </p>
+                </div>
+                <div className="grid grid-cols-4 gap-2 mt-8">
+                  <div className="rounded-2xl bg-white/5 p-3 text-center"><p className="text-[#00E2C4] font-bold">{selectedProfile.counts.friends}</p><p className="text-[10px] text-white/35">друзья</p></div>
+                  <div className="rounded-2xl bg-white/5 p-3 text-center"><p className="text-[#00E2C4] font-bold">{selectedProfile.counts.comments}</p><p className="text-[10px] text-white/35">комм.</p></div>
+                  <div className="rounded-2xl bg-white/5 p-3 text-center"><p className="text-[#00E2C4] font-bold">{selectedProfile.counts.ratings}</p><p className="text-[10px] text-white/35">оценки</p></div>
+                  <div className="rounded-2xl bg-white/5 p-3 text-center"><p className="text-[#00E2C4] font-bold">{selectedProfile.counts.favorites}</p><p className="text-[10px] text-white/35">избр.</p></div>
+                </div>
+                <p className="mt-6 text-center text-xs uppercase tracking-wider text-white/35">
+                  {selectedProfile.user.friendship_status === 'accepted' ? 'У вас в друзьях' : selectedProfile.user.friendship_status === 'pending' ? 'Заявка ожидает ответа' : 'Не в друзьях'}
+                </p>
+              </div>
+            ) : null}
+          </motion.div>
+        </div>
       )}
-    </div>
+    </AnimatePresence>
   );
 
   return (
@@ -235,13 +351,15 @@ export default function FriendsPage() {
                     transition={{ delay: i * 0.04 }}
                     className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/8 hover:border-white/10 transition-all group"
                   >
-                    <UserAvatar user={f} size={10} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white font-medium text-sm">{f.name}</p>
-                      <p className={`text-xs ${f.is_online ? 'text-green-400' : 'text-white/30'}`}>
-                        {f.is_online ? 'В сети' : f.custom_status || 'Не в сети'}
-                      </p>
-                    </div>
+                    <button type="button" onClick={() => openProfile(f.id)} className="flex items-center gap-3 flex-1 min-w-0 text-left">
+                      <UserAvatar user={f} size={10} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-medium text-sm truncate">{f.name}</p>
+                        <p className={`text-xs truncate ${f.is_online ? 'text-green-400' : 'text-white/30'}`}>
+                          {f.is_online ? 'В сети' : f.custom_status || 'Не в сети'}
+                        </p>
+                      </div>
+                    </button>
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => declineRequest(f.id)}
@@ -267,11 +385,13 @@ export default function FriendsPage() {
                   <div className="space-y-2">
                     {incoming.map((f) => (
                       <div key={f.id} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-[#00E2C4]/10">
-                        <UserAvatar user={f} size={10} />
-                        <div className="flex-1">
-                          <p className="text-white font-medium text-sm">{f.name}</p>
-                          <p className="text-xs text-white/40">Хочет добавить вас в друзья</p>
-                        </div>
+                        <button type="button" onClick={() => openProfile(f.id)} className="flex items-center gap-3 flex-1 min-w-0 text-left">
+                          <UserAvatar user={f} size={10} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white font-medium text-sm truncate">{f.name}</p>
+                            <p className="text-xs text-white/40 truncate">Хочет добавить вас в друзья</p>
+                          </div>
+                        </button>
                         <div className="flex gap-2">
                           <button
                             onClick={() => acceptRequest(f.id)}
@@ -300,11 +420,13 @@ export default function FriendsPage() {
                   <div className="space-y-2">
                     {outgoing.map((f) => (
                       <div key={f.id} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/5">
-                        <UserAvatar user={f} size={10} />
-                        <div className="flex-1">
-                          <p className="text-white font-medium text-sm">{f.name}</p>
-                          <p className="text-xs text-white/40">Ожидание ответа</p>
-                        </div>
+                        <button type="button" onClick={() => openProfile(f.id)} className="flex items-center gap-3 flex-1 min-w-0 text-left">
+                          <UserAvatar user={f} size={10} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white font-medium text-sm truncate">{f.name}</p>
+                            <p className="text-xs text-white/40 truncate">Ожидание ответа</p>
+                          </div>
+                        </button>
                         <button
                           onClick={() => cancelOutgoing(f.id)}
                           disabled={loadingIds.includes(f.id)}
@@ -333,6 +455,29 @@ export default function FriendsPage() {
           {/* Search Tab */}
           {activeTab === 'search' && (
             <motion.div key="search" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <form onSubmit={sendRequestByNickname} className="rounded-xl bg-white/5 border border-white/10 p-3">
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <UserPlus className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                    <input
+                      type="text"
+                      value={nickname}
+                      onChange={e => setNickname(e.target.value)}
+                      placeholder="Точный никнейм для заявки..."
+                      className="w-full pl-10 pr-4 py-3 bg-black/10 border border-white/10 rounded-xl text-white placeholder-white/30 outline-none focus:border-[#00E2C4]/50 transition-colors"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isSendingNickname || !nickname.trim()}
+                    className="px-4 py-3 rounded-xl bg-[#00E2C4]/20 border border-[#00E2C4]/40 text-[#00E2C4] text-xs font-semibold hover:bg-[#00E2C4]/30 transition-colors disabled:opacity-50"
+                  >
+                    {isSendingNickname ? '...' : 'Отправить'}
+                  </button>
+                </div>
+                {nicknameError ? <p className="mt-2 text-xs text-red-400">{nicknameError}</p> : null}
+              </form>
+
               <div className="relative">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
                 <input
@@ -363,13 +508,15 @@ export default function FriendsPage() {
                       transition={{ delay: i * 0.04 }}
                       className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/5"
                     >
-                      <UserAvatar user={u} size={10} />
-                      <div className="flex-1">
-                        <p className="text-white font-medium text-sm">{u.name}</p>
-                        <p className={`text-xs ${u.is_online ? 'text-green-400' : 'text-white/30'}`}>
-                          {u.is_online ? 'В сети' : u.custom_status || 'Не в сети'}
-                        </p>
-                      </div>
+                      <button type="button" onClick={() => openProfile(u.id)} className="flex items-center gap-3 flex-1 min-w-0 text-left">
+                        <UserAvatar user={u} size={10} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-medium text-sm truncate">{u.name}</p>
+                          <p className={`text-xs truncate ${u.is_online ? 'text-green-400' : 'text-white/30'}`}>
+                            {u.is_online ? 'В сети' : u.custom_status || 'Не в сети'}
+                          </p>
+                        </div>
+                      </button>
 
                       {/* Action Button */}
                       {isFriend ? (
@@ -421,6 +568,7 @@ export default function FriendsPage() {
         </AnimatePresence>
       </div>
 
+      <ProfileModal />
       {showJoinModal && <JoinRoomModal onClose={() => setShowJoinModal(false)} />}
     </div>
   );

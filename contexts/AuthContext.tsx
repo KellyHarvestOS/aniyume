@@ -10,6 +10,9 @@ export interface AuthUser {
   email: string;
   avatar?: string | null;
   is_premium?: boolean;
+  is_banned?: boolean;
+  ban_reason?: string | null;
+  ban_expires_at?: string | null;
 }
 
 interface AuthContextType {
@@ -77,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem('userToken');
+    localStorage.removeItem('isPremium');
     setToken(null);
     setUser(null);
   };
