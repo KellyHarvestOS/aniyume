@@ -124,7 +124,6 @@ export default function FAQPage() {
 const faqData = [
   { icon: <BiWifi />, question: "Видео постоянно тормозит, что делать?", answer: "Попробуйте снизить качество видео или проверить интернет-соединение." },
   { icon: <BiMobile />, question: "Есть ли мобильное приложение?", answer: "Можно установить сайт как PWA через браузер." },
-  { icon: <BiHdd />, question: "Как включить 1080p или 4K?", answer: "Выберите максимальное доступное качество в настройках плеера." },
   { icon: <BiDownload />, question: "Можно ли скачивать серии?", answer: "Скачивание недоступно из-за ограничений правообладателей." },
   { icon: <BiWorld />, question: "Как сменить озвучку?", answer: "Используйте выпадающий список «Озвучка» в плеере." },
   { icon: <BiCalendar />, question: "Когда выходят новые серии?", answer: "Обычно через 30–60 минут после релиза." },
@@ -133,11 +132,8 @@ const faqData = [
   { icon: <BiCaptions />, question: "Есть ли субтитры?", answer: "Да, у большинства популярных тайтлов." },
   { icon: <BiTrash />, question: "Как удалить аккаунт?", answer: "Удаление доступно в настройках профиля." },
   { icon: <FaWandMagicSparkles />, question: "Как работает умный поиск?", answer: "Поиск учитывает альтернативные названия." },
-  { icon: <BiShield />, question: "Это легально?", answer: "Сайт не хранит видео и использует открытые источники." },
   { icon: <BiLogoChrome />, question: "Какой браузер лучше?", answer: "Chrome, Firefox или Safari последних версий." },
   { icon: <BiGlobe />, question: "Нужен ли VPN?", answer: "Обычно нет, но иногда помогает." },
   { icon: <BiBug />, question: "Нашел баг, куда писать?", answer: "Напишите в поддержку с описанием проблемы." },
-  { icon: <BiPlay />, question: "Файл не найден в плеере", answer: "Попробуйте выбрать другую озвучку." },
-  { icon: <BiRename />, question: "Можно ли сменить ник?", answer: "Пока недоступно напрямую." },
   { icon: <BiMessageRounded />, question: "Как предложить идею?", answer: "Напишите нам в Telegram или Discord." }
 ];
