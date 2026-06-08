@@ -139,7 +139,6 @@ export default function EditProfilePage() {
           const user = data.user || data;
           setFormData({
             name: user.name || "",
-
             status_text: user.custom_status || user.status_text || "",
           });
           setSocialLinks(normalizeSocialLinks(user.social_links || user.socials || readSavedSocialLinks()));
@@ -301,7 +300,8 @@ export default function EditProfilePage() {
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col relative overflow-y-auto custom-scrollbar border-b border-slate-300 dark:border-white/15">
           <div className="max-w-4xl w-full mx-auto p-6 md:p-12 space-y-12">
 
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+              
               <div className="relative group">
                 <div className="absolute -inset-2 bg-brand rounded-full blur opacity-10 group-hover:opacity-30 transition duration-700"></div>
 
@@ -362,7 +362,7 @@ export default function EditProfilePage() {
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1 flex-1">
                 <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                   Фото профиля
                   {isPremium && (
@@ -381,13 +381,18 @@ export default function EditProfilePage() {
                   </span>
                 </p>
               </div>
+
+              {isPremium && (
+                <Link
+                  href="/profile/edit/premiumEdit"
+                  className="inline-flex items-center gap-3 px-6 py-3 bg-brand text-white dark:text-black rounded-lg font-black text-[11px] uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-xl shadow-black/10 whitespace-nowrap"
+                >
+                  <SiCodemagic className="text-lg text-white dark:text-black" />
+                  Кастомизация
+                </Link>
+              )}
             </div>
-            {isPremium && (
-              <Link href="/profile/edit/premiumEdit" className="flex items-center gap-3 px-8 py-4 bg-brand text-white dark:text-black rounded-lg font-black text-[11px] uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-xl shadow-black/10 whitespace-nowrap">
-                <SiCodemagic className="text-white dark:text-black text-lg" />
-                Кастомизация
-              </Link>
-            )}
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
               <div className="space-y-3">
@@ -403,8 +408,6 @@ export default function EditProfilePage() {
                 </label>
                 <input type="text" value={formData.status_text} onChange={(e) => setFormData({ ...formData, status_text: e.target.value })} className="w-full px-6 py-4 bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-white/5 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white dark:focus:bg-[#1a1a1a] transition-all shadow-sm" placeholder="Ваш статус" />
               </div>
-
-
 
               <div className="md:col-span-2 space-y-3">
                 <div className="flex items-center justify-between gap-4">
@@ -463,7 +466,6 @@ export default function EditProfilePage() {
 
               {isPremium && (
                 <div className="md:col-span-2">
-
                   <p className="mb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.15em] text-slate-900 dark:text-gray-100">
                     <HiCursorClick className="text-brand h-4 w-4" />
                     Кастомная мышка
@@ -510,6 +512,12 @@ export default function EditProfilePage() {
               )}
             </div>
 
+            {message && (
+              <div className={`p-4 rounded-lg font-bold text-sm ${message.type === "success" ? "bg-green-500/10 text-green-500 border border-green-500/20" : "bg-red-500/10 text-red-500 border border-red-500/20"}`}>
+                {message.text}
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row gap-4 pt-6 pb-20">
               <button type="submit" disabled={saving} className="px-10 py-4 bg-brand text-white font-black uppercase tracking-tighter rounded-lg shadow-lg shadow-[#2EC4B6]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50">
                 {saving ? "СОХРАНЕНИЕ..." : "Сохранить профиль"}
@@ -520,7 +528,7 @@ export default function EditProfilePage() {
             </div>
           </div>
         </form>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 }
