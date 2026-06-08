@@ -198,7 +198,7 @@ export default function FriendsPage() {
             <div className="container mx-auto px-4 md:px-20 pt-5 mb-8 relative z-10">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-gray-100 dark:border-white/5 pb-5">
                     <div>
-                        <h1 className="text-5xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white leading-none">
+                        <h1 className="text-5xl font-black uppercase  tracking-tighter text-gray-900 dark:text-white leading-none">
                             {isSearchMode ? 'Поиск ' : 'Мои '} <span className="text-brand">{isSearchMode ? 'Людей' : 'Друзья'}</span>
                         </h1>
                         <p className="mt-3 text-gray-400 font-bold uppercase tracking-[0.5em] text-[10px] ml-1">
@@ -238,7 +238,7 @@ export default function FriendsPage() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Поиск по имени"
-                        className="w-full bg-transparent pt-4 pb-3 pl-12 pr-10 text-sm font-black uppercase italic tracking-widest text-gray-900 dark:text-white border-2 rounded-xl border-gray-100 dark:border-white/10 outline-none transition-all placeholder:text-gray-500 focus:border-brand"
+                        className="w-full bg-transparent pt-4 pb-3 pl-12 pr-10 text-sm font-black italic tracking-widest text-gray-900 dark:text-white border-2 rounded-xl border-gray-100 dark:border-white/10 outline-none transition-all placeholder:text-gray-500 focus:border-brand"
                     />
                     {searchQuery && (
                         <button
@@ -462,7 +462,7 @@ export default function FriendsPage() {
                             animate={{ opacity: 1 }}
                             className="col-span-full py-20 text-center"
                         >
-                            <p className="text-2xl font-black uppercase italic text-gray-400 tracking-tighter">
+                            <p className="text-2xl font-black uppercase text-gray-400 tracking-tighter">
                                 {isSearchMode ? 'По вашему запросу ' : 'У вас пока нет '} <span className="text-brand">{isSearchMode ? 'ничего не найдено' : 'друзей'}</span>
                             </p>
                         </motion.div>
