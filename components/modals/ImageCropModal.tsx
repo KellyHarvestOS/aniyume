@@ -75,7 +75,6 @@ export default function ImageCropModal({ image, onCropComplete, onClose }: Image
                 animate={{ scale: 1, y: 0 }}
                 className="relative w-full max-w-lg bg-white dark:bg-[#111111] rounded-2xl overflow-hidden border border-white/10 shadow-2xl"
             >
-                {/* Header */}
                 <div className="p-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-[#161616]">
                     <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
                         Редактирование фото
@@ -85,7 +84,6 @@ export default function ImageCropModal({ image, onCropComplete, onClose }: Image
                     </button>
                 </div>
 
-                {/* Crop Area */}
                 <div className="relative w-full h-80 bg-[#0a0a0a]">
                     <Cropper
                         image={image}
@@ -99,7 +97,6 @@ export default function ImageCropModal({ image, onCropComplete, onClose }: Image
                     />
                 </div>
 
-                {/* Controls */}
                 <div className="p-6 space-y-6 bg-white dark:bg-[#111111]">
                     <div className="space-y-3">
                         <div className="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-tighter">

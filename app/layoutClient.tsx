@@ -10,6 +10,8 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   const pathname = usePathname();
 
   const noLayoutPages = ['/login', '/register', '/premium', '/watch'];
+
+
   const hideLayout = noLayoutPages.includes(pathname);
 
   useEffect(() => {

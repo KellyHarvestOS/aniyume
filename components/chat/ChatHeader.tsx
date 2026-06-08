@@ -1,0 +1,133 @@
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+import { FaArrowLeft, FaEllipsisV, FaBan, FaTrashAlt, FaPlay } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+
+interface ChatHeaderProps {
+    friendId: number;
+    friendName: string;
+    isOnline: boolean;
+}
+
+export default function ChatHeader({ friendId, friendName, isOnline }: ChatHeaderProps) {
+    const router = useRouter();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleInvite = () => {
+        setIsMenuOpen(false);
+        router.push('/watch'); 
+    };
+
+    const handleClearChat = () => {
+        setIsMenuOpen(false);
+        alert('История сообщений очищена!');
+    };
+
+    const handleBlockUser = () => {
+        setIsMenuOpen(false);
+        alert(`Пользователь ${friendName} заблокирован!`);
+    };
+
+    return (
+        <div className="relative z-[100] custom-glass border-b  border-gray-100 dark:border-white/5 shrink-0 px-4 md:px-8 bg-white/40 dark:bg-black/40 backdrop-blur-xl">
+            <div className="h-20 flex items-center justify-between">
+                
+                <div className="flex items-center gap-4 md:gap-6">
+                    <button
+                        onClick={() => router.push('/profile/friends')}
+                        className="w-10 h-10 rounded-xl bg-white dark:bg-white/5 flex items-center justify-center text-gray-500 hover:text-brand transition-all duration-300 group border border-transparent hover:border-brand/30 hover:scale-105 active:scale-95"
+                    >
+                        <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" />
+                    </button>
+
+                    <div className="flex items-center gap-4 group cursor-pointer">
+                        <div className="relative">
+                            <img
+                                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${friendId}`}
+                                alt="Avatar"
+                                className="relative w-12 h-12 rounded-xl border-2 border-white dark:border-[#151515] object-cover bg-gray-800 z-10 transition-transform duration-300 group-hover:scale-105"
+                            />
+                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 border-2 border-white dark:border-[#111111] rounded-full z-20 ${isOnline ? 'bg-brand' : 'bg-gray-500'}`} />
+                        </div>
+
+                        <div>
+                            <h2 className="text-xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white leading-none group-hover:text-brand transition-colors">
+                                {friendName}
+                            </h2>
+                            <p className={`text-[10px] font-bold uppercase tracking-[0.2em] mt-1.5 flex items-center gap-1.5 ${isOnline ? 'text-brand' : 'text-gray-400'}`}>
+                                {isOnline ? 'В сети' : 'Оффлайн'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="relative" ref={menuRef}>
+                    <button 
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border border-transparent
+                            ${isMenuOpen 
+                                ? 'bg-brand/10 text-brand border-brand/30' 
+                                : 'bg-white dark:bg-white/5 text-gray-500 hover:text-brand hover:border-brand/30'
+                            } hover:scale-105 active:scale-95`}
+                    >
+                        <FaEllipsisV className={`transition-transform duration-300 ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`} />
+                    </button>
+
+
+                    <AnimatePresence>
+                        {isMenuOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                transition={{ duration: 0.15 }}
+                                
+                                className="absolute right-0 top-14 w-64  z-[120] bg-white dark:bg-[#151515]/95  rounded-xl  p-2 border border-gray-200 dark:border-white/10 z-50 overflow-hidden"
+                            >
+                                <button 
+                                    onClick={handleInvite}
+                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] text-brand hover:bg-brand/10 transition-all group"
+                                >
+                                    <FaPlay size={10} className="group-hover:scale-110 transition-transform" /> 
+                                    Пригласить на просмотр
+                                </button>
+
+                                <div className="h-px w-full bg-gray-200 dark:bg-white/5 my-1" />
+
+                                <button 
+                                    onClick={handleClearChat}
+                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] text-orange-500 hover:bg-orange-500/10 transition-all group"
+                                >
+                                    <FaTrashAlt size={12} className="group-hover:scale-110 transition-transform" /> 
+                                    Очистить чат
+                                </button>
+                                
+                                <button 
+                                    onClick={handleBlockUser}
+                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] text-red-600 dark:text-red-500 hover:bg-red-500/10 transition-all group"
+                                >
+                                    <FaBan size={12} className="group-hover:scale-110 transition-transform" /> 
+                                    Заблокировать
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+            </div>
+        </div>
+    );
+}

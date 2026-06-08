@@ -14,6 +14,7 @@
     "@fingerprintjs/fingerprintjs": "^5.2.0",
     "clsx": "^2.1.1",
     "crypto-js": "^4.2.0",
+    "emoji-picker-react": "^4.19.1",
     "framer-motion": "^12.38.0",
     "hls.js": "^1.6.16",
     "jquery": "^4.0.0",

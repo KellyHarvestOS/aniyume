@@ -104,7 +104,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-14 border-t border-slate-400 pt-20 px-10 sm:grid-cols-2 lg:grid-cols-4 dark:border-gray-700 dark:border-t-4">
+        <div className="grid grid-cols-1 gap-14 border-t border-slate-400 pt-20 px-10 sm:grid-cols-2 lg:grid-cols-4 dark:border-gray-700 dark:border-t">
           <Block title="Навигация">
             <FooterLink href="/popular" icon={HiFire}>Популярное</FooterLink>
             <FooterLink href="/schedule" icon={IoCalendarNumberSharp}>Расписание</FooterLink>

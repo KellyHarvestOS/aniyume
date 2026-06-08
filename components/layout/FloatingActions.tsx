@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation'; 
+import { usePathname } from 'next/navigation';
 import { ArrowUp } from 'lucide-react';
 import { RiRobot2Line } from "react-icons/ri";
 import ChatModal from '@/components/modals/ChatModal';
@@ -10,8 +10,8 @@ import { AnimatePresence } from 'framer-motion';
 export default function FloatingActions() {
   const [isVisible, setIsVisible] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  
-  const pathname = usePathname(); 
+
+  const pathname = usePathname();
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -35,9 +35,9 @@ export default function FloatingActions() {
 
 
   const hiddenPages = ['/login', '/register', '/premium'];
-  
 
-  const hideButtons = hiddenPages.includes(pathname);
+
+  const hideButtons = hiddenPages.includes(pathname) || pathname.includes('/chat');
 
 
   if (hideButtons) {
