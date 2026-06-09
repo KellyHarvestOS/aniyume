@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import ChatHeader from '@/components/chat/ChatHeader';
@@ -7,6 +8,7 @@ import ChatInput from '@/components/chat/ChatInput';
 import ChatSidebar, { ChatPreview } from '@/components/chat/ChatSidebar';
 import { useAuth } from '@/contexts/AuthContext';
 import { getStorageAssetUrl } from '@/lib/storage';
+
 interface ApiMessage {
     id: number;
     sender_id: number;
@@ -14,6 +16,7 @@ interface ApiMessage {
     photo_path: string | null;
     created_at: string;
 }
+
 interface ApiUser {
     id: number;
     name: string;
@@ -21,7 +24,9 @@ interface ApiUser {
     is_online: boolean;
     is_blocked?: boolean;
 }
+
 const isGif = (value: string | null) => Boolean(value && /^https?:\/\/.+\.gif(\?.*)?$/i.test(value));
+
 export default function ChatPage() {
     const params = useParams<{ id: string }>();
     const router = useRouter();
@@ -84,7 +89,9 @@ export default function ChatPage() {
     }, [loadChat]);
 
     useEffect(() => {
-        scrollContainerRef.current?.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: 'smooth' });
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+        }
     }, [messages]);
 
     const handleSendMessage = async (data: { text?: string; gif?: string; image?: File }) => {
@@ -120,31 +127,37 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="h-screen max-h-screen bg-white dark:bg-[#111111] transition-colors overflow-hidden relative flex">
+        <div className="h-screen max-h-[100dvh] bg-white dark:bg-[#111111] transition-colors overflow-hidden relative flex">
             <ChatSidebar chats={chats} activeChatId={friendId} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-            <div className={`flex-1 flex flex-col min-w-0 relative z-10 h-full ${!friendId ? 'hidden lg:flex' : 'flex'}`}>
-                <ChatHeader
-                    friendId={friendId}
-                    friendName={friend?.name || `Пользователь ${friendId}`}
-                    friendAvatar={friend?.avatar}
-                    isOnline={friend?.is_online || false}
-                    isBlocked={friend?.is_blocked || false}
-                    onClear={clearChat}
-                    onBlock={toggleBlock}
-                />
-                <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-3 md:px-8 py-4 flex flex-col gap-2 
-                scrollbar-thin scrollbar-thumb-brand scrollbar-track-transparent
-                [&::-webkit-scrollbar]:w-2
-                [&::-webkit-scrollbar-track]:bg-transparent
-                [&::-webkit-scrollbar-thumb]:bg-brand
-                [&::-webkit-scrollbar-thumb]:rounded-full
-                [&::-webkit-scrollbar-thumb]:border-4
-                [&::-webkit-scrollbar-thumb]:border-transparent">
+
+            <div className={`flex-1 flex flex-col min-w-0 relative h-full bg-white dark:bg-[#111111] ${!friendId ? 'hidden lg:flex' : 'flex'}`}>
+                <div className="shrink-0 z-50">
+                    <ChatHeader
+                        friendId={friendId}
+                        friendName={friend?.name || `Пользователь ${friendId}`}
+                        friendAvatar={friend?.avatar}
+                        isOnline={friend?.is_online || false}
+                        isBlocked={friend?.is_blocked || false}
+                        onClear={clearChat}
+                        onBlock={toggleBlock}
+                    />
+                </div>
+
+                <div
+                    ref={scrollContainerRef}
+                    className="flex-1 overflow-y-auto px-3 md:px-8 py-4 flex flex-col gap-2 
+                    scrollbar-thin scrollbar-thumb-brand scrollbar-track-transparent
+                    [&::-webkit-scrollbar]:w-2
+                    [&::-webkit-scrollbar-track]:bg-transparent
+                    [&::-webkit-scrollbar-thumb]:bg-brand
+                    [&::-webkit-scrollbar-thumb]:rounded-full"
+                >
                     {error && <p className="mx-auto rounded-xl bg-red-500/10 p-3 text-[12px] md:text-sm font-bold text-red-500 max-w-[90%] text-center">{error}</p>}
                     {messages.map((message) => <ChatMessage key={message.id} msg={message} isMe={message.senderId === me?.id} />)}
                     {!messages.length && !error && <p className="pt-10 text-center text-xs md:text-sm text-gray-400">Здесь пока нет сообщений</p>}
                 </div>
-                <div className="px-3 pb-3 md:px-0 md:pb-0">
+
+                <div className="shrink-0 bg-white dark:bg-[#111111] px-3 pb-3 md:px-0 md:pb-0">
                     <ChatInput onSend={handleSendMessage} disabled={friend?.is_blocked} />
                 </div>
             </div>
