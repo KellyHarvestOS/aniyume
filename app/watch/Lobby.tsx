@@ -71,7 +71,7 @@ export const Lobby = ({ onCreate, onBack }: LobbyProps) => {
 
                 <div className="md:w-1/2 p-12 bg-linear-to-br from-brand/10 to-transparent flex flex-col justify-center border-b md:border-b-0 md:border-r border-gray-100 dark:border-white/5">
                     <div className="mb-8">
-                        <Image
+                        <Image 
                             src={logoPaths.dark}
                             alt="AniYume"
                             width={180}
@@ -97,7 +97,7 @@ export const Lobby = ({ onCreate, onBack }: LobbyProps) => {
                         </span>
                     </h1>
                     <p className="text-gray-600 dark:text-gray-400 text-lg max-w-sm mb-8">
-                        Синхронный просмотр видео с друзьями. Создайте свою комнату за секунду.
+                        Синхронный просмотр видео с друзьями. Создайте свою комнату за секунду. 
                     </p>
                     <div className="flex items-center gap-4 text-sm font-medium text-gray-400">
                         <div className="flex -space-x-2">
@@ -107,7 +107,7 @@ export const Lobby = ({ onCreate, onBack }: LobbyProps) => {
                                 </div>
                             ))}
                         </div>
-                        <span className="flex items-center gap-2"> <FaUsers /> 2,400+ онлайн</span>
+                        <span className="flex items-center gap-2"> <FaUsers /> 500+ онлайн</span>
                     </div>
                 </div>
 

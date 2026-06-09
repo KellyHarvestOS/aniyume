@@ -138,10 +138,10 @@ export default function CreateRoomModal({ anime, episodeNumber, onClose, onCreat
               ) : (
                 <>
                   Создать комнату
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-4 h-4"/>
                 </>
               )}
-            </button>
+            </button> 
           </div>
         </motion.div>
       </motion.div>
