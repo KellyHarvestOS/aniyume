@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Link2, Users, Lock, Tv, ChevronRight } from 'lucide-react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Anime {
   id: number;
@@ -19,10 +20,16 @@ interface CreateRoomModalProps {
 }
 
 export default function CreateRoomModal({ anime, episodeNumber, onClose, onCreated }: CreateRoomModalProps) {
-  const [maxParticipants, setMaxParticipants] = useState(10);
+  const { user } = useAuth();
+  const participantLimit = user?.is_premium ? 10 : 2;
+  const [maxParticipants, setMaxParticipants] = useState(participantLimit);
   const [isPrivate, setIsPrivate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    setMaxParticipants(participantLimit);
+  }, [participantLimit]);
 
   const handleCreate = async () => {
     setIsLoading(true);
@@ -96,15 +103,18 @@ export default function CreateRoomModal({ anime, episodeNumber, onClose, onCreat
               <input
                 type="range"
                 min={2}
-                max={20}
+                max={participantLimit}
                 value={maxParticipants}
                 onChange={e => setMaxParticipants(Number(e.target.value))}
                 className="w-full accent-brand"
               />
               <div className="flex justify-between text-xs text-gray-400 dark:text-white/30 mt-1">
                 <span>2</span>
-                <span>20</span>
+                <span>{participantLimit}</span>
               </div>
+              {!user?.is_premium && (
+                <p className="mt-2 text-xs text-white/40">Premium позволяет создавать комнаты до 10 участников.</p>
+              )}
             </div>
 
             <div

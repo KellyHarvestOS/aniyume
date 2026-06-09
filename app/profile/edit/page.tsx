@@ -76,6 +76,7 @@ export default function EditProfilePage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPremium, setIsPremium] = useState(false);
+  const [hasAdminGrantedFrames, setHasAdminGrantedFrames] = useState(false);
   const [isCustomCursorDisabled, setIsCustomCursorDisabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -129,6 +130,7 @@ export default function EditProfilePage() {
           const data = await res.json();
           const user = data.user || data;
           setIsPremium(Boolean(user.is_premium));
+          setHasAdminGrantedFrames(Array.isArray(data.profile_frames) && data.profile_frames.some((frame: any) => frame.admin_granted));
           setIsCustomCursorDisabled(getProfilePreference("premium_cursor_disabled") === "true");
           setInitialName(user.name || "");
           setFormData({
@@ -399,7 +401,7 @@ export default function EditProfilePage() {
                 </p>
               </div>
 
-              {isPremium && (
+              {(isPremium || hasAdminGrantedFrames) && (
                 <Link
                   href="/profile/edit/premiumEdit"
                   className="inline-flex items-center gap-3 px-6 py-3 bg-brand text-white dark:text-black rounded-lg font-black text-[11px] uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-xl shadow-black/10 whitespace-nowrap"

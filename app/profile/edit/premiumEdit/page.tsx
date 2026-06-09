@@ -50,11 +50,7 @@ export default function PremiumEditPage() {
 
     useEffect(() => {
         const premiumStatus = localStorage.getItem("isPremium") === "true";
-        if (!premiumStatus) {
-            router.push("/profile/edit");
-            return;
-        }
-        setIsPremium(true);
+        setIsPremium(premiumStatus);
 
         const savedValue = getProfilePreference("theme_value", "from-[#34dccb] to-[#007492]")!;
         const savedType = (getProfilePreference("theme_type", "gradient") as 'gradient' | 'solid');
@@ -80,6 +76,12 @@ export default function PremiumEditPage() {
             .then((response) => response.json())
             .then((data) => {
                 const user = data.user || data;
+                const hasAdminGrantedFrames = Array.isArray(data.profile_frames)
+                    && data.profile_frames.some((frame: any) => frame.admin_granted);
+                if (!user?.is_premium && !hasAdminGrantedFrames) {
+                    router.replace("/profile/edit");
+                    return;
+                }
                 setWatchTime(data.watch_time || { days: 0, hours: 0, minutes: 0 });
                 setPreviewUserName(user?.name || "?");
                 setPreviewAvatarUrl(getAvatarUrl(user?.avatar || user?.avatar_url));
@@ -187,10 +189,12 @@ export default function PremiumEditPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                     <div className="lg:col-span-7">
                         <div className="bg-white dark:bg-zinc-900 rounded-[1rem] p-10 shadow-2xl border border-slate-200 dark:border-white/5">
-                            <ThemeSelector 
-                                profileValue={profileValue} 
-                                onSelect={handleValueChange} 
-                            />
+                            {isPremium && (
+                                <ThemeSelector
+                                    profileValue={profileValue}
+                                    onSelect={handleValueChange}
+                                />
+                            )}
                             
                             <FrameSelector 
                                 avatarFrameKey={avatarFrameKey}

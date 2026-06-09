@@ -132,7 +132,8 @@ export const ProfileCard = ({
 
 
 
-        <div className="grid grid-cols-2 gap-2 my-6">
+        <div className="relative grid grid-cols-2 gap-2 my-6" inert={!editable ? true : undefined}>
+          {!editable && <div className="absolute inset-0 z-10" aria-hidden="true" />}
           <Link
             href="/bookmarks"
             className="bg-slate-100 dark:bg-[#161616] p-2 rounded-lg border border-slate-100 dark:border-gray-800 hover:border-brand transition group"

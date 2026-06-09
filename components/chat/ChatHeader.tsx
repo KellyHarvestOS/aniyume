@@ -45,7 +45,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
     };
 
     return (
-        <div className="relative z-[100] custom-glass border-b border-gray-100 dark:border-white/5 shrink-0 px-3 md:px-8 bg-white/40 dark:bg-black/40 backdrop-blur-xl">
+        <div className="sticky top-0 z-[100] custom-glass border-b border-gray-100 dark:border-white/5 shrink-0 px-3 md:px-8 bg-white/90 dark:bg-black/90 backdrop-blur-xl">
             <div className="h-16 md:h-20 flex items-center justify-between">
 
                 <div className="flex items-center gap-3 md:gap-6">
@@ -56,7 +56,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
                         <FaArrowLeft size={14} className="md:text-base group-hover:-translate-x-1 transition-transform" />
                     </button>
 
-                    <div className="flex items-center gap-3 md:gap-4 group cursor-pointer">
+                    <button type="button" onClick={() => router.push(`/users/${friendId}`)} className="flex items-center gap-3 md:gap-4 group cursor-pointer text-left">
                         <div className="relative shrink-0">
                             <img
                                 src={getStorageAssetUrl(friendAvatar) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${friendId}`}
@@ -74,7 +74,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
                                 {isOnline ? 'В сети' : 'Оффлайн'}
                             </p>
                         </div>
-                    </div>
+                    </button>
                 </div>
 
                 <div className="relative" ref={menuRef}>

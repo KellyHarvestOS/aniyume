@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { FaUserPlus, FaUserCircle } from 'react-icons/fa';
+import { FaCommentAlt, FaUserPlus, FaUserCircle } from 'react-icons/fa';
 import { HiAdjustmentsHorizontal, HiMiniBookmark, HiFire } from "react-icons/hi2";
 import { CgMenuRightAlt, CgMenuRight } from "react-icons/cg";
 import { IoCalendarNumberSharp } from "react-icons/io5";
@@ -19,6 +19,7 @@ export default function Header() {
   const pathname = usePathname();
   const { user, isLoading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [chatHref, setChatHref] = useState('/profile/friends');
 
   const [logoPaths, setLogoPaths] = useState({
     light: '/images/logo01.png',
@@ -83,6 +84,45 @@ export default function Header() {
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setChatHref('/profile/friends');
+      return;
+    }
+
+    const storedId = localStorage.getItem('lastDirectChatUserId');
+    if (storedId) {
+      setChatHref(`/profile/friends/chat/${storedId}`);
+      return;
+    }
+
+    const token = localStorage.getItem('userToken');
+    fetch('/api/external/chats', {
+      headers: {
+        Accept: 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    })
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => {
+        const latestId = data?.data?.[0]?.user?.id;
+        if (latestId) {
+          localStorage.setItem('lastDirectChatUserId', String(latestId));
+          setChatHref(`/profile/friends/chat/${latestId}`);
+        }
+      })
+      .catch(() => {});
+  }, [user]);
+
+  useEffect(() => {
+    const syncLastChat = () => {
+      const storedId = localStorage.getItem('lastDirectChatUserId');
+      setChatHref(storedId ? `/profile/friends/chat/${storedId}` : '/profile/friends');
+    };
+    window.addEventListener('direct-chat-updated', syncLastChat);
+    return () => window.removeEventListener('direct-chat-updated', syncLastChat);
   }, []);
 
   const avatarUrl = getStorageAssetUrl(user?.avatar);
@@ -169,6 +209,15 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-3 sm:gap-4 lg:border-l lg:border-gray-200 lg:dark:border-gray-800 lg:pl-6">
+            {isLoggedIn && (
+              <Link
+                href={chatHref}
+                aria-label="Открыть последний чат"
+                className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${pathname.includes('/profile/friends/chat') ? 'bg-brand text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-brand dark:text-gray-300 dark:hover:bg-white/10'}`}
+              >
+                <FaCommentAlt />
+              </Link>
+            )}
             {isLoading ? (
               <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
             ) : isLoggedIn ? (

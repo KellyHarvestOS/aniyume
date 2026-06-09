@@ -109,6 +109,8 @@ export default function ChatPage() {
             return;
         }
         setError('');
+        localStorage.setItem('lastDirectChatUserId', String(friendId));
+        window.dispatchEvent(new Event('direct-chat-updated'));
         setMessages((current) => [...current, mapMessage(result.data)]);
     };
 
