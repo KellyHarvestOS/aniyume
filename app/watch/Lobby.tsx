@@ -2,22 +2,23 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { FaPlus, FaHashtag, FaDoorOpen, FaUsers, FaArrowLeft } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 import { getProfilePreference } from '@/lib/profilePreferences';
 
 interface LobbyProps {
-    onCreate: () => void;
-    onJoin: (e: React.FormEvent) => void;
-    inputCode: string;
-    onBack: () => void;
-    setInputCode: (val: string) => void;
+    onCreate: () => void; 
+    onBack: () => void;  
 }
 
-export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: LobbyProps) => {
-
+export const Lobby = ({ onCreate, onBack }: LobbyProps) => {
     const { user } = useAuth();
+    const router = useRouter(); 
 
+  
+    const [inputCode, setInputCode] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const [logoPaths, setLogoPaths] = useState({
         light: '/images/logo01.png',
@@ -45,6 +46,17 @@ export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: Lob
         return () => window.removeEventListener('storage', applyLogo);
     }, [user]);
 
+    const handleJoin = (e: React.FormEvent) => {
+        e.preventDefault();
+        const cleanCode = inputCode.trim();
+
+        if (cleanCode) {
+            setIsLoading(true);
+
+            router.push(`/watch-party/${cleanCode}`);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#f8fafc] dark:bg-[#050505] flex items-center justify-center p-4 md:p-8 transition-colors overflow-hidden relative">
 
@@ -52,12 +64,12 @@ export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: Lob
 
                 <button
                     onClick={onBack}
-                    className="absolute top-6 left-6 z-20 p-3 rounded-2xl bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-[#21D0B8] hover:border-[#21D0B8] transition-all active:scale-95 group"
+                    className="absolute top-6 left-6 z-20 p-3 rounded-2xl bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-brand hover:border-brand transition-all active:scale-95 group"
                 >
                     <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" />
                 </button>
 
-                <div className="md:w-1/2 p-12 bg-linear-to-br from-[#21D0B8]/10 to-transparent flex flex-col justify-center border-b md:border-b-0 md:border-r border-gray-100 dark:border-white/5">
+                <div className="md:w-1/2 p-12 bg-linear-to-br from-brand/10 to-transparent flex flex-col justify-center border-b md:border-b-0 md:border-r border-gray-100 dark:border-white/5">
                     <div className="mb-8">
                         <Image
                             src={logoPaths.dark}
@@ -80,7 +92,7 @@ export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: Lob
                     </div>
                     <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white leading-[1.1] mb-6 uppercase tracking-tighter">
                         Смотрите <br />
-                        <span className=" text-brand">
+                        <span className="text-brand">
                             вместе
                         </span>
                     </h1>
@@ -105,8 +117,8 @@ export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: Lob
                         <div className="space-y-3">
                             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 px-1">Начать сессию</p>
                             <button
-                                onClick={onCreate}
-                                className="group relative w-full flex items-center justify-between gap-3 bg-brand hover:bg-brand/90 text-white py-5 px-8 rounded-2xl font-bold transition-all"
+                                onClick={onCreate} 
+                                className="group relative w-full flex items-center justify-between gap-3 bg-brand hover:bg-brand/90 text-white py-5 px-8 rounded-2xl font-bold transition-all shadow-lg shadow-brand/20 active:scale-[0.98]"
                             >
                                 <span className="flex items-center gap-3">
                                     <FaPlus className="text-lg" />
@@ -127,7 +139,8 @@ export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: Lob
                             </div>
                         </div>
 
-                        <form onSubmit={onJoin} className="space-y-4">
+
+                        <form onSubmit={handleJoin} className="space-y-4">
                             <div className="space-y-3">
                                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 px-1">Уже есть код?</p>
                                 <div className="relative group">
@@ -140,16 +153,24 @@ export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: Lob
                                         value={inputCode}
                                         onChange={(e) => setInputCode(e.target.value)}
                                         className="w-full bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-5 pl-12 pr-4 text-gray-900 dark:text-white focus:border-brand focus:ring-4 focus:ring-brand/10 outline-none transition-all placeholder:text-gray-500"
+                                        required
                                     />
                                 </div>
                             </div>
 
                             <button
                                 type="submit"
-                                className="w-full py-5 border-2 border-gray-200 dark:border-white/10 hover:border-brand hover:bg-brand/5 text-gray-700 dark:text-gray-300 hover:text-brand rounded-2xl font-bold transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+                                disabled={isLoading || !inputCode.trim()}
+                                className="w-full py-5 border-2 border-gray-200 dark:border-white/10 hover:border-brand hover:bg-brand/5 text-gray-700 dark:text-gray-300 hover:text-brand rounded-2xl font-bold transition-all flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <FaDoorOpen className="text-lg" />
-                                Войти по коду
+                                {isLoading ? (
+                                    <div className="w-5 h-5 rounded-full border-2 border-brand/30 border-t-brand animate-spin" />
+                                ) : (
+                                    <>
+                                        <FaDoorOpen className="text-lg" />
+                                        Войти по коду
+                                    </>
+                                )}
                             </button>
                         </form>
                     </div>
