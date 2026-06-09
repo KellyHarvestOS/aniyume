@@ -137,7 +137,14 @@ export default function ChatPage() {
                     onClear={clearChat}
                     onBlock={toggleBlock}
                 />
-                <div ref={scrollContainerRef} className="flex-1 overflow-y-auto no-scrollbar px-4 md:px-8 py-8 flex flex-col gap-2">
+                <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 md:px-8 py-8 flex flex-col gap-2 
+    scrollbar-thin scrollbar-thumb-brand scrollbar-track-transparent
+    [&::-webkit-scrollbar]:w-2
+    [&::-webkit-scrollbar-track]:bg-transparent
+    [&::-webkit-scrollbar-thumb]:bg-brand
+    [&::-webkit-scrollbar-thumb]:rounded-full
+    [&::-webkit-scrollbar-thumb]:border-4
+    [&::-webkit-scrollbar-thumb]:border-transparent">
                     {error && <p className="mx-auto rounded-xl bg-red-500/10 p-3 text-sm font-bold text-red-500">{error}</p>}
                     {messages.map((message) => <ChatMessage key={message.id} msg={message} isMe={message.senderId === me?.id} />)}
                     {!messages.length && !error && <p className="pt-20 text-center text-sm text-gray-400">Здесь пока нет сообщений</p>}

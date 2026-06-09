@@ -164,6 +164,23 @@ export default function FriendsPage() {
                 .search-input:focus + .search-line {
                     width: 100%;
                 }
+
+                 :global(body)::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    :global(body)::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    :global(body)::-webkit-scrollbar-thumb {
+        background-color: brand;
+        border-radius: 20px;
+        border: 2px solid transparent;
+    }
+
+    .custom-glass {
+    }
             `}</style>
 
             <svg className="absolute w-0 h-0">

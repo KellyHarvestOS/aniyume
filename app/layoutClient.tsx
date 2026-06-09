@@ -11,9 +11,10 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   const pathname = usePathname();
 
   const noLayoutPages = ['/login', '/register', '/premium', '/watch'];
-
-
   const hideLayout = noLayoutPages.includes(pathname);
+  const isChatPage = pathname?.startsWith('/profile/friends/chat');
+
+  const hideFooter = hideLayout || isChatPage;
 
   useEffect(() => {
     const checkPremium = () => {
@@ -52,7 +53,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
         {children}
       </main>
 
-      {!hideLayout && <Footer />}
+      {!hideFooter && <Footer />}
 
       <CookieConsent />
     </div>
