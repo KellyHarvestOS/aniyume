@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import CookieConsent from '../components/layout/CookieConsent';
+import { getProfilePreference } from '@/lib/profilePreferences';
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -19,10 +20,10 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
       const isPremium = localStorage.getItem('isPremium') === 'true';
       if (isPremium) {
         document.documentElement.classList.add('is-premium');
-        document.documentElement.classList.toggle('premium-cursor-disabled', localStorage.getItem('premium_cursor_disabled') === 'true');
-        const savedCursor = localStorage.getItem('profile_cursor_path') || '/images/cursor/Mouse-cursor.png';
-        const savedCursorKey = localStorage.getItem('profile_cursor_key') || 'default';
-        document.documentElement.dataset.premiumCursor = savedCursorKey;
+        document.documentElement.classList.toggle('premium-cursor-disabled', getProfilePreference('premium_cursor_disabled') === 'true');
+        const savedCursor = getProfilePreference('cursor_path', '/images/cursor/Mouse-cursor.png');
+        const savedCursorKey = getProfilePreference('cursor_key', 'default');
+        document.documentElement.dataset.premiumCursor = savedCursorKey || 'default';
         document.documentElement.style.setProperty('--premium-cursor', `url('${savedCursor}') 4 4`);
       } else {
         document.documentElement.classList.remove('is-premium');

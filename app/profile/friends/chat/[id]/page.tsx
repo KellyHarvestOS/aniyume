@@ -1,134 +1,148 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import ChatHeader from '@/components/chat/ChatHeader';
-import ChatMessage from '@/components/chat/ChatMessage';
+import ChatMessage, { Message } from '@/components/chat/ChatMessage';
 import ChatInput from '@/components/chat/ChatInput';
-import ChatSidebar from '@/components/chat/ChatSidebar';
+import ChatSidebar, { ChatPreview } from '@/components/chat/ChatSidebar';
+import { useAuth } from '@/contexts/AuthContext';
+import { getStorageAssetUrl } from '@/lib/storage';
 
-export interface Message {
-    id: string;
-    text?: string;
-    imageUrl?: string;
-    gifUrl?: string;
-    senderId: number;
-    timestamp: Date;
+interface ApiMessage {
+    id: number;
+    sender_id: number;
+    body: string | null;
+    photo_path: string | null;
+    created_at: string;
 }
 
-export interface ChatPreview {
+interface ApiUser {
     id: number;
     name: string;
+    avatar: string | null;
     is_online: boolean;
-    lastMessage?: string;
-    unreadCount?: number;
+    is_blocked?: boolean;
 }
 
+const isGif = (value: string | null) => Boolean(value && /^https?:\/\/.+\.gif(\?.*)?$/i.test(value));
+
 export default function ChatPage() {
-    const params = useParams();
+    const params = useParams<{ id: string }>();
+    const router = useRouter();
+    const { user: me, isLoading } = useAuth();
     const friendId = Number(params.id);
-
-    const [chats, setChats] = useState<ChatPreview[]>([
-        { id: 1, name: 'Кирито', is_online: true, lastMessage: 'Залетаю через 5 минут 🚀', unreadCount: 2 },
-        { id: 2, name: 'Асуна', is_online: true, lastMessage: 'Привет! Го в пати?' },
-        { id: 3, name: 'Саске', is_online: false, lastMessage: 'Я вернусь в Коноху...' },
-    ]);
-
-    const activeChatName = chats.find(c => c.id === friendId)?.name || `NICKNAME_${friendId}`;
-    const isActiveOnline = chats.find(c => c.id === friendId)?.is_online ?? true;
-
+    const [friend, setFriend] = useState<ApiUser | null>(null);
+    const [chats, setChats] = useState<ChatPreview[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState<Message[]>([
-        { id: '1', text: 'Привет! Го в пати?', senderId: friendId, timestamp: new Date(Date.now() - 3600000) },
-        { id: '2', text: 'Залетаю через 5 минут 🚀', senderId: 0, timestamp: new Date(Date.now() - 3500000) },
-    ]);
-    const [isTyping, setIsTyping] = useState(false);
-
+    const [error, setError] = useState('');
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollTo({
-                top: scrollContainerRef.current.scrollHeight,
-                behavior: "smooth"
-            });
+        if (!isLoading && !me) router.push('/login');
+    }, [isLoading, me, router]);
+
+    const authHeaders = () => ({
+        Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+        Accept: 'application/json',
+    });
+
+    const mapMessage = (message: ApiMessage): Message => ({
+        id: String(message.id),
+        text: isGif(message.body) ? undefined : message.body || undefined,
+        gifUrl: isGif(message.body) ? message.body! : undefined,
+        imageUrl: getStorageAssetUrl(message.photo_path) || undefined,
+        senderId: message.sender_id,
+        timestamp: new Date(message.created_at),
+    });
+
+    const loadChat = useCallback(async () => {
+        if (!friendId) return;
+        const [chatResponse, listResponse] = await Promise.all([
+            fetch(`/api/external/chats/${friendId}`, { headers: authHeaders() }),
+            fetch('/api/external/chats', { headers: authHeaders() }),
+        ]);
+        if (chatResponse.ok) {
+            const data = await chatResponse.json();
+            setFriend(data.user);
+            setMessages((data.messages || []).map(mapMessage));
+        } else if (chatResponse.status === 403) {
+            setError('Чат доступен только между друзьями');
         }
+        if (listResponse.ok) {
+            const data = await listResponse.json();
+            setChats((data.data || []).map((chat: any) => ({
+                id: chat.user.id,
+                name: chat.user.name,
+                avatar: chat.user.avatar,
+                is_online: chat.user.is_online,
+                lastMessage: chat.last_message?.photo_path ? 'Фотография' : chat.last_message?.body || 'Начните переписку',
+            })));
+        }
+    }, [friendId]);
+
+    useEffect(() => {
+        loadChat();
+        const timer = window.setInterval(loadChat, 3000);
+        return () => window.clearInterval(timer);
+    }, [loadChat]);
+
+    useEffect(() => {
+        scrollContainerRef.current?.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: 'smooth' });
     }, [messages]);
 
-    const handleSendMessage = (data: { text?: string; gif?: string; image?: File }) => {
-        const newMsg: Message = {
-            id: Date.now().toString(),
-            text: data.text,
-            gifUrl: data.gif, // Если пришла гифка
-            senderId: 0,
-            timestamp: new Date(),
-        };
-        setMessages(prev => [...prev, newMsg]);
+    const handleSendMessage = async (data: { text?: string; gif?: string; image?: File }) => {
+        const form = new FormData();
+        if (data.text || data.gif) form.set('body', data.text || data.gif || '');
+        if (data.image) form.set('photo', data.image);
+        const response = await fetch(`/api/external/chats/${friendId}/messages`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: form,
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            setError(response.status === 429 ? 'Повторяющиеся сообщения: отправка отключена на 5 секунд' : result.errors?.body?.[0] || result.message || 'Не удалось отправить сообщение');
+            return;
+        }
+        setError('');
+        setMessages((current) => [...current, mapMessage(result.data)]);
+    };
+
+    const clearChat = async () => {
+        const response = await fetch(`/api/external/chats/${friendId}`, { method: 'DELETE', headers: authHeaders() });
+        if (response.ok) setMessages([]);
+    };
+
+    const toggleBlock = async () => {
+        if (!friend) return;
+        const response = await fetch(`/api/external/chats/${friendId}/block`, {
+            method: friend.is_blocked ? 'DELETE' : 'POST',
+            headers: authHeaders(),
+        });
+        if (response.ok) setFriend({ ...friend, is_blocked: !friend.is_blocked });
     };
 
     return (
         <div className="h-screen max-h-screen bg-white dark:bg-[#111111] transition-colors overflow-hidden relative flex">
-            <style jsx global>{`
-                .custom-glass {
-                    background: rgba(255, 255, 255, 0.02);
-                    backdrop-filter: blur(15px);
-                }
-                .dark .custom-glass {
-                    background: rgba(20, 20, 20, 0.4);
-                }
-                .no-scrollbar::-webkit-scrollbar {
-                    width: 4px;
-                }
-                .no-scrollbar::-webkit-scrollbar-track {
-                    background: transparent;
-                }
-                .no-scrollbar::-webkit-scrollbar-thumb {
-                    background: rgba(var(--brand-main-rgb, 33, 208, 184), 0.3);
-                    border-radius: 10px;
-                }
-            `}</style>
-
-
-
-            <ChatSidebar
-                chats={chats}
-                activeChatId={friendId}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-            />
-
+            <ChatSidebar chats={chats} activeChatId={friendId} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             <div className="flex-1 flex flex-col min-w-0 relative z-10 h-full">
                 <ChatHeader
                     friendId={friendId}
-                    friendName={activeChatName}
-                    isOnline={isActiveOnline}
+                    friendName={friend?.name || `Пользователь ${friendId}`}
+                    friendAvatar={friend?.avatar}
+                    isOnline={friend?.is_online || false}
+                    isBlocked={friend?.is_blocked || false}
+                    onClear={clearChat}
+                    onBlock={toggleBlock}
                 />
-
-
-                <div
-                    ref={scrollContainerRef}
-                    className="flex-1 overflow-y-auto no-scrollbar px-4 md:px-8 py-8 flex flex-col gap-6"
-                >
-                    {messages.map((msg) => (
-                        <ChatMessage key={msg.id} msg={msg} isMe={msg.senderId === 0} />
-                    ))}
-
-                    {isTyping && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                            <div className="bg-gray-100 dark:bg-white/5 px-4 py-3 rounded-2xl rounded-bl-sm border border-gray-200 dark:border-white/5 flex gap-1 items-center">
-                                <span className="w-1.5 h-1.5 bg-brand rounded-full animate-bounce" />
-                                <span className="w-1.5 h-1.5 bg-brand rounded-full animate-bounce delay-75" />
-                                <span className="w-1.5 h-1.5 bg-brand rounded-full animate-bounce delay-150" />
-                            </div>
-                        </motion.div>
-                    )}
-
+                <div ref={scrollContainerRef} className="flex-1 overflow-y-auto no-scrollbar px-4 md:px-8 py-8 flex flex-col gap-2">
+                    {error && <p className="mx-auto rounded-xl bg-red-500/10 p-3 text-sm font-bold text-red-500">{error}</p>}
+                    {messages.map((message) => <ChatMessage key={message.id} msg={message} isMe={message.senderId === me?.id} />)}
+                    {!messages.length && !error && <p className="pt-20 text-center text-sm text-gray-400">Здесь пока нет сообщений</p>}
                 </div>
-
-                <ChatInput onSend={handleSendMessage} />
+                <ChatInput onSend={handleSendMessage} disabled={friend?.is_blocked} />
             </div>
         </div>
     );

@@ -8,6 +8,7 @@ import { Heart, Star, MessageCircle, Users } from "lucide-react";
 import { getAvatarUrl } from "@/lib/storage";
 import ProfileLevelBadge, { ProfileWatchTime } from "@/components/profile/ProfileLevelBadge";
 import { getAvatarFrameFit } from "@/lib/avatarFrames";
+import { avatarFrames } from "@/app/profile/edit/premiumEdit/constants";
 
 interface ProfileCardProps {
   user: {
@@ -16,6 +17,8 @@ interface ProfileCardProps {
     custom_status: string | null;
     created_at: string;
     is_premium?: boolean;
+    selected_profile_frame?: string | null;
+    is_online?: boolean;
   };
   counts: {
     favorites: number;
@@ -24,7 +27,8 @@ interface ProfileCardProps {
     friends: number;
   };
   watchTime?: ProfileWatchTime | null;
-  onLogout: () => void;
+  onLogout?: () => void;
+  editable?: boolean;
 }
 
 export const ProfileCard = ({
@@ -32,24 +36,13 @@ export const ProfileCard = ({
   counts,
   watchTime,
   onLogout,
+  editable = true,
 }: ProfileCardProps) => {
   const avatarUrl = getAvatarUrl(user.avatar);
-  const [avatarFramePath, setAvatarFramePath] = React.useState<string | null>(null);
-  const [avatarFrameKey, setAvatarFrameKey] = React.useState("none");
+  const avatarFrameKey = user.selected_profile_frame || "none";
+  const avatarFramePath = avatarFrames.find((frame) => frame.key === avatarFrameKey)?.imagePath || null;
   const hasAvatarFrame = Boolean(avatarFramePath);
   const avatarFrameFit = getAvatarFrameFit(avatarFrameKey);
-
-  React.useEffect(() => {
-    const syncAvatarFrame = () => {
-      setAvatarFramePath(localStorage.getItem("profile_avatar_frame_path"));
-      setAvatarFrameKey(localStorage.getItem("profile_avatar_frame_key") || "none");
-    };
-
-    syncAvatarFrame();
-    window.addEventListener("storage", syncAvatarFrame);
-
-    return () => window.removeEventListener("storage", syncAvatarFrame);
-  }, []);
 
   return (
     <div className="bg-white dark:bg-[#161616] rounded-lg shadow-sm border border-slate-100 dark:border-gray-800 text-center sticky top-24 relative overflow-hidden">
@@ -122,7 +115,7 @@ export const ProfileCard = ({
             </div>
           )}
 
-          <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-4 border-white dark:border-black/70 rounded-full z-10" />
+          <div className={`absolute bottom-2 right-2 w-5 h-5 ${user.is_online === false ? "bg-gray-400" : "bg-green-500"} border-4 border-white dark:border-black/70 rounded-full z-10`} />
         </div>
 
         <h2
@@ -189,14 +182,14 @@ export const ProfileCard = ({
           В клубе с {new Date(user.created_at).toLocaleDateString()}
         </p>
 
-        <Link href="/profile/edit">
+        {editable && <Link href="/profile/edit">
           <button className="w-full flex items-center justify-center gap-2 bg-brand text-white dark:text-gray-900 py-3 rounded-xl font-bold shadow hover:bg-teal-600 transition hover:scale-[1.02] active:scale-[0.98]">
             <FaEdit className="text-lg" />
             Редактировать
           </button>
-        </Link>
+        </Link>}
 
-        {!user.is_premium && (
+        {editable && !user.is_premium && (
           <Link href="/premium" className="block mt-3">
             <button className="premium-lava-btn w-full h-10 rounded-xl font-black shadow-lg shadow-[#2EC4B6]/40 hover:scale-[1.03] active:scale-[0.97] transition-all">
               <div className="lava-container">
@@ -213,12 +206,12 @@ export const ProfileCard = ({
           </Link>
         )}
 
-        <button
+        {editable && onLogout && <button
           onClick={onLogout}
           className="w-full mt-3 text-red-400 text-sm font-bold hover:underline"
         >
           Выйти
-        </button>
+        </button>}
       </div>
     </div>
   );

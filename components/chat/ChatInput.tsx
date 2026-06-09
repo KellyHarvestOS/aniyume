@@ -11,11 +11,12 @@ import ImageCropModal from '@/components/modals/ImageCropModal';
 
 interface ChatInputProps {
     onSend: (data: { text?: string; gif?: string; image?: File }) => void;
+    disabled?: boolean;
 }
 
 const BANNED_WORDS = ['плохоеслово', 'мат', 'оскорбление'];
 
-export default function ChatInput({ onSend }: ChatInputProps) {
+export default function ChatInput({ onSend, disabled = false }: ChatInputProps) {
     const [message, setMessage] = useState('');
     const [showEmoji, setShowEmoji] = useState(false);
     const [showGif, setShowGif] = useState(false);
@@ -106,7 +107,7 @@ export default function ChatInput({ onSend }: ChatInputProps) {
 
     const handleSend = (e?: React.FormEvent) => {
         e?.preventDefault();
-        if (isMuted || !message.trim()) return;
+        if (isMuted || disabled || !message.trim()) return;
         if (checkSpam()) return;
         const filteredMessage = message;
         onSend({ text: filteredMessage });
@@ -115,7 +116,7 @@ export default function ChatInput({ onSend }: ChatInputProps) {
     };
 
     const handleGifSend = (url: string) => {
-        if (isMuted || checkSpam()) return;
+        if (isMuted || disabled || checkSpam()) return;
         onSend({ gif: url });
         setShowGif(false);
     };
@@ -228,8 +229,8 @@ export default function ChatInput({ onSend }: ChatInputProps) {
                                 handleSend();
                             }
                         }}
-                        disabled={isMuted}
-                        placeholder={isMuted ? `Подождите ${muteTimer}с...` : "Написать сообщение..."}
+                        disabled={isMuted || disabled}
+                        placeholder={disabled ? "Пользователь заблокирован" : isMuted ? `Подождите ${muteTimer}с...` : "Написать сообщение..."}
                         className="w-full bg-transparent resize-none outline-none text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-500 py-3 px-2 max-h-32 min-h-[44px] no-scrollbar"
                         rows={1}
                     />
@@ -246,7 +247,7 @@ export default function ChatInput({ onSend }: ChatInputProps) {
 
                     <button
                         type="submit"
-                        disabled={!message.trim() || isMuted}
+                        disabled={!message.trim() || isMuted || disabled}
                         className="w-12 h-12 bg-brand text-white dark:text-black rounded-xl flex items-center justify-center transition-all active:scale-95 disabled:opacity-50 hover:brightness-110"
                     >
                         <FaPaperPlane size={16} />

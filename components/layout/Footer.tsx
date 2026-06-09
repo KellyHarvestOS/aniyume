@@ -16,6 +16,7 @@ import { IoCall } from "react-icons/io5";
 import { FaXTwitter } from 'react-icons/fa6';
 import { HiAdjustmentsHorizontal, HiMiniBookmark, HiFire } from 'react-icons/hi2';
 import { IoCalendarNumberSharp } from 'react-icons/io5';
+import { getProfilePreference } from '@/lib/profilePreferences';
 
 interface FooterLinkProps {
   href: string;
@@ -32,7 +33,7 @@ export default function Footer() {
 
   const applyTheme = useCallback(() => {
     const isPremium = localStorage.getItem("isPremium") === "true";
-    const savedLogoKey = localStorage.getItem("profile_logo_key");
+    const savedLogoKey = getProfilePreference("logo_key");
 
     if (isPremium && savedLogoKey) {
       setLogoPaths({

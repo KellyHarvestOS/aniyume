@@ -13,6 +13,7 @@ import { BsCursor } from "react-icons/bs";
 import { HiCursorClick } from "react-icons/hi";
 import { getAvatarUrl } from "@/lib/storage";
 import { getAvatarFrameFit } from "@/lib/avatarFrames";
+import { getProfilePreference, setProfilePreference } from "@/lib/profilePreferences";
 
 const MAX_SOCIAL_LINKS = 10;
 
@@ -65,14 +66,6 @@ const normalizeSocialLink = (url: string) => {
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
 };
 
-const readSavedSocialLinks = () => {
-  try {
-    return JSON.parse(localStorage.getItem("profile_social_links") || "[]");
-  } catch {
-    return [];
-  }
-};
-
 const normalizeSocialLinks = (value: unknown) => {
   if (!Array.isArray(value)) return [""];
   const links = value.filter((item): item is string => typeof item === "string");
@@ -94,6 +87,8 @@ export default function EditProfilePage() {
   });
   const [socialLinks, setSocialLinks] = useState<string[]>([""]);
   const [socialLinkErrors, setSocialLinkErrors] = useState<Record<number, string>>({});
+  const [initialName, setInitialName] = useState("");
+  const [nameState, setNameState] = useState<{ checking: boolean; available: boolean | null; suggestions: string[] }>({ checking: false, available: null, suggestions: [] });
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -106,9 +101,9 @@ export default function EditProfilePage() {
 
   useEffect(() => {
     const syncAvatarFrame = () => {
-      setAvatarFramePath(localStorage.getItem("profile_avatar_frame_path"));
+      setAvatarFramePath(getProfilePreference("avatar_frame_path"));
       setAvatarFrameKey(
-        localStorage.getItem("profile_avatar_frame_key") || "none"
+        getProfilePreference("avatar_frame_key", "none") || "none"
       );
     };
 
@@ -123,10 +118,6 @@ export default function EditProfilePage() {
 
   useEffect(() => {
     const fetchCurrentData = async () => {
-      const premiumStatus = localStorage.getItem("isPremium") === "true";
-      setIsPremium(premiumStatus);
-      setIsCustomCursorDisabled(localStorage.getItem("premium_cursor_disabled") === "true");
-
       try {
         const token = localStorage.getItem("userToken");
         if (!token) return router.push("/login");
@@ -137,11 +128,14 @@ export default function EditProfilePage() {
         if (res.ok) {
           const data = await res.json();
           const user = data.user || data;
+          setIsPremium(Boolean(user.is_premium));
+          setIsCustomCursorDisabled(getProfilePreference("premium_cursor_disabled") === "true");
+          setInitialName(user.name || "");
           setFormData({
             name: user.name || "",
             status_text: user.custom_status || user.status_text || "",
           });
-          setSocialLinks(normalizeSocialLinks(user.social_links || user.socials || readSavedSocialLinks()));
+          setSocialLinks(normalizeSocialLinks(user.social_links || user.socials));
 
           const avatar = user.avatar || user.avatar_url;
           if (avatar) {
@@ -156,6 +150,26 @@ export default function EditProfilePage() {
     };
     fetchCurrentData();
   }, [router]);
+
+  useEffect(() => {
+    const name = formData.name.trim();
+    if (!name || name === initialName) {
+      setNameState({ checking: false, available: name === initialName ? true : null, suggestions: [] });
+      return;
+    }
+
+    const timer = window.setTimeout(async () => {
+      setNameState((current) => ({ ...current, checking: true }));
+      const token = localStorage.getItem("userToken");
+      const res = await fetch(`/api/external/profile/name-availability?name=${encodeURIComponent(name)}`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+      });
+      const data = await res.json().catch(() => ({}));
+      setNameState({ checking: false, available: res.ok ? Boolean(data.available) : null, suggestions: data.suggestions || [] });
+    }, 350);
+
+    return () => window.clearTimeout(timer);
+  }, [formData.name, initialName]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -195,7 +209,7 @@ export default function EditProfilePage() {
 
   const handleCursorDisabledChange = (disabled: boolean) => {
     setIsCustomCursorDisabled(disabled);
-    localStorage.setItem("premium_cursor_disabled", String(disabled));
+    setProfilePreference("premium_cursor_disabled", String(disabled));
     document.documentElement.classList.toggle("premium-cursor-disabled", disabled);
     window.dispatchEvent(new Event("premiumUpdate"));
   };
@@ -241,14 +255,17 @@ export default function EditProfilePage() {
       }
 
       const normalizedSocialLinks = socialLinks.map(normalizeSocialLink).filter(Boolean).slice(0, MAX_SOCIAL_LINKS);
-      localStorage.setItem("profile_social_links", JSON.stringify(normalizedSocialLinks));
+      if (nameState.available === false) throw new Error("Это имя уже занято");
       const profileRes = await fetch("/api/external/profile/me", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, Accept: "application/json" },
         body: JSON.stringify({ name: formData.name, custom_status: formData.status_text, social_links: normalizedSocialLinks }),
       });
 
-      if (!profileRes.ok) throw new Error("Ошибка обновления данных профиля");
+      if (!profileRes.ok) {
+        const error = await profileRes.json().catch(() => ({}));
+        throw new Error(error.errors?.name?.[0] || error.message || "Не удалось обновить профиль");
+      }
 
       if (selectedFile) {
         const avatarData = new FormData();
@@ -400,6 +417,15 @@ export default function EditProfilePage() {
                   <FaUser className="text-brand" /> Никнейм
                 </label>
                 <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-6 py-4 bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-white/5 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white dark:focus:bg-[#1a1a1a] transition-all shadow-sm" placeholder="Ваше имя" required />
+                <div className="min-h-5 px-1 text-[11px] font-bold">
+                  {nameState.checking && <span className="text-slate-400">Проверяем имя...</span>}
+                  {!nameState.checking && nameState.available === true && <span className="text-emerald-500">Имя свободно</span>}
+                  {!nameState.checking && nameState.available === false && (
+                    <span className="text-red-500">
+                      Имя занято{nameState.suggestions.length ? ` · свободные варианты: ${nameState.suggestions.join(", ")}` : ""}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-3">

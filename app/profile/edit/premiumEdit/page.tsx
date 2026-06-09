@@ -5,6 +5,7 @@ import { FaChevronLeft } from "react-icons/fa";
 import { SiCodemagic } from "react-icons/si";
 import { getProfileLevel, ProfileWatchTime } from "@/lib/profileLevel";
 import { getAvatarUrl } from "@/lib/storage";
+import { getProfilePreference, setProfilePreference } from "@/lib/profilePreferences";
 
 import { avatarFrames } from "./constants";
 import ThemeSelector from "./ThemeSelector";
@@ -55,12 +56,12 @@ export default function PremiumEditPage() {
         }
         setIsPremium(true);
 
-        const savedValue = localStorage.getItem("profile_theme_value") || "from-[#34dccb] to-[#007492]";
-        const savedType = localStorage.getItem("profile_theme_type") as 'gradient' | 'solid' || 'gradient';
-        const savedCursor = localStorage.getItem("profile_cursor_path") || "/images/cursor/Mouse-cursor.png";
-        const savedCursorKey = localStorage.getItem("profile_cursor_key") || "default";
-        const savedFrame = localStorage.getItem("profile_avatar_frame_key") || "none";
-        const savedFrameDates = localStorage.getItem("profile_avatar_frame_obtained_dates");
+        const savedValue = getProfilePreference("theme_value", "from-[#34dccb] to-[#007492]")!;
+        const savedType = (getProfilePreference("theme_type", "gradient") as 'gradient' | 'solid');
+        const savedCursor = getProfilePreference("cursor_path", "/images/cursor/Mouse-cursor.png")!;
+        const savedCursorKey = getProfilePreference("cursor_key", "default")!;
+        const savedFrame = getProfilePreference("avatar_frame_key", "none")!;
+        const savedFrameDates = getProfilePreference("avatar_frame_obtained_dates");
 
         setProfileValue(savedValue);
         setThemeType(savedType);
@@ -84,10 +85,9 @@ export default function PremiumEditPage() {
                 setPreviewAvatarUrl(getAvatarUrl(user?.avatar || user?.avatar_url));
                 if (user?.selected_profile_frame) {
                     setAvatarFrameKey(user.selected_profile_frame);
-                    localStorage.setItem("profile_avatar_frame_key", user.selected_profile_frame);
+                    setProfilePreference("avatar_frame_key", user.selected_profile_frame);
                     const selected = avatarFrames.find((frame) => frame.key === user.selected_profile_frame);
-                    if (selected?.imagePath) localStorage.setItem("profile_avatar_frame_path", selected.imagePath);
-                    else localStorage.removeItem("profile_avatar_frame_path");
+                    setProfilePreference("avatar_frame_path", selected?.imagePath || null);
                 }
                 if (Array.isArray(data.profile_frames)) {
                     const unlockedDates = data.profile_frames.reduce((acc: Record<string, string>, frame: any) => {
@@ -95,18 +95,18 @@ export default function PremiumEditPage() {
                         return acc;
                     }, {});
                     setFrameObtainedDates((prev) => ({ ...unlockedDates, ...prev }));
-                    localStorage.setItem("profile_avatar_frame_obtained_dates", JSON.stringify({ ...unlockedDates, ...frameObtainedDates }));
+                    setProfilePreference("avatar_frame_obtained_dates", JSON.stringify({ ...unlockedDates, ...frameObtainedDates }));
                 }
             })
             .catch(() => { });
     }, [router, updateGlobalStyles]);
 
     const handleSave = () => {
-        localStorage.setItem("profile_theme_value", profileValue);
-        localStorage.setItem("profile_theme_type", themeType);
-        localStorage.setItem("profile_avatar_frame_key", avatarFrameKey);
-        const savedCursor = localStorage.getItem("profile_cursor_path") || "/images/cursor/Mouse-cursor.png";
-        const savedCursorKey = localStorage.getItem("profile_cursor_key") || "default";
+        setProfilePreference("theme_value", profileValue);
+        setProfilePreference("theme_type", themeType);
+        setProfilePreference("avatar_frame_key", avatarFrameKey);
+        const savedCursor = getProfilePreference("cursor_path", "/images/cursor/Mouse-cursor.png")!;
+        const savedCursorKey = getProfilePreference("cursor_key", "default")!;
         updateGlobalStyles(profileValue, themeType, savedCursor, savedCursorKey);
         alert("Настройки оформления сохранены!");
         router.back();
@@ -117,11 +117,11 @@ export default function PremiumEditPage() {
         setProfileValue(value);
         updateGlobalStyles(value, type, cursorPath, cursorKey);
 
-        localStorage.setItem("profile_logo_key", logoKey);
-        localStorage.setItem("profile_cursor_path", cursorPath);
-        localStorage.setItem("profile_cursor_key", cursorKey);
-        localStorage.setItem("profile_theme_value", value);
-        localStorage.setItem("profile_theme_type", type);
+        setProfilePreference("logo_key", logoKey);
+        setProfilePreference("cursor_path", cursorPath);
+        setProfilePreference("cursor_key", cursorKey);
+        setProfilePreference("theme_value", value);
+        setProfilePreference("theme_type", type);
 
         window.dispatchEvent(new Event('storage'));
     };
@@ -131,16 +131,16 @@ export default function PremiumEditPage() {
         if (frame.key !== "none" && !frameObtainedDates[frame.key]) {
             nextDates[frame.key] = new Date().toISOString();
             setFrameObtainedDates(nextDates);
-            localStorage.setItem("profile_avatar_frame_obtained_dates", JSON.stringify(nextDates));
+            setProfilePreference("avatar_frame_obtained_dates", JSON.stringify(nextDates));
         }
 
         setAvatarFrameKey(frame.key);
-        localStorage.setItem("profile_avatar_frame_key", frame.key);
+        setProfilePreference("avatar_frame_key", frame.key);
         
         if (frame.imagePath) {
-            localStorage.setItem("profile_avatar_frame_path", frame.imagePath);
+            setProfilePreference("avatar_frame_path", frame.imagePath);
         } else {
-            localStorage.removeItem("profile_avatar_frame_path");
+            setProfilePreference("avatar_frame_path", null);
         }
 
         const token = localStorage.getItem("userToken");

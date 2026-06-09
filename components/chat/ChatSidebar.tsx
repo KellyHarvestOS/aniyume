@@ -4,6 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import { getStorageAssetUrl } from '@/lib/storage';
 
 
 
@@ -19,6 +20,7 @@ export interface Message {
 export interface ChatPreview {
     id: number;
     name: string;
+    avatar?: string | null;
     is_online: boolean;
     lastMessage?: string;
     unreadCount?: number;
@@ -63,7 +65,7 @@ export default function ChatSidebar({ chats, activeChatId, searchQuery, setSearc
                             <motion.button
                                 layout
                                 key={chat.id}
-                                onClick={() => router.push(`/chat/${chat.id}`)}
+                                onClick={() => router.push(`/profile/friends/chat/${chat.id}`)}
                                 className={`w-full px-6 py-3 flex items-center gap-4 transition-all group relative overflow-hidden
                                     ${isActive ? 'bg-brand/10 dark:bg-brand/10 border-l-4 border-brand' : 'hover:bg-gray-50 dark:hover:bg-white/5 border-l-4 border-transparent'}
                                 `}
@@ -71,7 +73,7 @@ export default function ChatSidebar({ chats, activeChatId, searchQuery, setSearc
                                 {isActive && <div className="absolute inset-0 bg-gradient-to-r from-brand/10 to-transparent pointer-events-none" />}
 
                                 <div className="relative shrink-0">
-                                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${chat.id}`} alt={chat.name} className="w-12 h-12 rounded-full border border-gray-200 dark:border-white/10 object-cover bg-gray-800" />
+                                    <img src={getStorageAssetUrl(chat.avatar) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${chat.id}`} alt={chat.name} className="w-12 h-12 rounded-full border border-gray-200 dark:border-white/10 object-cover bg-gray-800" />
                                     <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 border-2 border-white dark:border-[#111111] rounded-full ${chat.is_online ? 'bg-brand' : 'bg-gray-400'}`} />
                                 </div>
 

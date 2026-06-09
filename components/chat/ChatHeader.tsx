@@ -4,14 +4,19 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FaArrowLeft, FaEllipsisV, FaBan, FaTrashAlt, FaPlay } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getStorageAssetUrl } from '@/lib/storage';
 
 interface ChatHeaderProps {
     friendId: number;
     friendName: string;
+    friendAvatar?: string | null;
     isOnline: boolean;
+    isBlocked?: boolean;
+    onClear?: () => void | Promise<void>;
+    onBlock?: () => void | Promise<void>;
 }
 
-export default function ChatHeader({ friendId, friendName, isOnline }: ChatHeaderProps) {
+export default function ChatHeader({ friendId, friendName, friendAvatar, isOnline, isBlocked = false, onClear, onBlock }: ChatHeaderProps) {
     const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -31,14 +36,14 @@ export default function ChatHeader({ friendId, friendName, isOnline }: ChatHeade
         router.push('/watch'); 
     };
 
-    const handleClearChat = () => {
+    const handleClearChat = async () => {
         setIsMenuOpen(false);
-        alert('История сообщений очищена!');
+        if (window.confirm('Очистить всю переписку?')) await onClear?.();
     };
 
-    const handleBlockUser = () => {
+    const handleBlockUser = async () => {
         setIsMenuOpen(false);
-        alert(`Пользователь ${friendName} заблокирован!`);
+        await onBlock?.();
     };
 
     return (
@@ -56,7 +61,7 @@ export default function ChatHeader({ friendId, friendName, isOnline }: ChatHeade
                     <div className="flex items-center gap-4 group cursor-pointer">
                         <div className="relative">
                             <img
-                                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${friendId}`}
+                                src={getStorageAssetUrl(friendAvatar) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${friendId}`}
                                 alt="Avatar"
                                 className="relative w-12 h-12 rounded-xl border-2 border-white dark:border-[#151515] object-cover bg-gray-800 z-10 transition-transform duration-300 group-hover:scale-105"
                             />
@@ -120,7 +125,7 @@ export default function ChatHeader({ friendId, friendName, isOnline }: ChatHeade
                                     className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] text-red-600 dark:text-red-500 hover:bg-red-500/10 transition-all group"
                                 >
                                     <FaBan size={12} className="group-hover:scale-110 transition-transform" /> 
-                                    Заблокировать
+                                    {isBlocked ? 'Разблокировать' : 'Заблокировать'}
                                 </button>
                             </motion.div>
                         )}

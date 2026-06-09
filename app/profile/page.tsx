@@ -15,12 +15,7 @@ export default function ProfilePage() {
   const [statsSummary, setStatsSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const [localPremium, setLocalPremium] = useState(false);
-
   useEffect(() => {
-    const premiumStatus = localStorage.getItem("isPremium") === "true";
-    setLocalPremium(premiumStatus);
-
     const fetchAllData = async () => {
       try {
         const token = localStorage.getItem("userToken");
@@ -59,10 +54,7 @@ export default function ProfilePage() {
   if (loading) return <ProfileSkeleton />;
   if (!data) return null;
 
-  const user = {
-    ...(data.user || data),
-    is_premium: localPremium
-  };
+  const user = data.user || data;
 
   const counts = {
     favorites: data.counts?.favorites || 0,

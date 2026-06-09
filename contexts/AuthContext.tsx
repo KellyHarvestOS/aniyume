@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { setActiveProfileUserId } from '@/lib/profilePreferences';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -61,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then((data) => {
         const u = data.user || data;
         setUser(u);
+        setActiveProfileUserId(u.id);
         localStorage.setItem('isPremium', u.is_premium ? 'true' : 'false');
       })
       .catch(() => {
@@ -74,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = (newToken: string, newUser: AuthUser) => {
     localStorage.setItem('userToken', newToken);
     localStorage.setItem('isPremium', newUser.is_premium ? 'true' : 'false');
+    setActiveProfileUserId(newUser.id);
     setToken(newToken);
     setUser(newUser);
   };
@@ -81,6 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     localStorage.removeItem('userToken');
     localStorage.removeItem('isPremium');
+    setActiveProfileUserId(null);
     setToken(null);
     setUser(null);
   };
