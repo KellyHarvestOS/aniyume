@@ -275,7 +275,7 @@ export default function FriendsPage() {
                         </motion.div>
                     ))}
 
-                    {/* Исходящие заявки (не в режиме поиска) */}
+
                     {!isSearchMode && outgoing.map((u) => (
                         <motion.div
                             layout
@@ -307,7 +307,6 @@ export default function FriendsPage() {
                         </motion.div>
                     ))}
 
-                    {/* Основная сетка: друзья (с учётом локального поиска) */}
                     {isLoading && !isSearchMode ? (
                         <div className="col-span-full py-20 text-center">
                             <div className="w-12 h-12 rounded-full border-4 border-brand/30 border-t-brand animate-spin mx-auto" />
@@ -320,44 +319,58 @@ export default function FriendsPage() {
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
-                                whileHover={{ y: -8 }}
-                                className="custom-glass rounded-lg p-8 border border-white/5 hover:border-brand/30 transition-all duration-300 relative group"
+                                whileHover={{ y: -4 }}
+                                className="bg-white dark:bg-[#161616] rounded-lg shadow-sm border border-slate-100 dark:border-gray-800 hover:border-brand transition-all duration-300 relative group p-6 text-center"
                             >
-                                <div className="absolute top-8 left-8">
-                                    <span className="text-[9px] font-black text-gray-500 dark:text-white/20">ID: {u.id}</span>
+                                <div className="absolute top-4 left-4 z-10">
+                                    <span className="text-[10px] text-slate-400 font-bold uppercase">ID: {u.id}</span>
                                 </div>
 
-                                <div className="absolute top-8 right-8 flex items-center">
-                                    <span className={`status-dot ${u.is_online ? 'bg-brand' : 'bg-gray-400'}`} />
-                                    <span className="text-[9px] font-black uppercase text-gray-400 tracking-tighter">
-                                        {u.is_online ? 'В сети' : (u.custom_status || 'Оффлайн')}
-                                    </span>
-                                </div>
+                                <div className="flex flex-col items-center mt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => openProfile(u.id)}
+                                        className="relative w-24 h-24 mx-auto mb-4 hover:scale-105 active:scale-95 transition-transform"
+                                    >
+                                        <img
+                                            src={getAvatar(u)}
+                                            alt={u.name}
+                                            className="w-full h-full rounded-full object-cover shadow-lg border-4 border-white dark:border-[#1d1d1d]"
+                                        />
 
-                                <div className="flex flex-col items-center">
-                                    <button type="button" onClick={() => openProfile(u.id)} className="w-24 h-24 rounded-full border border-gray-100 dark:border-white/5 p-1.5 mb-6 mt-4">
-                                        <img src={getAvatar(u)} alt={u.name} className="w-full h-full rounded-full object-cover bg-gray-50 dark:bg-white/5" />
+                                        <div
+                                            className={`absolute bottom-1 right-1 w-5 h-5 ${u.is_online ? "bg-green-500" : "bg-gray-400"} border-4 border-white dark:border-[#161616] rounded-full z-10`}
+                                        />
                                     </button>
 
-                                    <button type="button" onClick={() => openProfile(u.id)} className="text-2xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white mb-8 group-hover:text-brand transition-colors">
+                                    <button
+                                        type="button"
+                                        onClick={() => openProfile(u.id)}
+                                        className="text-xl font-black mt-2 text-slate-900 dark:text-white hover:text-brand dark:hover:text-brand transition-colors"
+                                    >
                                         {u.name}
                                     </button>
 
-                                    <div className="flex gap-2 w-full mt-2">
+                                    <p className="text-sm w-full px-2 font-bold mt-1 text-slate-900 dark:text-gray-100 italic truncate">
+                                        {u.custom_status || (u.is_online ? 'В сети' : 'Не в сети')}
+                                    </p>
+
+                                    <div className="flex gap-2 w-full mt-6">
+
                                         <button
                                             onClick={() => router.push(`/profile/friends/chat/${u.id}`)}
-                                            className="flex-1 h-[48px] bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-900 dark:text-white rounded-xl relative overflow-hidden transition-all active:scale-95 flex items-center justify-center gap-2 border border-transparent hover:border-brand/30 group"
+                                            className="flex-1 flex items-center justify-center gap-2 bg-slate-100 dark:bg-[#161616] py-3 rounded-xl border border-slate-100 dark:border-gray-800 hover:border-brand transition group active:scale-[0.98]"
                                         >
-                                            <FaCommentAlt size={12} className="text-gray-400 group-hover:text-brand transition-colors" />
-                                            <span className="text-[10px] font-black uppercase tracking-[0.1em] italic">Чат</span>
+                                            <FaCommentAlt size={14} className="text-slate-400 group-hover:text-brand transition-colors" />
+                                            <span className="text-[10px] font-bold text-slate-400 group-hover:text-brand uppercase transition-colors">Чат</span>
                                         </button>
 
                                         <button
                                             onClick={() => router.push('/watch')}
-                                            className="flex-[1.5] h-[48px] bg-brand text-white dark:text-black rounded-xl relative overflow-hidden transition-all active:scale-95 shadow-lg shadow-brand/20 hover:brightness-110 flex items-center justify-center gap-2"
+                                            className="flex-[1.5] flex items-center justify-center gap-2 bg-brand text-white dark:text-gray-900 py-3 rounded-xl font-bold shadow hover:bg-teal-600 transition hover:scale-[1.02] active:scale-[0.98]"
                                         >
-                                            <FaPlay size={10} className="fill-current" />
-                                            <span className="text-[10px] font-black uppercase tracking-[0.1em] italic">Позвать</span>
+                                            <FaPlay size={12} className="fill-current" />
+                                            <span className="text-[10px] font-bold uppercase">Позвать</span>
                                         </button>
                                     </div>
                                 </div>

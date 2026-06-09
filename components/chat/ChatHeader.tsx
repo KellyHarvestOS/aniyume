@@ -33,7 +33,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
 
     const handleInvite = () => {
         setIsMenuOpen(false);
-        router.push('/watch'); 
+        router.push('/watch');
     };
 
     const handleClearChat = async () => {
@@ -49,7 +49,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
     return (
         <div className="relative z-[100] custom-glass border-b  border-gray-100 dark:border-white/5 shrink-0 px-4 md:px-8 bg-white/40 dark:bg-black/40 backdrop-blur-xl">
             <div className="h-20 flex items-center justify-between">
-                
+
                 <div className="flex items-center gap-4 md:gap-6">
                     <button
                         onClick={() => router.push('/profile/friends')}
@@ -63,7 +63,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
                             <img
                                 src={getStorageAssetUrl(friendAvatar) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${friendId}`}
                                 alt="Avatar"
-                                className="relative w-12 h-12 rounded-xl border-2 border-white dark:border-[#151515] object-cover bg-gray-800 z-10 transition-transform duration-300 group-hover:scale-105"
+                                className="relative w-12 h-12 rounded-full border-2 border-white dark:border-[#151515] object-cover bg-gray-800 z-10 transition-transform duration-300 group-hover:scale-105"
                             />
                             <div className={`absolute -bottom-1 -right-1 w-4 h-4 border-2 border-white dark:border-[#111111] rounded-full z-20 ${isOnline ? 'bg-brand' : 'bg-gray-500'}`} />
                         </div>
@@ -80,11 +80,11 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
                 </div>
 
                 <div className="relative" ref={menuRef}>
-                    <button 
+                    <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border border-transparent
-                            ${isMenuOpen 
-                                ? 'bg-brand/10 text-brand border-brand/30' 
+                            ${isMenuOpen
+                                ? 'bg-brand/10 text-brand border-brand/30'
                                 : 'bg-white dark:bg-white/5 text-gray-500 hover:text-brand hover:border-brand/30'
                             } hover:scale-105 active:scale-95`}
                     >
@@ -99,32 +99,32 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                                 transition={{ duration: 0.15 }}
-                                
+
                                 className="absolute right-0 top-14 w-64  z-[120] bg-white dark:bg-[#151515]/95  rounded-xl  p-2 border border-gray-200 dark:border-white/10 z-50 overflow-hidden"
                             >
-                                <button 
+                                <button
                                     onClick={handleInvite}
                                     className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] text-brand hover:bg-brand/10 transition-all group"
                                 >
-                                    <FaPlay size={10} className="group-hover:scale-110 transition-transform" /> 
+                                    <FaPlay size={10} className="group-hover:scale-110 transition-transform" />
                                     Пригласить на просмотр
                                 </button>
 
                                 <div className="h-px w-full bg-gray-200 dark:bg-white/5 my-1" />
 
-                                <button 
+                                <button
                                     onClick={handleClearChat}
                                     className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] text-orange-500 hover:bg-orange-500/10 transition-all group"
                                 >
-                                    <FaTrashAlt size={12} className="group-hover:scale-110 transition-transform" /> 
+                                    <FaTrashAlt size={12} className="group-hover:scale-110 transition-transform" />
                                     Очистить чат
                                 </button>
-                                
-                                <button 
+
+                                <button
                                     onClick={handleBlockUser}
                                     className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] text-red-600 dark:text-red-500 hover:bg-red-500/10 transition-all group"
                                 >
-                                    <FaBan size={12} className="group-hover:scale-110 transition-transform" /> 
+                                    <FaBan size={12} className="group-hover:scale-110 transition-transform" />
                                     {isBlocked ? 'Разблокировать' : 'Заблокировать'}
                                 </button>
                             </motion.div>

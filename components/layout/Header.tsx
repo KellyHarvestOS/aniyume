@@ -19,10 +19,9 @@ export default function Header() {
   const { user, isLoading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Динамические пути логотипа (с поддержкой premium-тем)
   const [logoPaths, setLogoPaths] = useState({
-    light: '/images/logo0.png',
-    dark: '/images/logo01.png'
+    light: '/images/logo01.png',
+    dark: '/images/logo0.png'
   });
 
   useEffect(() => {
