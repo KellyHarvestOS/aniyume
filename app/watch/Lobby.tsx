@@ -1,8 +1,10 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { FaPlus, FaHashtag, FaDoorOpen, FaUsers, FaArrowLeft } from 'react-icons/fa';
-
-
+import { useAuth } from '@/contexts/AuthContext';
+import { getProfilePreference } from '@/lib/profilePreferences';
 
 interface LobbyProps {
     onCreate: () => void;
@@ -13,11 +15,38 @@ interface LobbyProps {
 }
 
 export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: LobbyProps) => {
+
+    const { user } = useAuth();
+
+
+    const [logoPaths, setLogoPaths] = useState({
+        light: '/images/logo01.png',
+        dark: '/images/logo0.png'
+    });
+
+    useEffect(() => {
+        const applyLogo = () => {
+            const isPremium = user?.is_premium || localStorage.getItem("isPremium") === "true";
+            const savedLogoKey = getProfilePreference("logo_key");
+
+            if (isPremium && savedLogoKey) {
+                setLogoPaths({
+                    light: `/images/LogoStyle/${savedLogoKey}Dark.png`,
+                    dark: `/images/LogoStyle/${savedLogoKey}White.png`
+                });
+            } else {
+                setLogoPaths({ light: '/images/logo01.png', dark: '/images/logo0.png' });
+            }
+        };
+
+        applyLogo();
+
+        window.addEventListener('storage', applyLogo);
+        return () => window.removeEventListener('storage', applyLogo);
+    }, [user]);
+
     return (
         <div className="min-h-screen bg-[#f8fafc] dark:bg-[#050505] flex items-center justify-center p-4 md:p-8 transition-colors overflow-hidden relative">
-
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#21D0B8] opacity-10 blur-[120px] rounded-full" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600 opacity-10 blur-[120px] rounded-full" />
 
             <div className="max-w-5xl w-full bg-white/70 dark:bg-[#0f0f0f]/80 backdrop-blur-2xl rounded-4xl border border-gray-200/50 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col md:flex-row items-stretch transition-all">
 
@@ -31,18 +60,22 @@ export const Lobby = ({ onCreate, onJoin, onBack, inputCode, setInputCode }: Lob
                 <div className="md:w-1/2 p-12 bg-linear-to-br from-[#21D0B8]/10 to-transparent flex flex-col justify-center border-b md:border-b-0 md:border-r border-gray-100 dark:border-white/5">
                     <div className="mb-8">
                         <Image
-                            src="/images/logo0.png"
+                            src={logoPaths.dark}
                             alt="AniYume"
                             width={180}
                             height={100}
-                            className="dark:hidden h-25 w-auto"
+                            className="dark:hidden h-25 w-auto object-contain"
+                            priority
+                            key={`dark-${logoPaths.dark}`}
                         />
                         <Image
-                            src="/images/logo01.png"
+                            src={logoPaths.light}
                             alt="AniYume"
                             width={180}
                             height={100}
-                            className="hidden dark:block h-25 w-auto"
+                            className="hidden dark:block h-25 w-auto object-contain"
+                            priority
+                            key={`light-${logoPaths.light}`}
                         />
                     </div>
                     <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white leading-[1.1] mb-6 uppercase tracking-tighter">
