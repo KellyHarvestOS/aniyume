@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { FaUserPlus, FaUserCircle } from 'react-icons/fa';
 import { HiAdjustmentsHorizontal, HiMiniBookmark, HiFire } from "react-icons/hi2";
 import { CgMenuRightAlt, CgMenuRight } from "react-icons/cg";
-import { IoCalendarNumberSharp } from "react-icons/io5";
+import { IoCalendarNumberSharp, IoChatboxEllipses } from "react-icons/io5";
 import ThemeToggle from './ThemeToggle';
 import SearchBar from './SearchBar';
 import { useAuth } from '@/contexts/AuthContext';
@@ -86,6 +86,8 @@ export default function Header() {
 
   const avatarUrl = getStorageAssetUrl(user?.avatar);
   const isLoggedIn = !!user;
+
+  const isChatActive = pathname.startsWith('/profile/friends/chat');
 
   const navLinks = [
     { href: '/popular', label: 'Популярное', icon: <HiFire /> },
@@ -169,20 +171,35 @@ export default function Header() {
             {isLoading ? (
               <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
             ) : isLoggedIn ? (
-              <Link href="/profile" className="flex items-center transition-transform hover:scale-105">
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt="Profile"
-                    className={`w-9 h-9 rounded-full object-cover border-2 shadow-sm ${pathname === '/profile' ? 'border-brand' : 'border-transparent'}`}
-                    style={{ borderColor: pathname === '/profile' ? 'var(--brand-main)' : '' }}
+              <div className="flex items-center gap-3 sm:gap-4">
+                <Link
+                  href={`/profile/friends/chat/${user?.id}`}
+                  className="relative group transition-transform hover:scale-110 active:scale-95"
+                  title="Сообщения"
+                >
+                  <IoChatboxEllipses
+                    size={26}
+                    className={`transition-colors ${isChatActive ? 'text-brand' : 'text-gray-400 dark:text-gray-500 group-hover:text-brand'}`}
                   />
-                ) : (
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold ${pathname === '/profile' ? 'bg-brand' : 'bg-gray-400'}`}>
-                    {user?.name ? user.name[0].toUpperCase() : <FaUserCircle size={32} />}
-                  </div>
-                )}
-              </Link>
+
+                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
+                </Link>
+
+                <Link href="/profile" className="flex items-center transition-transform hover:scale-105">
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt="Profile"
+                      className={`w-9 h-9 rounded-full object-cover border-2 shadow-sm ${pathname === '/profile' ? 'border-brand' : 'border-transparent'}`}
+                      style={{ borderColor: pathname === '/profile' ? 'var(--brand-main)' : '' }}
+                    />
+                  ) : (
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold ${pathname === '/profile' ? 'bg-brand' : 'bg-gray-400'}`}>
+                      {user?.name ? user.name[0].toUpperCase() : <FaUserCircle size={32} />}
+                    </div>
+                  )}
+                </Link>
+              </div>
             ) : (
               <div className="flex items-center gap-2">
                 <Link

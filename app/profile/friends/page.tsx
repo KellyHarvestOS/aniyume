@@ -174,9 +174,10 @@ export default function FriendsPage() {
     }
 
     :global(body)::-webkit-scrollbar-thumb {
-        background-color: brand;
-        border-radius: 20px;
-        border: 2px solid transparent;
+       background-color: ##828282; 
+    border-radius: 20px;
+    background-clip: content-box;
+    border: 2px solid transparent;
     }
 
     .custom-glass {
