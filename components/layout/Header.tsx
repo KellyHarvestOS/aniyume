@@ -7,7 +7,8 @@ import { usePathname } from 'next/navigation';
 import { FaUserPlus, FaUserCircle } from 'react-icons/fa';
 import { HiAdjustmentsHorizontal, HiMiniBookmark, HiFire } from "react-icons/hi2";
 import { CgMenuRightAlt, CgMenuRight } from "react-icons/cg";
-import { IoCalendarNumberSharp, IoChatboxEllipses } from "react-icons/io5";
+import { IoCalendarNumberSharp } from "react-icons/io5";
+import { HiOutlineChatBubbleOvalLeftEllipsis } from "react-icons/hi2";
 import ThemeToggle from './ThemeToggle';
 import SearchBar from './SearchBar';
 import { useAuth } from '@/contexts/AuthContext';
@@ -177,12 +178,12 @@ export default function Header() {
                   className="relative group transition-transform hover:scale-110 active:scale-95"
                   title="Сообщения"
                 >
-                  <IoChatboxEllipses
+                  <HiOutlineChatBubbleOvalLeftEllipsis
                     size={26}
                     className={`transition-colors ${isChatActive ? 'text-brand' : 'text-gray-400 dark:text-gray-500 group-hover:text-brand'}`}
                   />
 
-                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
                 </Link>
 
                 <Link href="/profile" className="flex items-center transition-transform hover:scale-105">
