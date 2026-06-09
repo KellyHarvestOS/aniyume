@@ -127,11 +127,13 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="h-screen max-h-[100dvh] bg-white dark:bg-[#111111] transition-colors overflow-hidden relative flex">
+        <div className="fixed inset-0 h-screen w-screen bg-white dark:bg-[#111111] overflow-hidden flex flex-row">
+
             <ChatSidebar chats={chats} activeChatId={friendId} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-            <div className={`flex-1 flex flex-col min-w-0 relative h-full bg-white dark:bg-[#111111] ${!friendId ? 'hidden lg:flex' : 'flex'}`}>
-                <div className="shrink-0 z-50">
+            <div className={`flex-1 flex flex-col h-full min-w-0 bg-white dark:bg-[#111111] ${!friendId ? 'hidden lg:flex' : 'flex'}`}>
+
+                <div className="shrink-0 z-[100] border-b border-gray-100 dark:border-white/5">
                     <ChatHeader
                         friendId={friendId}
                         friendName={friend?.name || `Пользователь ${friendId}`}
@@ -145,19 +147,28 @@ export default function ChatPage() {
 
                 <div
                     ref={scrollContainerRef}
-                    className="flex-1 overflow-y-auto px-3 md:px-8 py-4 flex flex-col gap-2 
+                    className="flex-1 overflow-y-auto overflow-x-hidden px-3 md:px-8 py-4 flex flex-col gap-2 
                     scrollbar-thin scrollbar-thumb-brand scrollbar-track-transparent
-                    [&::-webkit-scrollbar]:w-2
-                    [&::-webkit-scrollbar-track]:bg-transparent
+                    [&::-webkit-scrollbar]:w-1.5
                     [&::-webkit-scrollbar-thumb]:bg-brand
                     [&::-webkit-scrollbar-thumb]:rounded-full"
                 >
-                    {error && <p className="mx-auto rounded-xl bg-red-500/10 p-3 text-[12px] md:text-sm font-bold text-red-500 max-w-[90%] text-center">{error}</p>}
-                    {messages.map((message) => <ChatMessage key={message.id} msg={message} isMe={message.senderId === me?.id} />)}
-                    {!messages.length && !error && <p className="pt-10 text-center text-xs md:text-sm text-gray-400">Здесь пока нет сообщений</p>}
+                    {error && (
+                        <div className="sticky top-2 z-10 mx-auto rounded-xl bg-red-500/10 p-3 text-[11px] md:text-sm font-bold text-red-500 max-w-[90%] text-center backdrop-blur-md border border-red-500/20">
+                            {error}
+                        </div>
+                    )}
+                    {messages.map((message) => (
+                        <ChatMessage key={message.id} msg={message} isMe={message.senderId === me?.id} />
+                    ))}
+                    {!messages.length && !error && (
+                        <p className="mt-auto mb-auto text-center text-xs md:text-sm text-gray-400">
+                            Здесь пока нет сообщений
+                        </p>
+                    )}
                 </div>
 
-                <div className="shrink-0 bg-white dark:bg-[#111111] px-3 pb-3 md:px-0 md:pb-0">
+                <div className="shrink-0 z-50 bg-white dark:bg-[#111111] px-3 pb-3 md:px-6 md:pb-4 border-t border-gray-100 dark:border-white/5">
                     <ChatInput onSend={handleSendMessage} disabled={friend?.is_blocked} />
                 </div>
             </div>
