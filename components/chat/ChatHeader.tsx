@@ -1,11 +1,10 @@
-'use client';
 
+'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { FaArrowLeft, FaEllipsisV, FaBan, FaTrashAlt, FaPlay } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getStorageAssetUrl } from '@/lib/storage';
-
 interface ChatHeaderProps {
     friendId: number;
     friendName: string;
@@ -15,7 +14,6 @@ interface ChatHeaderProps {
     onClear?: () => void | Promise<void>;
     onBlock?: () => void | Promise<void>;
 }
-
 export default function ChatHeader({ friendId, friendName, friendAvatar, isOnline, isBlocked = false, onClear, onBlock }: ChatHeaderProps) {
     const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -47,32 +45,32 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
     };
 
     return (
-        <div className="relative z-[100] custom-glass border-b  border-gray-100 dark:border-white/5 shrink-0 px-4 md:px-8 bg-white/40 dark:bg-black/40 backdrop-blur-xl">
-            <div className="h-20 flex items-center justify-between">
+        <div className="relative z-[100] custom-glass border-b border-gray-100 dark:border-white/5 shrink-0 px-3 md:px-8 bg-white/40 dark:bg-black/40 backdrop-blur-xl">
+            <div className="h-16 md:h-20 flex items-center justify-between">
 
-                <div className="flex items-center gap-4 md:gap-6">
+                <div className="flex items-center gap-3 md:gap-6">
                     <button
                         onClick={() => router.push('/profile/friends')}
-                        className="w-10 h-10 rounded-xl bg-white dark:bg-white/5 flex items-center justify-center text-gray-500 hover:text-brand transition-all duration-300 group border border-transparent hover:border-brand/30 hover:scale-105 active:scale-95"
+                        className="w-9 h-9 md:w-10 h-10 rounded-xl bg-white dark:bg-white/5 flex items-center justify-center text-gray-500 hover:text-brand transition-all duration-300 group border border-transparent hover:border-brand/30 hover:scale-105 active:scale-95"
                     >
-                        <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" />
+                        <FaArrowLeft size={14} className="md:text-base group-hover:-translate-x-1 transition-transform" />
                     </button>
 
-                    <div className="flex items-center gap-4 group cursor-pointer">
-                        <div className="relative">
+                    <div className="flex items-center gap-3 md:gap-4 group cursor-pointer">
+                        <div className="relative shrink-0">
                             <img
                                 src={getStorageAssetUrl(friendAvatar) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${friendId}`}
                                 alt="Avatar"
-                                className="relative w-12 h-12 rounded-full border-2 border-white dark:border-[#151515] object-cover bg-gray-800 z-10 transition-transform duration-300 group-hover:scale-105"
+                                className="relative w-10 h-10 md:w-12 h-12 rounded-full border-2 border-white dark:border-[#151515] object-cover bg-gray-800 z-10 transition-transform duration-300 group-hover:scale-105"
                             />
-                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 border-2 border-white dark:border-[#111111] rounded-full z-20 ${isOnline ? 'bg-brand' : 'bg-gray-500'}`} />
+                            <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 md:w-4 md:h-4 border-2 border-white dark:border-[#111111] rounded-full z-20 ${isOnline ? 'bg-brand' : 'bg-gray-500'}`} />
                         </div>
 
-                        <div>
-                            <h2 className="text-xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white leading-none group-hover:text-brand transition-colors">
+                        <div className="min-w-0">
+                            <h2 className="text-base md:text-xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white leading-none group-hover:text-brand transition-colors truncate">
                                 {friendName}
                             </h2>
-                            <p className={`text-[10px] font-bold uppercase tracking-[0.2em] mt-1.5 flex items-center gap-1.5 ${isOnline ? 'text-brand' : 'text-gray-400'}`}>
+                            <p className={`text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] mt-1 md:mt-1.5 flex items-center gap-1.5 ${isOnline ? 'text-brand' : 'text-gray-400'}`}>
                                 {isOnline ? 'В сети' : 'Оффлайн'}
                             </p>
                         </div>
@@ -82,13 +80,13 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
                 <div className="relative" ref={menuRef}>
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border border-transparent
-                            ${isMenuOpen
+                        className={`w-9 h-9 md:w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border border-transparent
+                        ${isMenuOpen
                                 ? 'bg-brand/10 text-brand border-brand/30'
                                 : 'bg-white dark:bg-white/5 text-gray-500 hover:text-brand hover:border-brand/30'
                             } hover:scale-105 active:scale-95`}
                     >
-                        <FaEllipsisV className={`transition-transform duration-300 ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`} />
+                        <FaEllipsisV size={14} className={`md:text-base transition-transform duration-300 ${isMenuOpen ? 'rotate-90' : 'rotate-0'}`} />
                     </button>
 
 
@@ -99,12 +97,11 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                                 transition={{ duration: 0.15 }}
-
-                                className="absolute right-0 top-14 w-64  z-[120] bg-white dark:bg-[#151515]/95  rounded-xl  p-2 border border-gray-200 dark:border-white/10 z-50 overflow-hidden"
+                                className="absolute right-0 top-12 md:top-14 w-56 md:w-64 z-[120] bg-white dark:bg-[#151515]/95 rounded-xl p-1.5 md:p-2 border border-gray-200 dark:border-white/10 overflow-hidden shadow-xl"
                             >
                                 <button
                                     onClick={handleInvite}
-                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] text-brand hover:bg-brand/10 transition-all group"
+                                    className="w-full flex items-center gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] text-brand hover:bg-brand/10 transition-all group"
                                 >
                                     <FaPlay size={10} className="group-hover:scale-110 transition-transform" />
                                     Пригласить на просмотр
@@ -114,7 +111,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
 
                                 <button
                                     onClick={handleClearChat}
-                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] text-orange-500 hover:bg-orange-500/10 transition-all group"
+                                    className="w-full flex items-center gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] text-orange-500 hover:bg-orange-500/10 transition-all group"
                                 >
                                     <FaTrashAlt size={12} className="group-hover:scale-110 transition-transform" />
                                     Очистить чат
@@ -122,7 +119,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
 
                                 <button
                                     onClick={handleBlockUser}
-                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] text-red-600 dark:text-red-500 hover:bg-red-500/10 transition-all group"
+                                    className="w-full flex items-center gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] text-red-600 dark:text-red-500 hover:bg-red-500/10 transition-all group"
                                 >
                                     <FaBan size={12} className="group-hover:scale-110 transition-transform" />
                                     {isBlocked ? 'Разблокировать' : 'Заблокировать'}
