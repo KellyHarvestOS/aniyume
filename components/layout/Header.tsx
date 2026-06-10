@@ -12,12 +12,14 @@ import { HiOutlineChatBubbleOvalLeftEllipsis } from "react-icons/hi2";
 import ThemeToggle from './ThemeToggle';
 import SearchBar from './SearchBar';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAuthModal } from '@/contexts/AuthModalContext';
 import { getStorageAssetUrl } from '@/lib/storage';
 import { getProfilePreference } from '@/lib/profilePreferences';
 
 export default function Header() {
   const pathname = usePathname();
   const { user, isLoading } = useAuth();
+  const { openAuth } = useAuthModal();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [chatHref, setChatHref] = useState('/profile/friends');
 
@@ -245,19 +247,21 @@ export default function Header() {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Link
-                  href="/login"
-                  className={`hidden sm:inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition-all ${pathname === '/login' ? 'text-brand' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                <button
+                  type="button"
+                  onClick={() => openAuth('login')}
+                  className="hidden sm:inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition-all hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                   <span>Вход</span>
-                </Link>
-                <Link
-                  href="/register"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openAuth('register')}
                   className="flex items-center gap-2 rounded-xl bg-brand px-4 py-2 sm:px-5 sm:py-2.5 text-sm font-bold text-white shadow-lg shadow-brand/20 hover:bg-brand-hover transition-all active:scale-95"
                 >
                   <FaUserPlus className="hidden sm:inline" />
                   <span>Регистрация</span>
-                </Link>
+                </button>
               </div>
             )}
 
@@ -307,13 +311,13 @@ export default function Header() {
 
           {!isLoggedIn && (
             <div className="flex flex-col gap-3 pb-4">
-              <Link
-                href="/login"
-                onClick={() => setIsMenuOpen(false)}
+              <button
+                type="button"
+                onClick={() => { setIsMenuOpen(false); openAuth('login'); }}
                 className="w-full py-4 text-center font-bold rounded-2xl bg-gray-100 dark:bg-white/10"
               >
                 Вход в аккаунт
-              </Link>
+              </button>
             </div>
           )}
         </div>

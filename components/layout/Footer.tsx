@@ -6,14 +6,12 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   FaTelegram,
-  FaYoutube,
   FaDiscord,
   FaShieldAlt,
   FaBalanceScale,
   FaQuestionCircle,
 } from 'react-icons/fa';
 import { IoCall } from "react-icons/io5";
-import { FaXTwitter } from 'react-icons/fa6';
 import { HiAdjustmentsHorizontal, HiMiniBookmark, HiFire } from 'react-icons/hi2';
 import { IoCalendarNumberSharp } from 'react-icons/io5';
 import { getProfilePreference } from '@/lib/profilePreferences';
@@ -121,22 +119,19 @@ export default function Footer() {
           </Block>
 
           <Block title="Поддержка">
-            <p className="text-slate-600 dark:text-gray-400">Наша команда отвечает ежедневно</p>
+            <p className="text-slate-600 dark:text-gray-400">Наша команда отвечает на сообщения</p>
             <a
-              href="mailto:support@aniyume.com"
+              href="mailto:zanshugurov07@gmail.com"
               className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-brand px-6 py-4 font-semibold text-white transition hover:brightness-110 shadow-lg shadow-brand/20"
             >
-              support@aniyume.com
+              zanshugurov07@gmail.com
             </a>
-            <span className="mt-3 block text-sm text-slate-400 dark:text-gray-400">10:00 – 22:00</span>
           </Block>
 
           <Block title="Мы в соцсетях">
-            <div className="grid grid-cols-4 gap-3 justify-items-center lg:justify-items-start">
-              <SocialCard href="https://discord.gg/PYMXhXcR5Y" icon={FaDiscord} label="Discord" hoverClass="hover:bg-[#5865F2]! hover:text-white!" />
+            <div className="grid grid-cols-2 gap-3 justify-items-center lg:justify-items-start">
+              <SocialCard href="https://discord.com/invite/PYMXhXcR5Y" icon={FaDiscord} label="Discord" hoverClass="hover:bg-[#5865F2]! hover:text-white!" />
               <SocialCard href="https://t.me/aniYume_group" icon={FaTelegram} label="Telegram" hoverClass="hover:bg-[#2ca0de]! hover:text-white!" />
-              <SocialCard href="https://www.youtube.com/" icon={FaYoutube} label="YouTube" hoverClass="hover:bg-[#FF0000]! hover:text-white!" />
-              <SocialCard href="https://x.com/?lang=ru" icon={FaXTwitter} label="Twitter" hoverClass="hover:bg-black! hover:text-white!" />
             </div>
           </Block>
         </div>

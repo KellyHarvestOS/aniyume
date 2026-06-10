@@ -14,11 +14,15 @@ interface WatchPartyChatProps {
 
 export default function WatchPartyChat({ messages, onSend, currentUserId, className = '' }: WatchPartyChatProps) {
   const [input, setInput] = useState('');
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Скроллим ТОЛЬКО внутренний контейнер чата (не bubbling к странице),
+  // и только когда реально появилось новое сообщение.
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [messages.length]);
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -47,7 +51,7 @@ export default function WatchPartyChat({ messages, onSend, currentUserId, classN
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-white/10">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 space-y-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-white/10">
         <AnimatePresence initial={false}>
           {messages.length === 0 && (
             <div className="text-center text-gray-400 dark:text-white/30 text-sm py-8">
@@ -105,7 +109,6 @@ export default function WatchPartyChat({ messages, onSend, currentUserId, classN
             );
           })}
         </AnimatePresence>
-        <div ref={bottomRef} />
       </div>
 
       {/* Input */}

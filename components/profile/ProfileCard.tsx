@@ -132,51 +132,42 @@ export const ProfileCard = ({
 
 
 
-        <div className="relative grid grid-cols-2 gap-2 my-6" inert={!editable ? true : undefined}>
-          {!editable && <div className="absolute inset-0 z-10" aria-hidden="true" />}
-          <Link
-            href="/bookmarks"
-            className="bg-slate-100 dark:bg-[#161616] p-2 rounded-lg border border-slate-100 dark:border-gray-800 hover:border-brand transition group"
-          >
-            <p className="font-bold text-brand">{counts.favorites}</p>
-            <div className="flex items-center justify-center gap-1 mt-1 text-center">
-              <Heart size={12} className="text-slate-400 group-hover:text-brand transition" />
-              <p className="text-[10px] text-slate-400 uppercase group-hover:text-brand">Избранное</p>
-            </div>
-          </Link>
+        <div className="grid grid-cols-2 gap-2 my-6">
+          {([
+            { href: "/bookmarks", value: counts.favorites, Icon: Heart, label: "Избранное" },
+            { href: "/profile/ratings", value: counts.ratings, Icon: Star, label: "Оценки" },
+            { href: "/profile/comments", value: counts.comments || 0, Icon: MessageCircle, label: "Комменты" },
+            { href: "/profile/friends", value: counts.friends || 0, Icon: Users, label: "Друзья" },
+          ] as const).map(({ href, value, Icon, label }) => {
+            const cardContent = (
+              <>
+                <p className="font-bold text-brand">{value}</p>
+                <div className="flex items-center justify-center gap-1 mt-1 text-center">
+                  <Icon size={12} className={`text-slate-400 ${editable ? "group-hover:text-brand transition" : ""}`} />
+                  <p className={`text-[10px] text-slate-400 uppercase ${editable ? "group-hover:text-brand" : ""}`}>{label}</p>
+                </div>
+              </>
+            );
 
-          <Link
-            href="/profile/ratings"
-            className="bg-slate-100 dark:bg-[#161616] p-2 rounded-lg border border-slate-100 dark:border-gray-800 hover:border-brand transition group"
-          >
-            <p className="font-bold text-brand">{counts.ratings}</p>
-            <div className="flex items-center justify-center gap-1 mt-1 text-center">
-              <Star size={12} className="text-slate-400 group-hover:text-brand transition" />
-              <p className="text-[10px] text-slate-400 uppercase group-hover:text-brand">Оценки</p>
-            </div>
-          </Link>
+            // На чужом профиле карточки только отображаются — без ссылки и без ховера.
+            if (!editable) {
+              return (
+                <div key={href} className="bg-slate-100 dark:bg-[#161616] p-2 rounded-lg border border-slate-100 dark:border-gray-800">
+                  {cardContent}
+                </div>
+              );
+            }
 
-          <Link
-            href="/profile/comments"
-            className="bg-slate-100 dark:bg-[#161616] p-2 rounded-lg border border-slate-100 dark:border-gray-800 hover:border-brand transition group"
-          >
-            <p className="font-bold text-brand">{counts.comments || 0}</p>
-            <div className="flex items-center justify-center gap-1 mt-1 text-center">
-              <MessageCircle size={12} className="text-slate-400 group-hover:text-brand transition" />
-              <p className="text-[10px] text-slate-400 uppercase group-hover:text-brand">Комменты</p>
-            </div>
-          </Link>
-
-          <Link
-            href="/profile/friends"
-            className="bg-slate-100 dark:bg-[#161616] p-2 rounded-lg border border-slate-100 dark:border-gray-800 hover:border-brand transition group"
-          >
-            <p className="font-bold text-brand">{counts.friends || 0}</p>
-            <div className="flex items-center justify-center gap-1 mt-1 text-center">
-              <Users size={12} className="text-slate-400 group-hover:text-brand transition" />
-              <p className="text-[10px] text-slate-400 uppercase group-hover:text-brand">Друзья</p>
-            </div>
-          </Link>
+            return (
+              <Link
+                key={href}
+                href={href}
+                className="bg-slate-100 dark:bg-[#161616] p-2 rounded-lg border border-slate-100 dark:border-gray-800 hover:border-brand transition group"
+              >
+                {cardContent}
+              </Link>
+            );
+          })}
         </div>
 
         <p className="text-[10px] text-slate-400 mb-4">

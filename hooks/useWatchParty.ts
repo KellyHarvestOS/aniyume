@@ -104,6 +104,19 @@ export function useWatchParty({
 
     echoRef.current = echo;
 
+    // Привязываемся к состоянию самого WebSocket-соединения (Reverb/Pusher),
+    // чтобы индикатор "Подключено/Нет связи" отражал реальный сокет и
+    // сам восстанавливался при реконнекте, а не зависел только от presence-колбэка.
+    const connection = (echo.connector as any)?.pusher?.connection;
+    const handleStateChange = (states: { current: string }) => {
+      console.log('[WatchPartyHook] Socket state:', states.current);
+      setIsConnected(states.current === 'connected');
+    };
+    if (connection) {
+      setIsConnected(connection.state === 'connected');
+      connection.bind('state_change', handleStateChange);
+    }
+
     console.log('[WatchPartyHook] Joining presence channel:', `watch-party.${roomCode}`);
     // Подписка на presence канал комнаты
     const channel = echo.join(`watch-party.${roomCode}`)
@@ -142,8 +155,9 @@ export function useWatchParty({
         onRoomClosed?.();
       })
       .error((error: any) => {
+        // Ошибка подписки на канал не означает разрыв сокета — состояние
+        // соединения отслеживается через state_change выше.
         console.error('[WatchPartyHook] Channel error:', error);
-        setIsConnected(false);
       });
 
     // Подписка на приватный канал для инвайтов (если есть currentUserId)
@@ -155,6 +169,9 @@ export function useWatchParty({
     }
 
     return () => {
+      if (connection) {
+        connection.unbind('state_change', handleStateChange);
+      }
       echo.leave(`watch-party.${roomCode}`);
       if (currentUserId) {
         echo.leave(`user.${currentUserId}`);

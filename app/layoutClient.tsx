@@ -5,12 +5,14 @@ import { useEffect } from 'react';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import CookieConsent from '../components/layout/CookieConsent';
+import AuthModal from '@/components/auth/AuthModal';
+import { AuthModalProvider } from '@/contexts/AuthModalContext';
 import { getProfilePreference } from '@/lib/profilePreferences';
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const noLayoutPages = ['/login', '/register', '/premium', '/watch'];
+  const noLayoutPages = ['/premium', '/watch'];
   const hideLayout = noLayoutPages.includes(pathname);
   const isChatPage = pathname?.startsWith('/profile/friends/chat');
 
@@ -46,16 +48,19 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   }, []);
 
   return (
-    <div className="bg-background text-foreground min-h-screen transition-colors duration-300">
-      {!hideLayout && <Header />}
+    <AuthModalProvider>
+      <div className="bg-background text-foreground min-h-screen transition-colors duration-300">
+        {!hideLayout && <Header />}
 
-      <main className="w-full min-h-screen ">
-        {children}
-      </main>
+        <main className="w-full min-h-screen ">
+          {children}
+        </main>
 
-      {!hideFooter && <Footer />}
+        {!hideFooter && <Footer />}
 
-      <CookieConsent />
-    </div>
+        <CookieConsent />
+        <AuthModal />
+      </div>
+    </AuthModalProvider>
   );
 }
