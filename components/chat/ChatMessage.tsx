@@ -2,6 +2,7 @@
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FaCopy, FaTrashAlt } from 'react-icons/fa';
 export interface Message {
     id: string;
     text?: string;
@@ -13,8 +14,10 @@ export interface Message {
 interface ChatMessageProps {
     msg: Message;
     isMe: boolean;
+    onCopy?: (msg: Message) => void;
+    onDelete?: (messageId: string) => void;
 }
-export default function ChatMessage({ msg, isMe }: ChatMessageProps) {
+export default function ChatMessage({ msg, isMe, onCopy, onDelete }: ChatMessageProps) {
 
     const isOnlyEmojis = (str: string) => {
         if (!str || !str.trim()) return false;
@@ -26,12 +29,13 @@ export default function ChatMessage({ msg, isMe }: ChatMessageProps) {
 
     const emojiOnly = msg.text ? isOnlyEmojis(msg.text) : false;
     const mediaUrl = msg.gifUrl || msg.imageUrl;
+    const canCopy = Boolean(msg.text || msg.gifUrl || msg.imageUrl);
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`flex ${isMe ? 'justify-end' : 'justify-start'} w-full mb-3 md:mb-4`}
+            className={`group flex ${isMe ? 'justify-end' : 'justify-start'} w-full mb-3 md:mb-4`}
         >
             <div className={`max-w-[88%] md:max-w-[80%] lg:max-w-[70%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
 
@@ -59,6 +63,29 @@ export default function ChatMessage({ msg, isMe }: ChatMessageProps) {
                         {msg.text}
                     </div>
                 )}
+
+                <div className={`mt-1 flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ${isMe ? 'flex-row-reverse' : ''}`}>
+                    {canCopy && (
+                        <button
+                            type="button"
+                            onClick={() => onCopy?.(msg)}
+                            className="h-7 w-7 rounded-full bg-gray-100 dark:bg-white/10 text-gray-500 hover:text-brand hover:bg-brand/10 flex items-center justify-center transition-colors"
+                            aria-label="Скопировать сообщение"
+                            title="Скопировать"
+                        >
+                            <FaCopy size={11} />
+                        </button>
+                    )}
+                    <button
+                        type="button"
+                        onClick={() => onDelete?.(msg.id)}
+                        className="h-7 w-7 rounded-full bg-gray-100 dark:bg-white/10 text-gray-500 hover:text-red-500 hover:bg-red-500/10 flex items-center justify-center transition-colors"
+                        aria-label="Удалить сообщение у себя"
+                        title="Удалить у себя"
+                    >
+                        <FaTrashAlt size={11} />
+                    </button>
+                </div>
 
                 <span className="text-[9px] md:text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-tighter opacity-60 px-1">
                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

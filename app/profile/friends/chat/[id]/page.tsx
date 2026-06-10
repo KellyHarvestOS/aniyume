@@ -37,6 +37,7 @@ export default function ChatPage() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [error, setError] = useState('');
+    const [hiddenMessageIds, setHiddenMessageIds] = useState<Set<string>>(new Set());
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -57,6 +58,19 @@ export default function ChatPage() {
         timestamp: new Date(message.created_at),
     });
 
+    const getHiddenMessageIds = useCallback(() => {
+        if (!friendId) return new Set<string>();
+        const stored = localStorage.getItem(`hiddenDirectChatMessageIds:${me?.id || 'guest'}:${friendId}`);
+        if (!stored) return new Set<string>();
+
+        try {
+            const ids = JSON.parse(stored);
+            return new Set(Array.isArray(ids) ? ids.map(String) : []);
+        } catch {
+            return new Set<string>();
+        }
+    }, [friendId, me?.id]);
+
     const loadChat = useCallback(async () => {
         if (!friendId) return;
         const [chatResponse, listResponse] = await Promise.all([
@@ -65,8 +79,10 @@ export default function ChatPage() {
         ]);
         if (chatResponse.ok) {
             const data = await chatResponse.json();
+            const hiddenIds = getHiddenMessageIds();
             setFriend(data.user);
-            setMessages((data.messages || []).map(mapMessage));
+            setHiddenMessageIds(hiddenIds);
+            setMessages((data.messages || []).map(mapMessage).filter((message: Message) => !hiddenIds.has(message.id)));
         } else if (chatResponse.status === 403) {
             setError('Чат доступен только между друзьями');
         }
@@ -92,7 +108,11 @@ export default function ChatPage() {
         if (!friendId) return;
         localStorage.setItem('lastDirectChatUserId', String(friendId));
         window.dispatchEvent(new Event('direct-chat-updated'));
-    }, [friendId]);
+    }, [friendId, getHiddenMessageIds]);
+
+    useEffect(() => {
+        setHiddenMessageIds(getHiddenMessageIds());
+    }, [getHiddenMessageIds]);
 
     useEffect(() => {
         if (scrollContainerRef.current) {
@@ -120,6 +140,26 @@ export default function ChatPage() {
         setMessages((current) => [...current, mapMessage(result.data)]);
     };
 
+    const handleCopyMessage = async (message: Message) => {
+        const value = message.text || message.gifUrl || message.imageUrl;
+        if (!value) return;
+
+        try {
+            await navigator.clipboard.writeText(value);
+            setError('');
+        } catch {
+            setError('Не удалось скопировать сообщение');
+        }
+    };
+
+    const handleDeleteMessage = (messageId: string) => {
+        const nextHiddenIds = new Set(hiddenMessageIds);
+        nextHiddenIds.add(messageId);
+        localStorage.setItem(`hiddenDirectChatMessageIds:${me?.id || 'guest'}:${friendId}`, JSON.stringify(Array.from(nextHiddenIds)));
+        setHiddenMessageIds(nextHiddenIds);
+        setMessages((current) => current.filter((message) => message.id !== messageId));
+    };
+
     const clearChat = async () => {
         const response = await fetch(`/api/external/chats/${friendId}`, { method: 'DELETE', headers: authHeaders() });
         if (response.ok) setMessages([]);
@@ -135,12 +175,12 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="fixed inset-0 h-screen w-screen bg-white dark:bg-[#111111] overflow-hidden flex flex-row">
+        <div className="min-h-screen w-full bg-white dark:bg-[#111111] overflow-x-hidden flex flex-row">
             <ChatSidebar chats={chats} activeChatId={friendId} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-            <div className={`flex-1 flex flex-col h-full min-w-0 relative ${!friendId ? 'hidden lg:flex' : 'flex'}`}>
+            <div className={`flex-1 flex flex-col min-h-screen min-w-0 relative ${!friendId ? 'hidden lg:flex' : 'flex'}`}>
 
-                <header className="sticky top-0 flex-none z-[100] bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-100 dark:border-white/5">
+                <header className="flex-none z-[100] bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-100 dark:border-white/5">
                     <ChatHeader
                         friendId={friendId}
                         friendName={friend?.name || `Пользователь ${friendId}`}
@@ -154,11 +194,13 @@ export default function ChatPage() {
 
                 <main
                     ref={scrollContainerRef}
-                    className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 md:px-8 py-4 flex flex-col gap-2 
+                    className="h-[calc(100vh-8.5rem)] md:h-[calc(100vh-9.5rem)] overflow-y-auto overflow-x-hidden px-3 md:px-8 py-4 flex flex-col gap-2 
                 scrollbar-thin scrollbar-thumb-brand scrollbar-track-transparent
-                [&::-webkit-scrollbar]:w-1.5
-                [&::-webkit-scrollbar-thumb]:bg-brand
-                [&::-webkit-scrollbar-thumb]:rounded-full"
+                [&::-webkit-scrollbar]:w-2
+                [&::-webkit-scrollbar-track]:bg-transparent
+                [&::-webkit-scrollbar-thumb]:rounded-full
+                [&::-webkit-scrollbar-thumb]:bg-brand/70
+                hover:[&::-webkit-scrollbar-thumb]:bg-brand"
                 >
                     {error && (
                         <div className="sticky top-2 z-10 mx-auto rounded-xl bg-red-500/10 p-3 text-[11px] md:text-sm font-bold text-red-500 max-w-[90%] text-center backdrop-blur-md border border-red-500/20">
@@ -168,7 +210,7 @@ export default function ChatPage() {
 
                     <div className="flex flex-col gap-2">
                         {messages.map((message) => (
-                            <ChatMessage key={message.id} msg={message} isMe={message.senderId === me?.id} />
+                            <ChatMessage key={message.id} msg={message} isMe={message.senderId === me?.id} onCopy={handleCopyMessage} onDelete={handleDeleteMessage} />
                         ))}
                     </div>
 
