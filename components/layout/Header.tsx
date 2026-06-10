@@ -251,16 +251,22 @@ export default function Header() {
                     </div>
                   )}
                   {avatarFramePath && (
-                    <img
-                      src={avatarFramePath}
-                      alt="Avatar frame"
-                      className="pointer-events-none absolute left-1/2 top-1/2 z-10 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
+                    <div
+                      className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
                       style={{
                         width: avatarFrameFit.width || avatarFrameFit.size,
                         height: avatarFrameFit.height || avatarFrameFit.size,
-                        transform: `translate(calc(-50% + ${avatarFrameFit.x || '0px'}), calc(-50% + ${avatarFrameFit.y || '0px'}))`,
+                        marginLeft: avatarFrameFit.x || '0px',
+                        marginTop: avatarFrameFit.y || '0px',
                       }}
-                    />
+                    >
+                      <img
+                        src={avatarFramePath}
+                        alt=""
+                        className="h-full w-full object-contain"
+                        onError={(event) => { event.currentTarget.style.display = 'none'; }}
+                      />
+                    </div>
                   )}
                 </Link>
               </div>
