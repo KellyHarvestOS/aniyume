@@ -237,37 +237,39 @@ export default function Header() {
               <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
             ) : isLoggedIn ? (
               <div className="flex items-center gap-3 sm:gap-4">
-                <Link href="/profile" className="relative flex h-12 w-12 items-center justify-center transition-transform hover:scale-105">
-                  {avatarUrl ? (
-                    <img
-                      src={avatarUrl}
-                      alt="Profile"
-                      className={`w-9 h-9 rounded-full object-cover border-2 shadow-sm ${avatarFramePath ? 'border-transparent' : pathname === '/profile' ? 'border-brand' : 'border-transparent'}`}
-                      style={{ borderColor: pathname === '/profile' ? 'var(--brand-main)' : '' }}
-                    />
-                  ) : (
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold ${pathname === '/profile' ? 'bg-brand' : 'bg-gray-400'}`}>
-                      {user?.name ? user.name[0].toUpperCase() : <FaUserCircle size={32} />}
-                    </div>
-                  )}
-                  {avatarFramePath && (
-                    <div
-                      className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
-                      style={{
-                        width: avatarFrameFit.width || avatarFrameFit.size,
-                        height: avatarFrameFit.height || avatarFrameFit.size,
-                        marginLeft: avatarFrameFit.x || '0px',
-                        marginTop: avatarFrameFit.y || '0px',
-                      }}
-                    >
+                <Link href="/profile" className="flex h-12 w-12 items-center justify-center transition-transform hover:scale-105">
+                  <div className="relative h-9 w-9 rounded-full">
+                    {avatarUrl ? (
                       <img
-                        src={avatarFramePath}
-                        alt=""
-                        className="h-full w-full object-contain"
-                        onError={(event) => { event.currentTarget.style.display = 'none'; }}
+                        src={avatarUrl}
+                        alt="Profile"
+                        className={`h-full w-full rounded-full object-cover shadow-sm ${avatarFramePath ? 'border-0' : 'border-2 border-transparent'}`}
+                        style={{ borderColor: !avatarFramePath && pathname === '/profile' ? 'var(--brand-main)' : '' }}
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <div className={`h-full w-full rounded-full flex items-center justify-center text-white text-sm font-bold ${avatarFramePath ? 'border-0' : ''} ${pathname === '/profile' ? 'bg-brand' : 'bg-gray-400'}`}>
+                        {user?.name ? user.name[0].toUpperCase() : <FaUserCircle size={32} />}
+                      </div>
+                    )}
+                    {avatarFramePath && (
+                      <div
+                        className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
+                        style={{
+                          width: avatarFrameFit.width || avatarFrameFit.size,
+                          height: avatarFrameFit.height || avatarFrameFit.size,
+                          marginLeft: avatarFrameFit.x || '0px',
+                          marginTop: avatarFrameFit.y || '0px',
+                        }}
+                      >
+                        <img
+                          src={avatarFramePath}
+                          alt=""
+                          className="h-full w-full object-contain"
+                          onError={(event) => { event.currentTarget.style.display = 'none'; }}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </Link>
               </div>
             ) : (
