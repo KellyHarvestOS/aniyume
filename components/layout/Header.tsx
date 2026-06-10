@@ -135,6 +135,9 @@ export default function Header() {
   const avatarUrl = getStorageAssetUrl(user?.avatar);
   const avatarFramePath = avatarFrames.find((frame) => frame.key === avatarFrameKey)?.imagePath || null;
   const avatarFrameFit = getAvatarFrameFit(avatarFrameKey);
+  const headerAvatarFrameFit = avatarFrameKey === 'ramkaUborka'
+    ? { ...avatarFrameFit, x: '-0.5px', y: '3px' }
+    : avatarFrameFit;
   const isLoggedIn = !!user;
 
   const isChatActive = pathname.startsWith('/profile/friends/chat');
@@ -255,10 +258,10 @@ export default function Header() {
                       <div
                         className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
                         style={{
-                          width: avatarFrameFit.width || avatarFrameFit.size,
-                          height: avatarFrameFit.height || avatarFrameFit.size,
-                          marginLeft: avatarFrameFit.x || '0px',
-                          marginTop: avatarFrameFit.y || '0px',
+                          width: headerAvatarFrameFit.width || headerAvatarFrameFit.size,
+                          height: headerAvatarFrameFit.height || headerAvatarFrameFit.size,
+                          marginLeft: headerAvatarFrameFit.x || '0px',
+                          marginTop: headerAvatarFrameFit.y || '0px',
                         }}
                       >
                         <img
