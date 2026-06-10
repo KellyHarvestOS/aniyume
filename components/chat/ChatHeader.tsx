@@ -67,7 +67,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
                         </div>
 
                         <div className="min-w-0">
-                            <h2 className="text-base md:text-xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white leading-none group-hover:text-brand transition-colors truncate">
+                            <h2 className="text-base md:text-xl font-black uppercase tracking-tighter text-gray-900 dark:text-white leading-none group-hover:text-brand transition-colors truncate">
                                 {friendName}
                             </h2>
                             <p className={`text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] mt-1 md:mt-1.5 flex items-center gap-1.5 ${isOnline ? 'text-brand' : 'text-gray-400'}`}>

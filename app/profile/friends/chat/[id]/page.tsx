@@ -96,7 +96,7 @@ export default function ChatPage() {
                 lastMessage: chat.last_message?.photo_path ? 'Фотография' : chat.last_message?.body || 'Начните переписку',
             })));
         }
-    }, [friendId]);
+    }, [friendId, getHiddenMessageIds]);
 
     useEffect(() => {
         loadChat();
@@ -175,10 +175,10 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="min-h-screen w-full bg-white dark:bg-[#111111] overflow-x-hidden flex flex-row">
+        <div className="h-[calc(100dvh-5rem)] w-full bg-white dark:bg-[#111111] overflow-hidden flex flex-row">
             <ChatSidebar chats={chats} activeChatId={friendId} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-            <div className={`flex-1 flex flex-col min-h-screen min-w-0 relative ${!friendId ? 'hidden lg:flex' : 'flex'}`}>
+            <div className={`flex-1 flex flex-col h-full min-h-0 min-w-0 relative ${!friendId ? 'hidden lg:flex' : 'flex'}`}>
 
                 <header className="flex-none z-[100] bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-100 dark:border-white/5">
                     <ChatHeader
@@ -194,7 +194,7 @@ export default function ChatPage() {
 
                 <main
                     ref={scrollContainerRef}
-                    className="h-[calc(100vh-8.5rem)] md:h-[calc(100vh-9.5rem)] overflow-y-auto overflow-x-hidden px-3 md:px-8 py-4 flex flex-col gap-2 
+                    className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 md:px-8 py-4 flex flex-col gap-2 
                 scrollbar-thin scrollbar-thumb-brand scrollbar-track-transparent
                 [&::-webkit-scrollbar]:w-2
                 [&::-webkit-scrollbar-track]:bg-transparent

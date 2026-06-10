@@ -11,6 +11,7 @@ export interface AuthUser {
   email: string;
   avatar?: string | null;
   is_premium?: boolean;
+  selected_profile_frame?: string | null;
   is_banned?: boolean;
   ban_reason?: string | null;
   ban_expires_at?: string | null;

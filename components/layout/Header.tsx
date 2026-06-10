@@ -15,6 +15,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAuthModal } from '@/contexts/AuthModalContext';
 import { getStorageAssetUrl } from '@/lib/storage';
 import { getProfilePreference } from '@/lib/profilePreferences';
+import { avatarFrames } from '@/app/profile/edit/premiumEdit/constants';
+import { getAvatarFrameFit } from '@/lib/avatarFrames';
 
 export default function Header() {
   const pathname = usePathname();
@@ -22,6 +24,7 @@ export default function Header() {
   const { openAuth } = useAuthModal();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [chatHref, setChatHref] = useState('/profile/friends');
+  const [avatarFrameKey, setAvatarFrameKey] = useState<string | null>(null);
 
   const [logoPaths, setLogoPaths] = useState({
     light: '/images/logo01.png',
@@ -34,6 +37,8 @@ export default function Header() {
       const themeType = getProfilePreference("theme_type");
       const themeValue = getProfilePreference("theme_value");
       const savedLogoKey = getProfilePreference("logo_key");
+      const savedAvatarFrameKey = getProfilePreference("avatar_frame_key") || user?.selected_profile_frame || null;
+      setAvatarFrameKey(savedAvatarFrameKey);
 
       if (isPremium) {
         document.documentElement.classList.add('is-premium');
@@ -128,6 +133,8 @@ export default function Header() {
   }, []);
 
   const avatarUrl = getStorageAssetUrl(user?.avatar);
+  const avatarFramePath = avatarFrames.find((frame) => frame.key === avatarFrameKey)?.imagePath || null;
+  const avatarFrameFit = getAvatarFrameFit(avatarFrameKey);
   const isLoggedIn = !!user;
 
   const isChatActive = pathname.startsWith('/profile/friends/chat');
@@ -230,18 +237,30 @@ export default function Header() {
               <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
             ) : isLoggedIn ? (
               <div className="flex items-center gap-3 sm:gap-4">
-                <Link href="/profile" className="flex items-center transition-transform hover:scale-105">
+                <Link href="/profile" className="relative flex h-12 w-12 items-center justify-center transition-transform hover:scale-105">
                   {avatarUrl ? (
                     <img
                       src={avatarUrl}
                       alt="Profile"
-                      className={`w-9 h-9 rounded-full object-cover border-2 shadow-sm ${pathname === '/profile' ? 'border-brand' : 'border-transparent'}`}
+                      className={`w-9 h-9 rounded-full object-cover border-2 shadow-sm ${avatarFramePath ? 'border-transparent' : pathname === '/profile' ? 'border-brand' : 'border-transparent'}`}
                       style={{ borderColor: pathname === '/profile' ? 'var(--brand-main)' : '' }}
                     />
                   ) : (
                     <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold ${pathname === '/profile' ? 'bg-brand' : 'bg-gray-400'}`}>
                       {user?.name ? user.name[0].toUpperCase() : <FaUserCircle size={32} />}
                     </div>
+                  )}
+                  {avatarFramePath && (
+                    <img
+                      src={avatarFramePath}
+                      alt="Avatar frame"
+                      className="pointer-events-none absolute left-1/2 top-1/2 z-10 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
+                      style={{
+                        width: avatarFrameFit.width || avatarFrameFit.size,
+                        height: avatarFrameFit.height || avatarFrameFit.size,
+                        transform: `translate(calc(-50% + ${avatarFrameFit.x || '0px'}), calc(-50% + ${avatarFrameFit.y || '0px'}))`,
+                      }}
+                    />
                   )}
                 </Link>
               </div>
