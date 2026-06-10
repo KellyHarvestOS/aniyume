@@ -89,6 +89,12 @@ export default function ChatPage() {
     }, [loadChat]);
 
     useEffect(() => {
+        if (!friendId) return;
+        localStorage.setItem('lastDirectChatUserId', String(friendId));
+        window.dispatchEvent(new Event('direct-chat-updated'));
+    }, [friendId]);
+
+    useEffect(() => {
         if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
         }
@@ -134,7 +140,7 @@ export default function ChatPage() {
 
             <div className={`flex-1 flex flex-col h-full min-w-0 relative ${!friendId ? 'hidden lg:flex' : 'flex'}`}>
 
-                <header className="flex-none z-[100] bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-100 dark:border-white/5">
+                <header className="sticky top-0 flex-none z-[100] bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-100 dark:border-white/5">
                     <ChatHeader
                         friendId={friendId}
                         friendName={friend?.name || `Пользователь ${friendId}`}

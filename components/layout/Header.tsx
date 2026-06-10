@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { FaCommentAlt, FaUserPlus, FaUserCircle } from 'react-icons/fa';
+import { FaUserPlus, FaUserCircle } from 'react-icons/fa';
 import { HiAdjustmentsHorizontal, HiMiniBookmark, HiFire } from "react-icons/hi2";
 import { CgMenuRightAlt, CgMenuRight } from "react-icons/cg";
 import { IoCalendarNumberSharp } from "react-icons/io5";
@@ -213,28 +213,21 @@ export default function Header() {
               <Link
                 href={chatHref}
                 aria-label="Открыть последний чат"
-                className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${pathname.includes('/profile/friends/chat') ? 'bg-brand text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-brand dark:text-gray-300 dark:hover:bg-white/10'}`}
+                title="Сообщения"
+                className="relative group transition-transform hover:scale-110 active:scale-95"
               >
-                <FaCommentAlt />
+                <HiOutlineChatBubbleOvalLeftEllipsis
+                  size={26}
+                  className={`transition-colors ${isChatActive ? 'text-brand' : 'text-gray-400 dark:text-gray-500 group-hover:text-brand'}`}
+                />
+
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
               </Link>
             )}
             {isLoading ? (
               <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
             ) : isLoggedIn ? (
               <div className="flex items-center gap-3 sm:gap-4">
-                <Link
-                  href={`/profile/friends/chat/${user?.id}`}
-                  className="relative group transition-transform hover:scale-110 active:scale-95"
-                  title="Сообщения"
-                >
-                  <HiOutlineChatBubbleOvalLeftEllipsis
-                    size={26}
-                    className={`transition-colors ${isChatActive ? 'text-brand' : 'text-gray-400 dark:text-gray-500 group-hover:text-brand'}`}
-                  />
-
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
-                </Link>
-
                 <Link href="/profile" className="flex items-center transition-transform hover:scale-105">
                   {avatarUrl ? (
                     <img
