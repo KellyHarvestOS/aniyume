@@ -12,13 +12,13 @@
         <img src="https://github.com/user-attachments/assets/d7779d05-b096-4ffc-b7e5-830fdd0c62c6" width="100%" style="max-width: 450px;" alt="Aniyume Logo" />
         <br />
         <br />
-        <b>Современная платформа для просмотра аниме.</b>
+        <b>Современная платформа для просмотра аниме и общения.</b>
         <br />
-        <sub>Адаптивный дизайн • Умный поиск • Гибкие фильтры</sub>
+        <sub>Адаптивный дизайн • Умный поиск • Watch Party • Друзья и чаты</sub>
         <br />
         <br />
         <p>
-          <img src="https://img.shields.io/badge/Next.js_14-black?style=for-the-badge&logo=next.js&logoColor=white" />
+          <img src="https://img.shields.io/badge/Next.js_16-black?style=for-the-badge&logo=next.js&logoColor=white" />
           <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" />
           <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
         </p>
@@ -70,8 +70,9 @@
 
 ### <img src="https://api.iconify.design/heroicons/film-solid.svg?color=%2321D0B8" width="24" height="24" style="vertical-align: middle; margin-bottom: 2px;" alt="icon" /> Просмотр и Навигация
 *   **Умная лента:** Карусель новинок и топ-рейтинга с адаптивной версткой (React Slick).
-*   **Мощный Плеер:** Поддержка выбора озвучки, автоматическое переключение серий, интеграция с Kodik.
+*   **Мощный Плеер:** Поддержка выбора источника, HLS-воспроизведения, автоматическое переключение серий и отслеживание прогресса.
 *   **Каталог:** Пагинация, "ленивая" загрузка (Skeletons) и красивые карточки с эффектом Glassmorphism.
+*   **Watch Party:** Совместные комнаты просмотра с синхронизацией плеера, участниками, чатом и приглашениями друзей.
 
 ### <img src="https://api.iconify.design/heroicons/magnifying-glass-solid.svg?color=%2321D0B8" width="24" height="24" style="vertical-align: middle; margin-bottom: 2px;" alt="icon" /> Поиск и Фильтрация
 *   **Live Search:** Мгновенный поиск с выпадающим списком и Debounce-защитой.
@@ -80,8 +81,11 @@
 
 ### <img src="https://api.iconify.design/heroicons/calendar-days-solid.svg?color=%2321D0B8" width="24" height="24" style="vertical-align: middle; margin-bottom: 2px;" alt="icon" /> Утилиты
 *   **Расписание:** Автоматическое распределение онгоингов по дням недели.
-*   **Закладки:** Списки "Смотрю", "В планах", "Брошено" и т.д. (сохранение в LocalStorage / Cloud).
-*   **Дизайн:** Фирменный цвет `#21D0B8`, темная тема плеера, адаптив под мобильные устройства.
+*   **Закладки:** Списки "Смотрю", "В планах", "Брошено" и т.д. с синхронизацией через API.
+*   **Профиль:** Личный кабинет, комментарии, оценки, статистика просмотра и публичные страницы пользователей.
+*   **Друзья и Чаты:** Управление друзьями, личные диалоги, отправка текста, GIF и изображений, копирование и локальное удаление сообщений.
+*   **Premium-кастомизация:** Цветовые темы, кастомные логотипы, курсоры и декоративные рамки аватара.
+*   **Дизайн:** Фирменный цвет `#21D0B8`, темная тема, адаптив под мобильные устройства и кастомные состояния интерфейса.
 
 ---
 
@@ -90,10 +94,12 @@
 | Группа | Путь | Описание |
 | :--- | :--- | :--- |
 |  **(auth)** | `/login`, `/register` | Система авторизации и контроля доступа. |
-|  **(navigation)** | `/catalog`, `/popular`, `/bookmarks`, `/filter` , `/schedule`| Основные контентные хабы приложения. |
-|  **(info)** | `/about`, `/faq`, `/terms`, `/privacy` | Юридическая и справочная информация. |
-|  **profile** | `/profile`, `/edit`, `/comments` | Личный кабинет, настройки и активность пользователя. |
+|  **(navigation)** | `/catalog`, `/popular`, `/bookmarks`, `/filter` , `/schedule`, `/premium` | Основные контентные хабы приложения. |
+|  **(info)** | `/search`, `/faq`, `/terms`, `/privacy`, `/contacts` | Поиск, юридическая и справочная информация. |
+|  **profile** | `/profile`, `/profile/edit`, `/profile/comments`, `/profile/ratings`, `/profile/friends`, `/profile/friends/chat/[id]` | Личный кабинет, настройки, активность, друзья и личные чаты. |
 |  **anime** | `/anime/[id]` | Динамические страницы просмотра с плеером. |
+|  **users** | `/users/[id]` | Публичные страницы пользователей. |
+|  **watch-party** | `/watch`, `/watch-party/[code]` | Лобби и комнаты совместного просмотра. |
 
 ---
 
@@ -105,8 +111,9 @@
 | **Language** | [TypeScript](https://www.typescriptlang.org/) |
 | **Styling** | [Tailwind CSS](https://tailwindcss.com/) |
 | **Icons** | React Icons (Fa, Md, Hi), Heroicons |
-| **Components** | React Slick, Headless UI concepts |
-| **Architecture** | Server Components + Client Hooks |
+| **Components** | React Slick, Framer Motion, Lucide React, Emoji Picker |
+| **Player / Realtime** | HLS.js, P2P Media Loader, Laravel Echo, Pusher/Reverb |
+| **Architecture** | App Router, Server Components, Client Hooks, API Proxy |
 | **API** | Custom API Proxy (Bypass CORS & Cloudflare) |
 
 ### AI Chat Gateway
@@ -125,16 +132,27 @@ aniyume/
 │   ├── (navigation)/          # Навигационные хабы (Каталог, Закладки)
 │   ├── anime/[id]/            #  Страница просмотра и детали аниме
 │   ├── profile/               #  ЛК пользователя и настройки
+│   ├── users/[id]/             #  Публичные страницы пользователей
+│   ├── watch/                  #  Лобби совместного просмотра
+│   ├── watch-party/[code]/     #  Комнаты Watch Party
 │   ├── api/                   #  API эндпоинты (external integration)
 │   └── layout.tsx             # Глобальная обертка и провайдеры
 │
 ├──  components/             # Модульная система компонентов
 │   ├──  layout/             # Header, Footer, Modals, Search
 │   ├──  watch/              # Плеер, Комментарии, Сайдбар просмотра
+│   ├──  watch-party/        # Чат, участники и элементы совместного просмотра
+│   ├──  chat/               # Личные сообщения и интерфейс диалогов
 │   ├──  anime/              # Карточки, Списки и Карусели
 │   ├──  profile/            # Статистика, Активность, Карточки юзера
+│   ├──  auth/               # Формы и модальные окна авторизации
+│   ├──  modals/             # AI Chat и общие модальные сценарии
 │   ├──  skeletons/          # Красивые загрузчики (Shimmer effects)
 │   └──  UI/                 # ThemeToggle, Dropdowns, Tooltips
+│
+├──  contexts/               # Auth, модальные окна и глобальное состояние
+├──  hooks/                  # Watch tracker, Watch Party realtime и другие hooks
+├──  lib/                    # API-клиент, storage, profile preferences, helpers
 │
 └──  public/                 # Статические ассеты и иконки 
 ```
