@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { useI18n } from '@/contexts/I18nContext';
 
 const COOKIE_KEY = 'cookie-consent';
 
 export default function CookieConsent() {
+  const { t } = useI18n();
   const [visible, setVisible] = useState(false);
   
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -107,17 +109,17 @@ export default function CookieConsent() {
             </span>
 
             <h5 className="w-full text-sm font-semibold text-zinc-700 dark:text-zinc-100 mb-2 pointer-events-auto">
-              Ваша конфиденциальность важна
+              {t('cookie.title')}
             </h5>
 
             <p className="w-full text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6 pointer-events-auto">
-              Мы используем куки для улучшения работы сайта.
+              {t('cookie.text')}
               <br />
               <a
                 href="/privacy"
                 className="inline-block mt-2 font-semibold underline underline-offset-2 transition-colors hover:text-[#634647] dark:hover:text-[#ddad81]"
               >
-                Политика конфиденциальности
+                {t('cookie.policy')}
               </a>
             </p>
 
@@ -129,7 +131,7 @@ export default function CookieConsent() {
                          active:scale-[0.97] pointer-events-auto"
               type="button"
             >
-              Принять всё
+              {t('cookie.accept')}
             </button>
 
           </div>

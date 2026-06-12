@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaUserCheck, FaUserTimes, FaClock, FaTimes, FaUsers, FaFingerprint } from 'react-icons/fa';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface FriendRequestUser {
     id: number;
@@ -35,6 +36,7 @@ export default function FriendRequestsModal({
     onDecline,
     onCancel,
 }: FriendRequestsModalProps) {
+    const { t } = useI18n();
     const total = incoming.length + outgoing.length;
 
     return (
@@ -57,10 +59,10 @@ export default function FriendRequestsModal({
                     >
                         <div className="p-8 border-b border-gray-100 dark:border-white/5 flex justify-between items-center shrink-0">
                             <div>
-                                <h2 className="text-3xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white leading-none">Запросы</h2>
+                                <h2 className="text-3xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white leading-none">{t('requests.title')}</h2>
                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2 flex items-center gap-2">
                                     <span className="w-2 h-2 rounded-full bg-brand animate-pulse" />
-                                    {incoming.length} входящих · {outgoing.length} исходящих
+                                    {t('requests.counts', { incoming: incoming.length, outgoing: outgoing.length })}
                                 </p>
                             </div>
                             <button onClick={onClose} className="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-400 hover:text-red-500 transition-all active:scale-90">
@@ -78,9 +80,9 @@ export default function FriendRequestsModal({
                                             className="relative p-5 rounded-[2rem] bg-white dark:bg-[#161616] border border-gray-100 dark:border-white/5 hover:border-brand-simple transition-all flex flex-col group shadow-sm"
                                         >
                                             <div className="flex justify-between items-center mb-4">
-                                                <span className="text-[9px] font-black text-brand uppercase tracking-[0.2em]">Входящий</span>
+                                                <span className="text-[9px] font-black text-brand uppercase tracking-[0.2em]">{t('requests.incoming')}</span>
                                                 <div className="flex items-center gap-1 text-[8px] font-black text-gray-400 uppercase">
-                                                    <FaClock size={8} /> ожидает
+                                                    <FaClock size={8} /> {t('requests.waitingShort')}
                                                 </div>
                                             </div>
 
@@ -101,7 +103,7 @@ export default function FriendRequestsModal({
                                             </div>
 
                                             <p className="mb-6 flex-1 text-[11px] text-gray-600 dark:text-gray-400 italic leading-relaxed line-clamp-2 px-1">
-                                                {req.custom_status || (req.is_online ? 'В сети' : 'Не в сети')}
+                                                {req.custom_status || (req.is_online ? t('friends.online') : t('friends.offline'))}
                                             </p>
 
                                             <div className="flex gap-2 shrink-0">
@@ -110,7 +112,7 @@ export default function FriendRequestsModal({
                                                     disabled={loadingIds.includes(req.id)}
                                                     className="flex-[2] h-10 rounded-lg bg-brand text-white dark:text-black text-[10px] font-black uppercase italic tracking-widest flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-brand/20 disabled:opacity-50"
                                                 >
-                                                    <FaUserCheck size={12} /> Принять
+                                                    <FaUserCheck size={12} /> {t('friends.accept')}
                                                 </button>
                                                 <button
                                                     onClick={() => onDecline(req.id)}
@@ -130,9 +132,9 @@ export default function FriendRequestsModal({
                                             className="relative p-5 rounded-[2rem] bg-white dark:bg-[#161616] border border-gray-100 dark:border-white/5 hover:border-brand-simple transition-all flex flex-col group shadow-sm opacity-75"
                                         >
                                             <div className="flex justify-between items-center mb-4">
-                                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Исходящий</span>
+                                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">{t('requests.outgoing')}</span>
                                                 <div className="flex items-center gap-1 text-[8px] font-black text-gray-400 uppercase">
-                                                    <FaClock size={8} /> отправлен
+                                                    <FaClock size={8} /> {t('requests.sentShort')}
                                                 </div>
                                             </div>
 
@@ -153,7 +155,7 @@ export default function FriendRequestsModal({
                                             </div>
 
                                             <p className="mb-6 flex-1 text-[11px] text-gray-600 dark:text-gray-400 italic leading-relaxed line-clamp-2 px-1">
-                                                {req.custom_status || 'Ожидание ответа'}
+                                                {req.custom_status || t('requests.waitingResponse')}
                                             </p>
 
                                             <button
@@ -161,7 +163,7 @@ export default function FriendRequestsModal({
                                                 disabled={loadingIds.includes(req.id)}
                                                 className="h-10 rounded-lg bg-white/5 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-300 text-[10px] font-black uppercase flex items-center justify-center hover:border-brand-simple active:scale-95 transition-all disabled:opacity-50"
                                             >
-                                                Отменить
+                                                {t('requests.cancel')}
                                             </button>
                                         </motion.div>
                                     ))}
@@ -169,7 +171,7 @@ export default function FriendRequestsModal({
                             ) : (
                                 <div className="h-full flex flex-col items-center justify-center opacity-20">
                                     <FaUsers size={100} className="text-gray-400 mb-4" />
-                                    <p className="text-sm font-black uppercase tracking-[0.3em] text-gray-400">Пусто</p>
+                                    <p className="text-sm font-black uppercase tracking-[0.3em] text-gray-400">{t('requests.empty')}</p>
                                 </div>
                             )}
                         </div>

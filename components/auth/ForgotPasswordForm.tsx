@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { FaEnvelope, FaLock, FaKey, FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa';
 import AuthToast from '@/components/ui/AuthToast';
+import { useI18n } from '@/contexts/I18nContext';
 import type { AuthModalView } from '@/contexts/AuthModalContext';
 
 type ApiResponse = {
@@ -35,6 +36,7 @@ interface ForgotPasswordFormProps {
 }
 
 export default function ForgotPasswordForm({ onSwitch }: ForgotPasswordFormProps) {
+  const { t } = useI18n();
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
@@ -59,15 +61,15 @@ export default function ForgotPasswordForm({ onSwitch }: ForgotPasswordFormProps
       });
       const data = await readJson(res);
       if (!res.ok) {
-        const message = res.status === 429 ? 'Слишком много запросов. Попробуйте позже.' : firstError(data, 'Не удалось отправить код');
+        const message = res.status === 429 ? t('auth.forgot.tooManyRequests') : firstError(data, t('auth.forgot.sendCodeFailed'));
         setError(message);
-        showToast('Ошибка', message, 'danger');
+        showToast(t('auth.error'), message, 'danger');
         return;
       }
-      showToast('Код отправлен', 'Проверьте почту и введите 6-значный код.', 'success');
+      showToast(t('auth.forgot.codeSentTitle'), t('auth.forgot.codeSentMsg'), 'success');
       setStep('code');
     } catch {
-      setError('Ошибка сети');
+      setError(t('auth.networkError'));
     } finally {
       setLoading(false);
     }
@@ -85,14 +87,14 @@ export default function ForgotPasswordForm({ onSwitch }: ForgotPasswordFormProps
       });
       const data = await readJson(res);
       if (!res.ok) {
-        const message = firstError(data, 'Неверный код');
+        const message = firstError(data, t('auth.forgot.invalidCode'));
         setError(message);
-        showToast('Ошибка', message, 'danger');
+        showToast(t('auth.error'), message, 'danger');
         return;
       }
       setStep('reset');
     } catch {
-      setError('Ошибка сети');
+      setError(t('auth.networkError'));
     } finally {
       setLoading(false);
     }
@@ -102,11 +104,11 @@ export default function ForgotPasswordForm({ onSwitch }: ForgotPasswordFormProps
     e.preventDefault();
     setError('');
     if (password.length < 8) {
-      setError('Пароль должен содержать минимум 8 символов');
+      setError(t('auth.forgot.minPassword8'));
       return;
     }
     if (password !== confirmPassword) {
-      setError('Пароли не совпадают');
+      setError(t('auth.forgot.passwordMismatch'));
       return;
     }
     setLoading(true);
@@ -118,15 +120,15 @@ export default function ForgotPasswordForm({ onSwitch }: ForgotPasswordFormProps
       });
       const data = await readJson(res);
       if (!res.ok) {
-        const message = firstError(data, 'Не удалось сбросить пароль');
+        const message = firstError(data, t('auth.forgot.resetFailed'));
         setError(message);
-        showToast('Ошибка', message, 'danger');
+        showToast(t('auth.error'), message, 'danger');
         return;
       }
-      showToast('Готово', 'Пароль обновлён. Войдите с новым паролем.', 'success');
+      showToast(t('auth.forgot.doneTitle'), t('auth.forgot.doneMsg'), 'success');
       window.setTimeout(() => onSwitch('login'), 900);
     } catch {
-      setError('Ошибка сети');
+      setError(t('auth.networkError'));
     } finally {
       setLoading(false);
     }
@@ -139,23 +141,23 @@ export default function ForgotPasswordForm({ onSwitch }: ForgotPasswordFormProps
       <AuthToast isOpen={toast.isOpen} title={toast.title} message={toast.message} type={toast.type} />
 
       <h1 className="mb-2 flex items-center justify-center gap-3 text-center text-3xl font-black uppercase italic tracking-tighter text-[#2EC4B6]">
-        <FaKey className="text-2xl" /> Сброс пароля
+        <FaKey className="text-2xl" /> {t('auth.forgot.title')}
       </h1>
       <p className="mb-8 text-center text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">
-        {step === 'email' && 'Введите email для получения кода'}
-        {step === 'code' && 'Введите код из письма'}
-        {step === 'reset' && 'Придумайте новый пароль'}
+        {step === 'email' && t('auth.forgot.stepEmail')}
+        {step === 'code' && t('auth.forgot.stepCode')}
+        {step === 'reset' && t('auth.forgot.stepReset')}
       </p>
 
       {step === 'email' && (
         <form className="space-y-6" onSubmit={requestCode}>
           <div className="relative group">
             <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2EC4B6] transition-colors" />
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="EMAIL@EXAMPLE.COM" className={inputClass} required />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('auth.emailPlaceholder')} className={inputClass} required />
           </div>
           {error && <p className="text-[10px] font-black uppercase tracking-widest text-red-500">{error}</p>}
           <button type="submit" disabled={loading} className="w-full rounded-xl bg-[#2EC4B6] py-4 text-xs font-black uppercase italic tracking-[0.2em] text-white shadow-lg shadow-[#2EC4B6]/20 transition-all hover:bg-[#259B92] active:scale-95 disabled:opacity-50">
-            {loading ? 'ОТПРАВКА...' : 'ПОЛУЧИТЬ КОД'}
+            {loading ? t('auth.forgot.sending') : t('auth.forgot.getCode')}
           </button>
         </form>
       )}
@@ -177,10 +179,10 @@ export default function ForgotPasswordForm({ onSwitch }: ForgotPasswordFormProps
           </div>
           {error && <p className="text-[10px] font-black uppercase tracking-widest text-red-500">{error}</p>}
           <button type="submit" disabled={loading || code.length < 6} className="w-full rounded-xl bg-[#2EC4B6] py-4 text-xs font-black uppercase italic tracking-[0.2em] text-white shadow-lg shadow-[#2EC4B6]/20 transition-all hover:bg-[#259B92] active:scale-95 disabled:opacity-50">
-            {loading ? 'ПРОВЕРКА...' : 'ПОДТВЕРДИТЬ КОД'}
+            {loading ? t('auth.forgot.checking') : t('auth.forgot.confirmCode')}
           </button>
           <button type="button" onClick={requestCode} disabled={loading} className="w-full text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[#2EC4B6] transition-colors disabled:opacity-50">
-            Отправить код повторно
+            {t('auth.forgot.resendCode')}
           </button>
         </form>
       )}
@@ -189,25 +191,25 @@ export default function ForgotPasswordForm({ onSwitch }: ForgotPasswordFormProps
         <form className="space-y-6" onSubmit={resetPassword}>
           <div className="relative group">
             <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2EC4B6] transition-colors" />
-            <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="НОВЫЙ ПАРОЛЬ" className={`${inputClass} pr-12`} required />
+            <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('auth.forgot.newPasswordPlaceholder')} className={`${inputClass} pr-12`} required />
             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#2EC4B6] transition-colors">
               {showPassword ? <FaEyeSlash className="text-lg" /> : <FaEye className="text-lg" />}
             </button>
           </div>
           <div className="relative group">
             <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2EC4B6] transition-colors" />
-            <input type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="ПОВТОР ПАРОЛЯ" className={inputClass} required />
+            <input type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder={t('auth.forgot.confirmPasswordPlaceholder')} className={inputClass} required />
           </div>
           {error && <p className="text-[10px] font-black uppercase tracking-widest text-red-500">{error}</p>}
           <button type="submit" disabled={loading} className="w-full rounded-xl bg-[#2EC4B6] py-4 text-xs font-black uppercase italic tracking-[0.2em] text-white shadow-lg shadow-[#2EC4B6]/20 transition-all hover:bg-[#259B92] active:scale-95 disabled:opacity-50">
-            {loading ? 'СОХРАНЕНИЕ...' : 'СБРОСИТЬ ПАРОЛЬ'}
+            {loading ? t('auth.forgot.saving') : t('auth.forgot.resetSubmit')}
           </button>
         </form>
       )}
 
       <div className="flex flex-col items-center pt-6 text-center">
         <button type="button" onClick={() => onSwitch('login')} className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-gray-400 transition-colors hover:text-[#2EC4B6]">
-          <FaArrowLeft size={10} /> Вернуться ко входу
+          <FaArrowLeft size={10} /> {t('auth.forgot.backToLogin')}
         </button>
       </div>
     </>

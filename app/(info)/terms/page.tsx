@@ -8,6 +8,7 @@ import {
   FaBan,
   FaGavel,
 } from 'react-icons/fa6';
+import { useI18n } from '@/contexts/I18nContext';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -23,6 +24,7 @@ const itemVariants = {
 };
 
 export default function TermsPage() {
+  const { t } = useI18n();
   return (
     <section className="min-h-screen w-full bg-white dark:bg-[#111111] text-gray-800 dark:text-gray-200 py-10 md:py-16 relative overflow-hidden transition-colors duration-300">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand/10 rounded-full blur-[120px] pointer-events-none -z-10" />
@@ -35,47 +37,31 @@ export default function TermsPage() {
       >
         <motion.div variants={itemVariants} className="flex flex-col items-center text-center mb-12 sm:mb-16">
           <h1 className="text-4xl sm:text-6xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-gray-100 mb-6">
-            Условия <span className="text-brand w-auto">использованияㅤ</span>
+            {t('terms.title1')} <span className="text-brand w-auto">{t('terms.title2')}</span>
           </h1>
 
           <div className="w-24 h-1.5 bg-brand rounded-full mb-6 shadow-lg shadow-brand/20 mx-auto" />
 
           <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto">
-            Пожалуйста, внимательно ознакомьтесь с правилами использования платформы AniYume. Пользование сайтом означает ваше согласие с данными условиями.
+            {t('terms.intro')}
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-          <TermSection
-            variants={itemVariants}
-            icon={<FaCopyright />}
-            title="1. Статус контента"
-          >
-            AniYume является <strong>индексатором</strong> (поисковой системой). Мы не храним видеофайлы на собственных серверах. Весь контент транслируется из открытых сторонних источников (Kodik, Anilibria). Мы не несем ответственности за содержание, доступность или качество внешних ресурсов.
+          <TermSection variants={itemVariants} icon={<FaCopyright />} title={t('terms.s1Title')}>
+            <span dangerouslySetInnerHTML={{ __html: t('terms.s1Body') }} />
           </TermSection>
 
-          <TermSection
-            variants={itemVariants}
-            icon={<FaShieldHalved />}
-            title="2. Авторское право"
-          >
-            Мы уважаем интеллектуальную собственность. Если вы являетесь правообладателем и считаете, что ваши права нарушены, свяжитесь напрямую с хостинг-провайдером видео. В случае необходимости мы можем заблокировать отображение конкретного контента в нашем индексе.
+          <TermSection variants={itemVariants} icon={<FaShieldHalved />} title={t('terms.s2Title')}>
+            <span dangerouslySetInnerHTML={{ __html: t('terms.s2Body') }} />
           </TermSection>
 
-          <TermSection
-            variants={itemVariants}
-            icon={<FaBan />}
-            title="3. Правила поведения"
-          >
-            Запрещается: использование скриптов для парсинга данных, попытки нарушения работы серверов (DDoS), распространение вредоносного ПО или спама. Любая активность, направленная на дестабилизацию платформы, приведет к немедленной блокировке доступа по IP.
+          <TermSection variants={itemVariants} icon={<FaBan />} title={t('terms.s3Title')}>
+            <span dangerouslySetInnerHTML={{ __html: t('terms.s3Body') }} />
           </TermSection>
 
-          <TermSection
-            variants={itemVariants}
-            icon={<FaGavel />}
-            title="4. Ответственность"
-          >
-            Сервис предоставляется по принципу <strong>«как есть»</strong> (AS IS). Администрация не гарантирует бесперебойную работу сайта и не несет ответственности за любой ущерб, возникший в результате использования материалов, найденных через нашу систему.
+          <TermSection variants={itemVariants} icon={<FaGavel />} title={t('terms.s4Title')}>
+            <span dangerouslySetInnerHTML={{ __html: t('terms.s4Body') }} />
           </TermSection>
         </div>
       </motion.div>

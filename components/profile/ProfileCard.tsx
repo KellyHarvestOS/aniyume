@@ -9,6 +9,7 @@ import { getAvatarUrl } from "@/lib/storage";
 import ProfileLevelBadge, { ProfileWatchTime } from "@/components/profile/ProfileLevelBadge";
 import { getAvatarFrameFit } from "@/lib/avatarFrames";
 import { avatarFrames } from "@/app/profile/edit/premiumEdit/constants";
+import { useI18n } from "@/contexts/I18nContext";
 
 interface ProfileCardProps {
   user: {
@@ -38,6 +39,7 @@ export const ProfileCard = ({
   onLogout,
   editable = true,
 }: ProfileCardProps) => {
+  const { t } = useI18n();
   const avatarUrl = getAvatarUrl(user.avatar);
   const avatarFrameKey = user.selected_profile_frame || "none";
   const avatarFramePath = avatarFrames.find((frame) => frame.key === avatarFrameKey)?.imagePath || null;
@@ -122,11 +124,11 @@ export const ProfileCard = ({
           className={`text-xl font-black mt-2 ${user.is_premium ? "text-white" : "text-slate-900 dark:text-white"
             }`}
         >
-          {user.name || "Пользователь"}
+          {user.name || t("profileCard.user")}
         </h2>
 
         <p className={`text-sm w-40 mx-auto font-bold mt-1 text-black dark:text-gray-100 italic ${user.is_premium ? "text-white" : "text-black"}`}>
-          {user.custom_status || "Cтатус отсутствует"}
+          {user.custom_status || t("profileCard.noStatus")}
         </p>
 
 
@@ -134,10 +136,10 @@ export const ProfileCard = ({
 
         <div className="grid grid-cols-2 gap-2 my-6">
           {([
-            { href: "/bookmarks", value: counts.favorites, Icon: Heart, label: "Избранное" },
-            { href: "/profile/ratings", value: counts.ratings, Icon: Star, label: "Оценки" },
-            { href: "/profile/comments", value: counts.comments || 0, Icon: MessageCircle, label: "Комменты" },
-            { href: "/profile/friends", value: counts.friends || 0, Icon: Users, label: "Друзья" },
+            { href: "/bookmarks", value: counts.favorites, Icon: Heart, label: t("profileCard.favorites") },
+            { href: "/profile/ratings", value: counts.ratings, Icon: Star, label: t("profileCard.ratings") },
+            { href: "/profile/comments", value: counts.comments || 0, Icon: MessageCircle, label: t("profileCard.comments") },
+            { href: "/profile/friends", value: counts.friends || 0, Icon: Users, label: t("profileCard.friends") },
           ] as const).map(({ href, value, Icon, label }) => {
             const cardContent = (
               <>
@@ -171,13 +173,13 @@ export const ProfileCard = ({
         </div>
 
         <p className="text-[10px] text-slate-400 mb-4">
-          В клубе с {new Date(user.created_at).toLocaleDateString()}
+          {t("profileCard.inClubSince", { date: new Date(user.created_at).toLocaleDateString() })}
         </p>
 
         {editable && <Link href="/profile/edit">
           <button className="w-full flex items-center justify-center gap-2 bg-brand text-white dark:text-gray-900 py-3 rounded-xl font-bold shadow hover:bg-teal-600 transition hover:scale-[1.02] active:scale-[0.98]">
             <FaEdit className="text-lg" />
-            Редактировать
+            {t("common.edit")}
           </button>
         </Link>}
 
@@ -192,7 +194,7 @@ export const ProfileCard = ({
               </div>
               <span className="flex items-center justify-center gap-2 text-white dark:text-gray-900 uppercase tracking-widest text-xs drop-shadow-md">
                 <RiVipCrownFill className="text-lg" />
-                КУПИТЬ PREMIUM
+                {t("profileCard.buyPremium")}
               </span>
             </button>
           </Link>
@@ -202,7 +204,7 @@ export const ProfileCard = ({
           onClick={onLogout}
           className="w-full mt-3 text-red-400 text-sm font-bold hover:underline"
         >
-          Выйти
+          {t("profileCard.logout")}
         </button>}
       </div>
     </div>

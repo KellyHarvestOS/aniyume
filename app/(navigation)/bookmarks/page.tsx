@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import BookmarksSkeleton from "@/components/skeletons/BookmarksSkeleton";
+import { useI18n } from "@/contexts/I18nContext";
 import {
   FaHeart,
   FaEye,
@@ -25,15 +26,16 @@ interface AnimeItem {
 }
 
 const TABS = [
-  { id: "favorites", label: "Избранное", icon: <FaHeart /> },
-  { id: "watching", label: "Смотрю", icon: <FaEye /> },
-  { id: "planned", label: "В планах", icon: <FaCalendarCheck /> },
-  { id: "completed", label: "Просмотрено", icon: <FaCheckCircle /> },
-  { id: "on_hold", label: "Отложено", icon: <FaPause /> },
-  { id: "dropped", label: "Брошено", icon: <FaTrash /> },
+  { id: "favorites", labelKey: "bookmarks.favorites", icon: <FaHeart /> },
+  { id: "watching", labelKey: "bookmarks.watching", icon: <FaEye /> },
+  { id: "planned", labelKey: "bookmarks.planned", icon: <FaCalendarCheck /> },
+  { id: "completed", labelKey: "bookmarks.completed", icon: <FaCheckCircle /> },
+  { id: "on_hold", labelKey: "bookmarks.onHold", icon: <FaPause /> },
+  { id: "dropped", labelKey: "bookmarks.dropped", icon: <FaTrash /> },
 ];
 
 export default function BookmarksPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [activeTab, setActiveTab] = useState("favorites");
@@ -137,7 +139,7 @@ export default function BookmarksPage() {
       <div className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-40 backdrop-blur-xl">
         <div className="container mx-auto px-6 pt-8">
           <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
-            Мои <span className="text-brand w-[10rem]">Списки</span>
+            {t('bookmarks.title1')} <span className="text-brand w-[10rem]">{t('bookmarks.title2')}</span>
           </h1>
 
           <div className="flex gap-6 overflow-x-auto no-scrollbar">
@@ -151,7 +153,7 @@ export default function BookmarksPage() {
                   }`}
               >
                 <span className={activeTab === tab.id ? "icon-brand" : ""}>{tab.icon}</span>
-                {tab.label}
+                {t(tab.labelKey)}
                 <span className="text-[10px] opacity-40 text-brand">
                   {allLists[tab.id]?.length || 0}
                 </span>
@@ -166,7 +168,7 @@ export default function BookmarksPage() {
           <div className="text-center py-40">
             <FaSearch className="mx-auto text-gray-200 dark:text-white/5 text-8xl mb-6" />
             <h2 className="text-2xl font-black text-gray-400 dark:text-white/20 uppercase italic">
-              Здесь ничего не найдено
+              {t('bookmarks.empty')}
             </h2>
           </div>
         ) : (

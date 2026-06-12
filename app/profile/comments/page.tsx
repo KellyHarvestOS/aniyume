@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import MyCommentsSkeleton from '@/components/skeletons/MyCommentsSkeleton';
+import { useI18n } from '@/contexts/I18nContext';
 import {
   FaTrash,
   FaSearch,
@@ -24,6 +25,7 @@ interface UserComment {
 }
 
 const CommentCard = ({ c, onDelete, getPosterUrl }: { c: UserComment, onDelete: (id: number) => void, getPosterUrl: (p?: string) => string }) => {
+  const { t } = useI18n();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLong, setIsLong] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -54,7 +56,7 @@ const CommentCard = ({ c, onDelete, getPosterUrl }: { c: UserComment, onDelete: 
               href={`/anime/${c.anime?.id}`}
               className="text-sm sm:text-base font-black hover:text-[#39bcba] transition-colors line-clamp-2 uppercase tracking-tight leading-tight"
             >
-              {c.anime?.title || 'Без названия'}
+              {c.anime?.title || t('myComments.noTitle')}
             </Link>
             <div className="flex gap-1 shrink-0">
               <button
@@ -89,7 +91,7 @@ const CommentCard = ({ c, onDelete, getPosterUrl }: { c: UserComment, onDelete: 
           onClick={() => setIsExpanded(!isExpanded)}
           className="w-full py-3 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-tighter text-[#39bcba] hover:bg-[#39bcba]/5 transition-colors border-t border-slate-200 dark:border-white/5"
         >
-          {isExpanded ? <><FaChevronUp /> Свернуть</> : <><FaChevronDown /> Читать полностью</>}
+          {isExpanded ? <><FaChevronUp /> {t('myComments.collapse')}</> : <><FaChevronDown /> {t('myComments.readMore')}</>}
         </button>
       )}
     </article>
@@ -97,6 +99,7 @@ const CommentCard = ({ c, onDelete, getPosterUrl }: { c: UserComment, onDelete: 
 };
 
 export default function MyCommentsPage() {
+  const { t } = useI18n();
   const [comments, setComments] = useState<UserComment[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -128,7 +131,7 @@ export default function MyCommentsPage() {
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Удалить этот комментарий?')) return;
+    if (!confirm(t('myComments.confirmDelete'))) return;
     const token = localStorage.getItem('userToken');
     try {
       const res = await fetch(`/api/external/comments/${id}`, {
@@ -147,10 +150,10 @@ export default function MyCommentsPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-8 border-b border-gray-100 dark:border-white/5 pb-6 sm:pb-10">
           <div>
             <h1 className="text-4xl sm:text-5xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white leading-none break-words">
-              Мои <span className="text-brand block sm:inline">Комментарии</span>
+              {t('myComments.title1')} <span className="text-brand block sm:inline">{t('myComments.title2')}</span>
             </h1>
             <p className="mt-3 text-gray-400 font-bold uppercase tracking-[0.5em] text-[9px] sm:text-[10px] ml-1">
-              Всего • Сообщений • {comments.length}
+              {t('myComments.totalMessages', { n: comments.length })}
             </p>
           </div>
         </div>
@@ -162,9 +165,9 @@ export default function MyCommentsPage() {
             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-dashed border-slate-200 dark:border-white/10 flex items-center justify-center mb-6 sm:mb-8">
               <FaSearch className="text-2xl sm:text-3xl text-slate-300 dark:text-gray-700" />
             </div>
-            <h2 className="text-lg sm:text-xl font-black mb-6 uppercase tracking-tight">Список пуст</h2>
+            <h2 className="text-lg sm:text-xl font-black mb-6 uppercase tracking-tight">{t('myComments.empty')}</h2>
             <Link href="/catalog" className="px-8 sm:px-10 py-3 sm:py-4 rounded-xl bg-brand text-white font-black uppercase text-[10px] sm:text-xs tracking-widest hover:scale-105 transition-all shadow-lg shadow-brand/20">
-              Перейти в каталог
+              {t('myComments.toCatalog')}
             </Link>
           </div>
         ) : (

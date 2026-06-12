@@ -13,6 +13,7 @@ import ThemeToggle from './ThemeToggle';
 import SearchBar from './SearchBar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuthModal } from '@/contexts/AuthModalContext';
+import { useI18n } from '@/contexts/I18nContext';
 import { getStorageAssetUrl } from '@/lib/storage';
 import { getProfilePreference } from '@/lib/profilePreferences';
 import { avatarFrames } from '@/app/profile/edit/premiumEdit/constants';
@@ -22,6 +23,7 @@ export default function Header() {
   const pathname = usePathname();
   const { user, isLoading } = useAuth();
   const { openAuth } = useAuthModal();
+  const { t } = useI18n();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [chatHref, setChatHref] = useState('/profile/friends');
   const [avatarFrameKey, setAvatarFrameKey] = useState<string | null>(null);
@@ -143,10 +145,10 @@ export default function Header() {
   const isChatActive = pathname.startsWith('/profile/friends/chat');
 
   const navLinks = [
-    { href: '/popular', label: 'Популярное', icon: <HiFire /> },
-    { href: '/schedule', label: 'Расписание', icon: <IoCalendarNumberSharp /> },
-    { href: '/filter', label: 'Фильтр', icon: <HiAdjustmentsHorizontal /> },
-    { href: '/bookmarks', label: 'Закладки', icon: <HiMiniBookmark /> },
+    { href: '/popular', label: t('nav.popular'), icon: <HiFire /> },
+    { href: '/schedule', label: t('nav.schedule'), icon: <IoCalendarNumberSharp /> },
+    { href: '/filter', label: t('nav.filter'), icon: <HiAdjustmentsHorizontal /> },
+    { href: '/bookmarks', label: t('nav.bookmarks'), icon: <HiMiniBookmark /> },
   ];
 
   return (
@@ -224,8 +226,8 @@ export default function Header() {
             {isLoggedIn && (
               <Link
                 href={chatHref}
-                aria-label="Открыть последний чат"
-                title="Сообщения"
+                aria-label={t('header.openLastChat')}
+                title={t('header.messages')}
                 className="relative group transition-transform hover:scale-110 active:scale-95"
               >
                 <HiOutlineChatBubbleOvalLeftEllipsis
@@ -282,7 +284,7 @@ export default function Header() {
                   onClick={() => openAuth('login')}
                   className="hidden sm:inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition-all hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
-                  <span>Вход</span>
+                  <span>{t('header.login')}</span>
                 </button>
                 <button
                   type="button"
@@ -290,7 +292,7 @@ export default function Header() {
                   className="flex items-center gap-2 rounded-xl bg-brand px-4 py-2 sm:px-5 sm:py-2.5 text-sm font-bold text-white shadow-lg shadow-brand/20 hover:bg-brand-hover transition-all active:scale-95"
                 >
                   <FaUserPlus className="hidden sm:inline" />
-                  <span>Регистрация</span>
+                  <span>{t('header.register')}</span>
                 </button>
               </div>
             )}
@@ -346,7 +348,7 @@ export default function Header() {
                 onClick={() => { setIsMenuOpen(false); openAuth('login'); }}
                 className="w-full py-4 text-center font-bold rounded-2xl bg-gray-100 dark:bg-white/10"
               >
-                Вход в аккаунт
+                {t('header.loginAccount')}
               </button>
             </div>
           )}

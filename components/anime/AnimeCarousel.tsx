@@ -4,6 +4,7 @@ import Slider, { Settings } from "react-slick";
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import CarouselSkeleton from '@/components/skeletons/CarouselSkeleton';
+import { useI18n } from '@/contexts/I18nContext';
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -42,6 +43,7 @@ const TickerCard = ({ anime }: { anime: AnimeItem }) => (
 );
 
 export default function FeaturedNewestRows() {
+  const { t } = useI18n();
   const [allAnime, setAllAnime] = useState<AnimeItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -117,17 +119,16 @@ export default function FeaturedNewestRows() {
           <div className="flex items-center gap-3 mb-2">
             <div className="h-1 w-12 bg-brand rounded-full" />
             <span className="text-[10px] font-black text-brand uppercase tracking-[0.4em]">
-              ВаШ сайт AniYume
+              {t('home.badge')}
             </span>
           </div>
 
           <h2 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white uppercase tracking-tighter leading-none">
-            Новинки <span className="text-gray-500 dark:text-gray-600">сезона</span>
+            {t('home.heroTitle1')} <span className="text-gray-500 dark:text-gray-600">{t('home.heroTitle2')}</span>
           </h2>
 
           <p className="mt-4 text-gray-500 dark:text-gray-400 text-sm md:text-base font-medium max-w-md leading-relaxed">
-            Самые ожидаемые релизы этого года уже доступны на AniYume.
-            Смотрите первыми в высоком качестве.
+            {t('home.carouselTagline')}
           </p>
         </div>
       </div>

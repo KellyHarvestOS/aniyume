@@ -4,7 +4,10 @@ import React, { useState } from 'react';
 import { FaEnvelope, FaLock, FaSignInAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
 import AuthToast from '@/components/ui/AuthToast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useI18n } from '@/contexts/I18nContext';
 import type { AuthModalView } from '@/contexts/AuthModalContext';
+
+type TranslateFn = (key: string, vars?: Record<string, string | number>) => string;
 
 type AuthResponse = {
   message?: string;
@@ -20,16 +23,16 @@ type LoginUser = Parameters<ReturnType<typeof useAuth>['login']>[1];
 
 type LoginFormData = { email: string; password: string; bot_check?: string };
 
-const getErrorMessage = (error: unknown) => {
+const getErrorMessage = (error: unknown, t: TranslateFn) => {
   if (error instanceof Error) return error.message;
   if (typeof error === 'string') return error;
-  return 'Не удалось войти. Попробуйте позже.';
+  return t('auth.login.failed');
 };
 
-const formatBanMessage = (response: AuthResponse) => {
-  if (!response.ban_reason && !response.ban_expires_at) return response.message || 'Аккаунт заблокирован.';
-  const until = response.ban_expires_at ? ` Срок: до ${new Date(response.ban_expires_at).toLocaleString('ru-RU')}.` : ' Срок: навсегда.';
-  return `${response.message || 'Аккаунт заблокирован.'}${response.ban_reason ? ` Причина: ${response.ban_reason}.` : ''}${until}`;
+const formatBanMessage = (response: AuthResponse, t: TranslateFn) => {
+  if (!response.ban_reason && !response.ban_expires_at) return response.message || t('auth.ban.blocked');
+  const until = response.ban_expires_at ? t('auth.ban.until', { date: new Date(response.ban_expires_at).toLocaleString() }) : t('auth.ban.forever');
+  return `${response.message || t('auth.ban.blocked')}${response.ban_reason ? t('auth.ban.reason', { reason: response.ban_reason }) : ''}${until}`;
 };
 
 const readJson = async (res: Response): Promise<AuthResponse> => {
@@ -53,6 +56,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ onSuccess, onSwitch }: LoginFormProps) {
   const { login } = useAuth();
+  const { t } = useI18n();
   const [formData, setFormData] = useState<LoginFormData>({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -80,7 +84,7 @@ export default function LoginForm({ onSuccess, onSwitch }: LoginFormProps) {
         localStorage.setItem('userToken', 'mock-premium-user-token');
         localStorage.setItem('userData', JSON.stringify({ id: 'mock-premium-user', name: 'vladjjjsss7', email: MOCK_LOGIN_EMAIL }));
         window.dispatchEvent(new Event('authChange'));
-        showToast('Успешный вход', 'Вы успешно вошли в тестовый аккаунт AniYume.', 'success');
+        showToast(t('auth.login.successTitle'), t('auth.login.testSuccessMsg'), 'success');
         window.setTimeout(() => onSuccess?.(), 900);
         return;
       }
@@ -94,21 +98,21 @@ export default function LoginForm({ onSuccess, onSwitch }: LoginFormProps) {
       const responseData = await readJson(res);
 
       if (!res.ok) {
-        throw new Error(res.status === 403 ? formatBanMessage(responseData) : responseData.message || 'Неверный логин или пароль');
+        throw new Error(res.status === 403 ? formatBanMessage(responseData, t) : responseData.message || t('auth.login.invalid'));
       }
 
       const token = responseData.data?.token || responseData.data?.access_token || responseData.token || responseData.access_token;
       const user = responseData.data?.user || responseData.user;
 
-      if (!token) throw new Error('Ошибка авторизации: токен отсутствует');
+      if (!token) throw new Error(t('auth.login.noToken'));
 
       login(token, (user as LoginUser | undefined) || { id: 0, name: '', email: formData.email });
-      showToast('Успешный вход', 'Вы успешно вошли в систему AniYume.', 'success');
+      showToast(t('auth.login.successTitle'), t('auth.login.successMsg'), 'success');
       window.setTimeout(() => onSuccess?.(), 900);
     } catch (error: unknown) {
-      const message = getErrorMessage(error);
+      const message = getErrorMessage(error, t);
       setFieldErrors({ email: message, password: message });
-      showToast('Ошибка входа', message, 'danger');
+      showToast(t('auth.login.errorTitle'), message, 'danger');
     } finally {
       setLoading(false);
     }
@@ -119,16 +123,16 @@ export default function LoginForm({ onSuccess, onSwitch }: LoginFormProps) {
       <AuthToast isOpen={toast.isOpen} title={toast.title} message={toast.message} type={toast.type} />
 
       <h1 className="mb-2 flex items-center justify-center gap-3 text-center text-3xl font-black uppercase italic tracking-tighter text-[#2EC4B6]">
-        <FaSignInAlt className="text-2xl" /> Вход
+        <FaSignInAlt className="text-2xl" /> {t('auth.login.title')}
       </h1>
       <p className="mb-8 text-center text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">
-        Авторизация в системе AniYume
+        {t('auth.login.subtitle')}
       </p>
 
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="email" className="mb-2 ml-1 block text-[11px] font-black uppercase tracking-widest text-[#2EC4B6]">
-            Email Адрес
+            {t('auth.email')}
           </label>
           <div className="relative group">
             <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2EC4B6] transition-colors" />
@@ -137,7 +141,7 @@ export default function LoginForm({ onSuccess, onSwitch }: LoginFormProps) {
               id="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="EMAIL@EXAMPLE.COM"
+              placeholder={t('auth.emailPlaceholder')}
               aria-invalid={!!fieldErrors.email}
               className={`w-full rounded-xl border bg-gray-50 py-3.5 pl-12 pr-4 text-sm font-bold text-gray-700 outline-none transition focus:ring-2 dark:bg-[#111111] dark:text-gray-200 ${fieldErrors.email
                 ? 'border-red-400 shadow-[0_0_0_3px_rgba(239,68,68,0.12)] focus:ring-red-400/30 dark:border-red-500/70'
@@ -150,7 +154,7 @@ export default function LoginForm({ onSuccess, onSwitch }: LoginFormProps) {
 
         <div>
           <label htmlFor="password" className="mb-2 ml-1 block text-[11px] font-black uppercase tracking-widest text-[#2EC4B6]">
-            Пароль аккаунта
+            {t('auth.login.passwordLabel')}
           </label>
           <div className="relative group">
             <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2EC4B6] transition-colors" />
@@ -183,7 +187,7 @@ export default function LoginForm({ onSuccess, onSwitch }: LoginFormProps) {
             onClick={() => onSwitch('forgot')}
             className="text-[10px] font-black uppercase tracking-widest text-gray-400 transition-colors hover:text-[#2EC4B6]"
           >
-            Забыли пароль?
+            {t('auth.login.forgot')}
           </button>
         </div>
 
@@ -198,7 +202,7 @@ export default function LoginForm({ onSuccess, onSwitch }: LoginFormProps) {
           disabled={loading}
           className="w-full rounded-xl bg-[#2EC4B6] py-4 text-xs font-black uppercase italic tracking-[0.2em] text-white shadow-lg shadow-[#2EC4B6]/20 transition-all hover:bg-[#259B92] active:scale-95 disabled:opacity-50"
         >
-          {loading ? 'ОБРАБОТКА...' : 'ВОЙТИ В ПРОФИЛЬ'}
+          {loading ? t('auth.processing') : t('auth.login.submit')}
         </button>
 
         <div className="flex flex-col items-center pt-2 text-center">
@@ -207,7 +211,7 @@ export default function LoginForm({ onSuccess, onSwitch }: LoginFormProps) {
             onClick={() => onSwitch('register')}
             className="text-[11px] font-black uppercase tracking-widest text-gray-400 transition-colors hover:text-[#2EC4B6]"
           >
-            Нет аккаунта? <span className="text-[#2EC4B6] underline">Зарегистрироваться</span>
+            {t('auth.login.noAccount')} <span className="text-[#2EC4B6] underline">{t('auth.login.registerLink')}</span>
           </button>
         </div>
       </form>

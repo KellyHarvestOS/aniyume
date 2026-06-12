@@ -23,6 +23,7 @@ interface ApiUser {
     avatar: string | null;
     is_online: boolean;
     is_blocked?: boolean;
+    selected_profile_frame?: string | null;
 }
 
 const isGif = (value: string | null) => Boolean(value && /^https?:\/\/.+\.gif(\?.*)?$/i.test(value));
@@ -93,6 +94,7 @@ export default function ChatPage() {
                 name: chat.user.name,
                 avatar: chat.user.avatar,
                 is_online: chat.user.is_online,
+                selected_profile_frame: chat.user.selected_profile_frame ?? null,
                 lastMessage: chat.last_message?.photo_path ? 'Фотография' : chat.last_message?.body || 'Начните переписку',
             })));
         }
@@ -185,6 +187,7 @@ export default function ChatPage() {
                         friendId={friendId}
                         friendName={friend?.name || `Пользователь ${friendId}`}
                         friendAvatar={friend?.avatar}
+                        friendFrame={friend?.selected_profile_frame}
                         isOnline={friend?.is_online || false}
                         isBlocked={friend?.is_blocked || false}
                         onClear={clearChat}

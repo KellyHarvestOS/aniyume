@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { FaChevronDown } from 'react-icons/fa';
 import AnimeCardSkeleton from '@/components/skeletons/AnimeCardSkeleton';
 import AnimeCard from '@/components/anime/AnimeCard';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface AnimeData {
   id: number;
@@ -44,6 +45,7 @@ const buildParams = (page: number, filters: AnimeListProps['filters'] = {}) => {
 };
 
 const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
+  const { t } = useI18n();
   const filterKey = useMemo(() => JSON.stringify(filters), [filters]);
   const [data, setData] = useState<AnimeData[]>([]);
   const [page, setPage] = useState(1);
@@ -167,19 +169,19 @@ const AnimeList: React.FC<AnimeListProps> = ({ title, filters = {} }) => {
         {loadingNext && (
           <div className="flex flex-col items-center gap-4">
             <div className="w-10 h-10 border-4 border-brand/20 border-t-brand rounded-full animate-spin" />
-            <span className="text-xs font-black uppercase tracking-widest text-gray-500 animate-pulse">Загружаем ещё...</span>
+            <span className="text-xs font-black uppercase tracking-widest text-gray-500 animate-pulse">{t('list.loadingMore')}</span>
           </div>
         )}
         {!hasMore && data.length > 0 && (
           <div className="flex flex-col items-center gap-2">
             <div className="h-px w-24 bg-gradient-to-r from-transparent via-gray-600 to-transparent mb-4" />
-            <span className="text-sm font-bold text-gray-500 italic">На этом всё! :)</span>
+            <span className="text-sm font-bold text-gray-500 italic">{t('list.end')}</span>
           </div>
         )}
         {!loading && data.length === 0 && (
           <div className="text-center py-20">
-            <h3 className="text-xl font-bold text-gray-400">Ничего не найдено по вашему запросу</h3>
-            <p className="text-sm text-gray-500 mt-2">Попробуйте изменить параметры фильтрации</p>
+            <h3 className="text-xl font-bold text-gray-400">{t('list.notFound')}</h3>
+            <p className="text-sm text-gray-500 mt-2">{t('list.tryFilters')}</p>
           </div>
         )}
       </div>

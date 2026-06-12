@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaStar, FaChevronLeft, FaTrashAlt, FaPlay } from "react-icons/fa";
 import RatingCardSkeleton from "@/components/skeletons/RatingCardSkeleton";
+import { useI18n } from "@/contexts/I18nContext";
 
 interface RatedAnime {
   id: number;
@@ -19,6 +20,7 @@ interface RatedAnime {
 
 export default function RatingsPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [ratings, setRatings] = useState<RatedAnime[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +47,7 @@ export default function RatingsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Удалить оценку?")) return;
+    if (!confirm(t("ratings.confirmDelete"))) return;
 
     setRatings((prev) => prev.filter((item) => item.id !== id));
 
@@ -85,10 +87,10 @@ export default function RatingsPage() {
           </button>
           <div>
             <h1 className="text-2xl font-black uppercase tracking-tighter italic">
-              Мои <span className="text-brand w-[7rem]">Оценки</span>
+              {t("ratings.title1")} <span className="text-brand w-[7rem]">{t("ratings.title2")}</span>
             </h1>
             <p className="text-[9px] font-black text-black/40 dark:text-white/40 uppercase tracking-[0.4em]">
-              Всего: {ratings.length} 
+              {t("ratings.total", { n: ratings.length })}
             </p>
           </div>
         </div>
@@ -98,7 +100,7 @@ export default function RatingsPage() {
         {ratings.length === 0 ? (
           <div className="py-40 text-center">
             <h2 className="text-4xl font-black text-black/10 dark:text-white/10 uppercase italic">
-              Оценок нет
+              {t("ratings.empty")}
             </h2>
           </div>
         ) : (
@@ -149,7 +151,7 @@ export default function RatingsPage() {
                       href={`/anime/${item.anime.id}#player`}
                       className="text-[8px] font-black text-brand uppercase hover:underline"
                     >
-                      Редактировать
+                      {t("common.edit")}
                     </Link>
                   </div>
                 </div>

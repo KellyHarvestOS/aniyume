@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaStar, FaPlay, FaArrowLeft, FaFilter, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface AnimeData {
   id: number;
@@ -18,15 +19,16 @@ interface AnimeData {
 }
 
 const FILTER_LABELS: Record<string, string> = {
-  genre: 'Жанр',
-  year: 'Год',
-  status: 'Статус',
-  type: 'Тип',
-  translator: 'Озвучка',
-  sort: 'Сортировка',
+  genre: 'filterLabel.genre',
+  year: 'filterLabel.year',
+  status: 'filterLabel.status',
+  type: 'filterLabel.type',
+  translator: 'filterLabel.translator',
+  sort: 'filterLabel.sort',
 };
 
 function CatalogContent() {
+  const { t } = useI18n();
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -105,12 +107,12 @@ function CatalogContent() {
           <div className="flex items-center gap-4">
             <button onClick={() => router.push('/')} className="text-gray-500 hover:text-gray-800 transition dark:text-gray-200"><FaArrowLeft size={20} /></button>
             <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-200">Каталог</h1>
-                <p className="text-xs text-gray-500">{isLoading ? 'Загрузка...' : `Найдено: ${totalItems}`}</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-200">{t('catalog.title')}</h1>
+                <p className="text-xs text-gray-500">{isLoading ? t('common.loading') : t('catalog.found', { count: totalItems })}</p>
             </div>
           </div>
-          <Link href={`/filter?${searchParams.toString()}`} className="flex items-center gap-2 text-[#21D0B8] font-bold text-sm border-2 border-[#21D0B8] px-4 py-2 rounded-lg transition hover:bg-[#21D0B8] hover:text-white">  
-             <FaFilter /> Фильтры
+          <Link href={`/filter?${searchParams.toString()}`} className="flex items-center gap-2 text-[#21D0B8] font-bold text-sm border-2 border-[#21D0B8] px-4 py-2 rounded-lg transition hover:bg-[#21D0B8] hover:text-white">
+             <FaFilter /> {t('catalog.filters')}
           </Link>
         </div>
 
@@ -118,12 +120,12 @@ function CatalogContent() {
           <div className="container mx-auto px-4 md:px-8 py-3 flex flex-wrap gap-2 border-t border-gray-100 dark:border-gray-800">
             {activeFilters.map(([key, value]) => (
               <div key={key} className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 text-gray-700 px-3 py-1 rounded-full text-xs font-medium border border-gray-200 dark:border-gray-600 dark:text-gray-200">
-                <span className="text-gray-400">{FILTER_LABELS[key] || key}:</span>
+                <span className="text-gray-400">{FILTER_LABELS[key] ? t(FILTER_LABELS[key]) : key}:</span>
                 <span>{value}</span>
                 <button onClick={() => removeFilter(key)} className="text-gray-400 hover:text-red-500 ml-1"><FaTimes /></button>
               </div>
             ))}
-            <button onClick={() => router.push('/catalog')} className="text-xs text-red-400 hover:text-red-600 underline ml-2">Сбросить всё</button>
+            <button onClick={() => router.push('/catalog')} className="text-xs text-red-400 hover:text-red-600 underline ml-2">{t('catalog.resetAll')}</button>
           </div>
         )}
       </div>
@@ -137,8 +139,8 @@ function CatalogContent() {
           <>
             {animeData.length === 0 ? (
                 <div className="text-center py-20">
-                    <h2 className="text-2xl font-bold text-gray-400">Ничего не найдено :(</h2>
-                    <Link href={`/filter?${searchParams.toString()}`} className="mt-6 inline-block bg-[#21D0B8] text-white px-6 py-2 rounded-lg font-bold">Изменить фильтры</Link>
+                    <h2 className="text-2xl font-bold text-gray-400">{t('catalog.notFound')}</h2>
+                    <Link href={`/filter?${searchParams.toString()}`} className="mt-6 inline-block bg-[#21D0B8] text-white px-6 py-2 rounded-lg font-bold">{t('catalog.changeFilters')}</Link>
                 </div>
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-10 gap-x-6 justify-items-center">
@@ -156,7 +158,7 @@ function CatalogContent() {
                                     {anime.year && <span className="bg-gray-700/80 px-2 py-0.5 rounded">{anime.year}</span>}
                                     {anime.type && <span className="bg-[#21D0B8]/20 text-[#21D0B8] px-2 py-0.5 rounded">{anime.type}</span>}
                                 </div>
-                                <button className="w-full bg-[#21D0B8] text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2 text-xs"><FaPlay className="text-[10px]" /> Смотреть</button>
+                                <button className="w-full bg-[#21D0B8] text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2 text-xs"><FaPlay className="text-[10px]" /> {t('card.watch')}</button>
                             </div>
                         </div>
                     </div>
@@ -173,7 +175,7 @@ function CatalogContent() {
                         <div className="flex items-center gap-1 px-2">{renderPageNumbers()}</div>
                         <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="p-3 rounded-xl hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition text-gray-600 dark:text-gray-200"><FaChevronRight /></button>
                     </div>
-                    <div className="text-gray-400 text-xs mt-3 font-medium ">Страница {currentPage} из {totalPages}</div>
+                    <div className="text-gray-400 text-xs mt-3 font-medium ">{t('catalog.pageOf', { current: currentPage, total: totalPages })}</div>
                 </div>
             )}
           </>
@@ -183,9 +185,14 @@ function CatalogContent() {
   );
 }
 
+function CatalogFallback() {
+  const { t } = useI18n();
+  return <div className="p-10 text-center">{t('catalog.loadingCatalog')}</div>;
+}
+
 export default function CatalogPage() {
   return (
-    <Suspense fallback={<div className="p-10 text-center">Загрузка каталога...</div>}>
+    <Suspense fallback={<CatalogFallback />}>
       <CatalogContent />
     </Suspense>
   );

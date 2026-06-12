@@ -8,6 +8,7 @@ import FriendRequestsModal from '@/components/modals/FriendRequestsModal';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useI18n } from '@/contexts/I18nContext';
 import { getStorageAssetUrl } from '@/lib/storage';
 
 interface FriendUser {
@@ -22,6 +23,7 @@ interface FriendUser {
 export default function FriendsPage() {
     const router = useRouter();
     const { user, isLoading: authLoading } = useAuth();
+    const { t } = useI18n();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
@@ -69,7 +71,7 @@ export default function FriendsPage() {
     const sendRequestByNickname = async (nickname: string) => {
         const res = await api.post('/friends/by-nickname', { nickname });
         const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.message || 'Не удалось отправить запрос');
+        if (!res.ok) throw new Error(data.message || t('friends.errSendRequest'));
 
         await loadData();
     };
@@ -80,7 +82,7 @@ export default function FriendsPage() {
             const res = await api.post(`/friends/${userId}/accept`, {});
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                throw new Error(data.message || 'Не удалось принять заявку');
+                throw new Error(data.message || t('friends.errAccept'));
             }
             const accepted = incoming.find(u => u.id === userId);
             if (accepted) {
@@ -98,7 +100,7 @@ export default function FriendsPage() {
             const res = await api.post(`/friends/${userId}/decline`, {});
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                throw new Error(data.message || 'Не удалось удалить');
+                throw new Error(data.message || t('friends.errRemove'));
             }
             setIncoming(prev => prev.filter(u => u.id !== userId));
             setFriends(prev => prev.filter(u => u.id !== userId));
@@ -113,7 +115,7 @@ export default function FriendsPage() {
             const res = await api.post(`/friends/${userId}/decline`, {});
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                throw new Error(data.message || 'Не удалось отменить заявку');
+                throw new Error(data.message || t('friends.errCancel'));
             }
             setOutgoing(prev => prev.filter(u => u.id !== userId));
         } finally {
@@ -197,10 +199,10 @@ export default function FriendsPage() {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-gray-100 dark:border-white/5 pb-5">
                     <div>
                         <h1 className="text-5xl font-black uppercase tracking-tighter text-gray-900 dark:text-white leading-none">
-                            Мои <span className="text-brand">Друзья</span>
+                            {t('friends.title1')} <span className="text-brand">{t('friends.title2')}</span>
                         </h1>
                         <p className="mt-3 text-gray-400 font-bold uppercase tracking-[0.5em] text-[10px] ml-1">
-                            {friends.filter(f => f.is_online).length} ОНЛАЙН • {friends.length} ВСЕГО
+                            {t('friends.onlineTotal', { online: friends.filter(f => f.is_online).length, total: friends.length })}
                         </p>
                     </div>
 
@@ -223,7 +225,7 @@ export default function FriendsPage() {
                             onClick={() => setIsModalOpen(true)}
                             className="bg-brand text-white px-6 py-3 rounded-xl font-black uppercase italic tracking-tighter text-xs hover:scale-105 transition-transform active:scale-95 shadow-lg shadow-brand/20 flex items-center justify-center gap-2"
                         >
-                            <FaPlus size={10} /> Добавить друга
+                            <FaPlus size={10} /> {t('friends.addFriend')}
                         </button>
                     </div>
                 </div>
@@ -236,7 +238,7 @@ export default function FriendsPage() {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Поиск по имени"
+                        placeholder={t('friends.searchByName')}
                         className="w-full bg-transparent pt-4 pb-3 pl-12 pr-10 text-sm font-black italic tracking-widest text-gray-900 dark:text-white border-2 rounded-xl border-gray-100 dark:border-white/10 outline-none transition-all placeholder:text-gray-500 focus:border-brand"
                     />
                     {searchQuery && (
@@ -264,7 +266,7 @@ export default function FriendsPage() {
                             className="custom-glass rounded-lg p-8 border-2 border-brand/50 shadow-[0_0_15px_rgba(var(--brand-main-rgb,33_208_184)/0.15)] transition-all duration-300 relative group bg-brand/5"
                         >
                             <div className="absolute top-4 left-0 w-full text-center">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-brand">Новая заявка</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-brand">{t('friends.newRequest')}</span>
                             </div>
 
                             <div className="flex flex-col items-center mt-6">
@@ -280,13 +282,13 @@ export default function FriendsPage() {
                                         onClick={() => acceptRequest(u.id)}
                                         disabled={loadingIds.includes(u.id)}
                                         className="flex-1 h-10 bg-brand hover:brightness-110 text-white rounded-xl shadow-lg font-bold text-xs flex items-center justify-center transition-all disabled:opacity-50">
-                                        Принять
+                                        {t('friends.accept')}
                                     </button>
                                     <button
                                         onClick={() => declineRequest(u.id)}
                                         disabled={loadingIds.includes(u.id)}
                                         className="flex-1 h-10 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl font-bold text-xs flex items-center justify-center transition-all disabled:opacity-50">
-                                        Скрыть
+                                        {t('friends.hide')}
                                     </button>
                                 </div>
                             </div>
@@ -304,7 +306,7 @@ export default function FriendsPage() {
                             className="custom-glass rounded-lg p-8 border border-white/10 transition-all duration-300 relative group opacity-60"
                         >
                             <div className="absolute top-4 left-0 w-full text-center">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Ожидает ответа</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t('friends.waitingResponse')}</span>
                             </div>
 
                             <div className="flex flex-col items-center mt-6">
@@ -319,7 +321,7 @@ export default function FriendsPage() {
                                     onClick={() => cancelOutgoing(u.id)}
                                     disabled={loadingIds.includes(u.id)}
                                     className="w-full h-10 bg-white/5 hover:bg-white/10 text-white/50 rounded-xl font-bold text-xs flex items-center justify-center transition-all disabled:opacity-50">
-                                    Отменить заявку
+                                    {t('friends.cancelRequest')}
                                 </button>
                             </div>
                         </motion.div>
@@ -370,7 +372,7 @@ export default function FriendsPage() {
                                     </button>
 
                                     <p className="text-sm w-full px-2 font-bold mt-1 text-slate-900 dark:text-gray-100 italic truncate">
-                                        {u.custom_status || (u.is_online ? 'В сети' : 'Не в сети')}
+                                        {u.custom_status || (u.is_online ? t('friends.online') : t('friends.offline'))}
                                     </p>
 
                                     <div className="flex gap-2 w-full mt-6">
@@ -380,7 +382,7 @@ export default function FriendsPage() {
                                             className="flex-1 flex items-center justify-center gap-2 bg-slate-100 dark:bg-[#161616] py-3 rounded-xl border border-slate-100 dark:border-gray-800 hover:border-brand transition group active:scale-[0.98]"
                                         >
                                             <FaCommentAlt size={14} className="text-slate-400 group-hover:text-brand transition-colors" />
-                                            <span className="text-[10px] font-bold text-slate-400 group-hover:text-brand uppercase transition-colors">Чат</span>
+                                            <span className="text-[10px] font-bold text-slate-400 group-hover:text-brand uppercase transition-colors">{t('friends.chat')}</span>
                                         </button>
 
                                         <button
@@ -388,7 +390,7 @@ export default function FriendsPage() {
                                             className="flex-[1.5] flex items-center justify-center gap-2 bg-brand text-white dark:text-gray-900 py-3 rounded-xl font-bold shadow hover:bg-teal-600 transition hover:scale-[1.02] active:scale-[0.98]"
                                         >
                                             <FaPlay size={12} className="fill-current" />
-                                            <span className="text-[10px] font-bold uppercase">Позвать</span>
+                                            <span className="text-[10px] font-bold uppercase">{t('friends.invite')}</span>
                                         </button>
                                     </div>
                                 </div>
@@ -401,7 +403,7 @@ export default function FriendsPage() {
                             className="col-span-full py-20 text-center"
                         >
                             <p className="text-2xl font-black text-gray-400 tracking-tighter">
-                                {isSearchMode ? 'Среди друзей ' : 'У вас пока нет '} <span className="text-brand">{isSearchMode ? 'ничего не найдено' : 'друзей'}</span>
+                                {isSearchMode ? t('friends.emptySearchPrefix') : t('friends.emptyPrefix')} <span className="text-brand">{isSearchMode ? t('friends.emptySearchHl') : t('friends.emptyHl')}</span>
                             </p>
                         </motion.div>
                     )}

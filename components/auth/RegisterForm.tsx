@@ -4,8 +4,11 @@ import React, { useState } from 'react';
 import { FaUser, FaEnvelope, FaLock, FaUserPlus, FaRegAddressCard, FaEye, FaEyeSlash } from 'react-icons/fa';
 import AuthToast from '@/components/ui/AuthToast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useI18n } from '@/contexts/I18nContext';
 import DatePicker from '@/components/ui/DatePicker';
 import type { AuthModalView } from '@/contexts/AuthModalContext';
+
+type TranslateFn = (key: string, vars?: Record<string, string | number>) => string;
 
 type RegisterResponse = {
   message?: string;
@@ -16,10 +19,10 @@ type RegisterResponse = {
   data?: { token?: string; access_token?: string; user?: unknown };
 };
 
-const getErrorMessage = (error: unknown) => {
+const getErrorMessage = (error: unknown, t: TranslateFn) => {
   if (error instanceof Error) return error.message;
   if (typeof error === 'string') return error;
-  return 'Не удалось создать аккаунт. Попробуйте позже.';
+  return t('auth.register.failed');
 };
 
 const readJson = async (res: Response): Promise<RegisterResponse> => {
@@ -58,6 +61,7 @@ interface RegisterFormProps {
 
 export default function RegisterForm({ onSuccess, onSwitch }: RegisterFormProps) {
   const { login } = useAuth();
+  const { t } = useI18n();
   const [formData, setFormData] = useState({ username: '', dateOfBirth: '', email: '', password: '', confirmPassword: '' });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -95,42 +99,42 @@ export default function RegisterForm({ onSuccess, onSwitch }: RegisterFormProps)
   const validateForm = () => {
     setFieldErrors({});
     if (!formData.username.trim()) {
-      const message = 'Введите имя пользователя';
+      const message = t('auth.register.enterUsername');
       markFieldInvalid('username', message);
-      showToast('Ошибка', message, 'danger');
+      showToast(t('auth.error'), message, 'danger');
       return false;
     }
     if (!formData.dateOfBirth) {
-      const message = 'Пожалуйста, выберите дату рождения';
+      const message = t('auth.register.selectBirthDate');
       markFieldInvalid('dateOfBirth', message);
-      showToast('Ошибка', message, 'danger');
+      showToast(t('auth.error'), message, 'danger');
       return false;
     }
     const calculatedAge = calculateAge(formData.dateOfBirth);
     if (calculatedAge < 1 || calculatedAge > 100) {
-      const message = `Ваш вычисленный возраст: ${calculatedAge}. Значение должно быть от 1 до 100 лет.`;
+      const message = t('auth.register.ageError', { age: calculatedAge });
       markFieldInvalid('dateOfBirth', message);
-      showToast('Неверный возраст', message, 'danger');
+      showToast(t('auth.register.invalidAge'), message, 'danger');
       return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      const message = 'Введите корректный адрес электронной почты';
+      const message = t('auth.register.invalidEmail');
       markFieldInvalid('email', message);
-      showToast('Ошибка Email', message, 'danger');
+      showToast(t('auth.register.emailErrorTitle'), message, 'danger');
       return false;
     }
     if (formData.password.length < 6) {
-      const message = 'Пароль должен содержать минимум 6 символов';
+      const message = t('auth.register.weakPassword');
       markFieldInvalid('password', message);
-      showToast('Слабый пароль', message, 'danger');
+      showToast(t('auth.register.weakPasswordTitle'), message, 'danger');
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
-      const message = 'Пароли не совпадают. Проверьте правильность ввода.';
+      const message = t('auth.register.passwordMismatch');
       markFieldInvalid('password', message);
       markFieldInvalid('confirmPassword', message);
-      showToast('Ошибка пароля', message, 'danger');
+      showToast(t('auth.register.passwordErrorTitle'), message, 'danger');
       return false;
     }
     return true;
@@ -155,7 +159,7 @@ export default function RegisterForm({ onSuccess, onSwitch }: RegisterFormProps)
       });
       const responseData = await readJson(res);
       if (!res.ok) {
-        let errorMessage = responseData.message || 'Ошибка регистрации';
+        let errorMessage = responseData.message || t('auth.register.regError');
         if (responseData.errors) {
           Object.entries(responseData.errors).forEach(([field, value]) => {
             const mappedField = backendFieldMap[field];
@@ -164,23 +168,23 @@ export default function RegisterForm({ onSuccess, onSwitch }: RegisterFormProps)
             markFieldInvalid(mappedField, message);
           });
           const firstError = Object.values(responseData.errors)[0];
-          errorMessage = Array.isArray(firstError) ? firstError[0] : firstError || 'Ошибка валидации';
+          errorMessage = Array.isArray(firstError) ? firstError[0] : firstError || t('auth.register.validationError');
         }
-        showToast('Регистрация отклонена', errorMessage, 'danger');
+        showToast(t('auth.register.rejected'), errorMessage, 'danger');
         return;
       }
       const token = responseData.data?.token || responseData.data?.access_token || responseData.token || responseData.access_token;
       const user = responseData.data?.user || responseData.user;
       if (token) {
         login(token, (user as RegisterUser | undefined) || { id: 0, name: formData.username, email: formData.email });
-        showToast('Успех!', 'Ваш аккаунт создан. Приятного просмотра аниме!', 'success');
+        showToast(t('auth.register.successTitle'), t('auth.register.successMsg'), 'success');
         window.setTimeout(() => onSuccess?.(), 900);
       } else {
-        showToast('Почти готово', 'Регистрация прошла успешно! Теперь войдите в свой аккаунт.', 'success');
+        showToast(t('auth.register.almostTitle'), t('auth.register.almostMsg'), 'success');
         window.setTimeout(() => onSwitch('login'), 900);
       }
     } catch (error: unknown) {
-      showToast('Сбой сервера', getErrorMessage(error), 'danger');
+      showToast(t('auth.register.serverError'), getErrorMessage(error, t), 'danger');
     } finally {
       setLoading(false);
     }
@@ -191,40 +195,40 @@ export default function RegisterForm({ onSuccess, onSwitch }: RegisterFormProps)
       <AuthToast isOpen={toast.isOpen} title={toast.title} message={toast.message} type={toast.type} />
 
       <h1 className="text-3xl font-black italic tracking-tighter mb-2 text-center text-[#2EC4B6] flex items-center justify-center gap-3 uppercase">
-        <FaUserPlus className="text-2xl" /> Регистрация
+        <FaUserPlus className="text-2xl" /> {t('auth.register.title')}
       </h1>
       <p className="text-gray-400 mb-8 text-center text-[10px] font-black uppercase tracking-[0.25em] opacity-80">
-        Создайте аккаунт в системе AniYume
+        {t('auth.register.subtitle')}
       </p>
 
       <form className="space-y-5" onSubmit={handleSubmit} noValidate>
         <div className="grid grid-cols-1 md:grid-cols-10 gap-x-5 gap-y-5">
           <div className="md:col-span-6 flex flex-col">
-            <label htmlFor="username" className="block text-[11px] font-black uppercase tracking-widest text-[#2EC4B6] mb-2 ml-1 h-4">Имя пользователя</label>
+            <label htmlFor="username" className="block text-[11px] font-black uppercase tracking-widest text-[#2EC4B6] mb-2 ml-1 h-4">{t('auth.register.username')}</label>
             <div className="relative group">
               <FaUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2EC4B6] transition-colors z-10" />
-              <input id="username" type="text" value={formData.username} onChange={handleChange} placeholder="ВАШ НИКНЕЙМ" aria-invalid={!!fieldErrors.username} className={inputClassName(!!fieldErrors.username, 'pl-12 pr-4')} />
+              <input id="username" type="text" value={formData.username} onChange={handleChange} placeholder={t('auth.register.usernamePlaceholder')} aria-invalid={!!fieldErrors.username} className={inputClassName(!!fieldErrors.username, 'pl-12 pr-4')} />
             </div>
             {renderFieldError('username')}
           </div>
 
           <div className="md:col-span-4 flex flex-col">
-            <label htmlFor="dateOfBirth" className="block text-[10px] font-black uppercase tracking-tight text-[#2EC4B6] mb-2 ml-1 h-4 whitespace-nowrap overflow-hidden">Дата рождения</label>
+            <label htmlFor="dateOfBirth" className="block text-[10px] font-black uppercase tracking-tight text-[#2EC4B6] mb-2 ml-1 h-4 whitespace-nowrap overflow-hidden">{t('auth.register.birthDate')}</label>
             <DatePicker id="dateOfBirth" value={formData.dateOfBirth} onChange={handleDateChange} hasError={!!fieldErrors.dateOfBirth} />
             {renderFieldError('dateOfBirth')}
           </div>
 
           <div className="md:col-span-10 flex flex-col">
-            <label htmlFor="email" className="block text-[11px] font-black uppercase tracking-widest text-[#2EC4B6] mb-2 ml-1 h-4">Email Адрес</label>
+            <label htmlFor="email" className="block text-[11px] font-black uppercase tracking-widest text-[#2EC4B6] mb-2 ml-1 h-4">{t('auth.email')}</label>
             <div className="relative group">
               <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2EC4B6] transition-colors z-10" />
-              <input id="email" type="email" value={formData.email} onChange={handleChange} placeholder="EMAIL@EXAMPLE.COM" aria-invalid={!!fieldErrors.email} className={inputClassName(!!fieldErrors.email, 'pl-12 pr-4')} />
+              <input id="email" type="email" value={formData.email} onChange={handleChange} placeholder={t('auth.emailPlaceholder')} aria-invalid={!!fieldErrors.email} className={inputClassName(!!fieldErrors.email, 'pl-12 pr-4')} />
             </div>
             {renderFieldError('email')}
           </div>
 
           <div className="md:col-span-5 flex flex-col">
-            <label htmlFor="password" className="block text-[11px] font-black uppercase tracking-widest text-[#2EC4B6] mb-2 ml-1 h-4">Пароль</label>
+            <label htmlFor="password" className="block text-[11px] font-black uppercase tracking-widest text-[#2EC4B6] mb-2 ml-1 h-4">{t('auth.register.password')}</label>
             <div className="relative group">
               <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2EC4B6] transition-colors z-10" />
               <input id="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} placeholder="••••••••" aria-invalid={!!fieldErrors.password} className={inputClassName(!!fieldErrors.password, 'pl-12 pr-10')} />
@@ -236,7 +240,7 @@ export default function RegisterForm({ onSuccess, onSwitch }: RegisterFormProps)
           </div>
 
           <div className="md:col-span-5 flex flex-col">
-            <label htmlFor="confirmPassword" className="block text-[11px] font-black uppercase tracking-widest text-[#2EC4B6] mb-2 ml-1 h-4">Повтор пароля</label>
+            <label htmlFor="confirmPassword" className="block text-[11px] font-black uppercase tracking-widest text-[#2EC4B6] mb-2 ml-1 h-4">{t('auth.register.confirmPassword')}</label>
             <div className="relative group">
               <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2EC4B6] transition-colors z-10" />
               <input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" aria-invalid={!!fieldErrors.confirmPassword} className={inputClassName(!!fieldErrors.confirmPassword, 'pl-12 pr-10')} />
@@ -250,14 +254,14 @@ export default function RegisterForm({ onSuccess, onSwitch }: RegisterFormProps)
 
         <div className="pt-2">
           <button type="submit" disabled={loading} className="w-full bg-[#2EC4B6] hover:bg-[#259B92] text-white font-black uppercase italic tracking-[0.2em] h-14 rounded-xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#2EC4B6]/25 disabled:opacity-50 active:scale-[0.98] text-xs">
-            {loading ? 'ОБРАБОТКА...' : <><FaRegAddressCard className="text-lg" /> Зарегистрироваться</>}
+            {loading ? t('auth.processing') : <><FaRegAddressCard className="text-lg" /> {t('auth.register.submit')}</>}
           </button>
         </div>
       </form>
 
       <div className="mt-6 pt-5 border-t border-gray-100 dark:border-white/5 text-center">
         <button type="button" onClick={() => onSwitch('login')} className="text-[11px] font-black uppercase tracking-widest text-gray-400 hover:text-[#2EC4B6] transition-colors">
-          Уже есть аккаунт? <span className="text-[#2EC4B6] underline">Войти</span>
+          {t('auth.register.haveAccount')} <span className="text-[#2EC4B6] underline">{t('auth.register.loginLink')}</span>
         </button>
       </div>
     </>

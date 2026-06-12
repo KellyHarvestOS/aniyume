@@ -5,6 +5,7 @@ import { FaBold, FaItalic, FaSyncAlt, FaSmile, FaTrash, FaEdit, FaSave, FaTimes,
 import Modal from '@/components/modals/ErrorModal';
 import ReportButton from '@/components/reports/ReportButton';
 import { getStorageAssetUrl } from '@/lib/storage';
+import AvatarFrameOverlay, { getAvatarFramePath } from '@/components/profile/AvatarFrameOverlay';
 
 const EMOJIS = ['😊', '😂', '😍', '🤔', '😎', '😭', '😮', '🔥', '✨', '👍', '👎', '❤️', '😱', '🙌', '👀'];
 
@@ -174,7 +175,7 @@ export default function AnimeComments({ animeId, preview = false }: { animeId: s
       {user.ok ? (
         <div className="bg-gray-50 border-gray-300 dark:bg-[#161616] p-4 sm:p-6 rounded-lg border dark:border-gray-800">
           <div className="mb-4 flex items-center gap-3">
-            <Avatar name={user.name} src={getImg(user.avatar as any)} size="10" />
+            <Avatar name={user.name} src={getImg(user.avatar as any)} size="10" frameKey={user.selected_profile_frame} />
             <p className="font-black dark:text-gray-200">{user.name}</p>
           </div>
           <div className="border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-[#111111]">
@@ -213,7 +214,7 @@ export default function AnimeComments({ animeId, preview = false }: { animeId: s
       <div className="mt-12 space-y-6">
         {comments.map(c => (
           <div key={c.id} className="flex min-w-0 gap-3 sm:gap-4 p-3 sm:p-5 bg-white dark:bg-[#181818] rounded-lg border border-gray-300 sm:border-gray-400 dark:border-gray-800">
-            <Avatar name={c.user.name} src={getImg(c.user.avatar)} size="12" />
+            <Avatar name={c.user.name} src={getImg(c.user.avatar)} size="12" frameKey={c.user.selected_profile_frame} />
             <div className="flex-1 min-w-0">
               <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:justify-between">
                 <div className="flex min-w-0 flex-wrap items-center gap-2 text-sm font-black dark:text-gray-200"><span className="truncate">{c.user.name}</span> <span className="text-[10px] text-gray-400 uppercase">{new Date(c.created_at).toLocaleDateString()}</span></div>
@@ -253,7 +254,7 @@ export default function AnimeComments({ animeId, preview = false }: { animeId: s
                 <div className="mt-4 space-y-3 border-l-2 pl-3 sm:pl-4 brand-border">
                   {c.replies.map((reply: any) => (
                     <div key={reply.id} className="flex gap-3 rounded-xl bg-gray-50 p-3 dark:bg-[#111111]">
-                      <Avatar name={reply.user.name} src={getImg(reply.user.avatar)} size="8" />
+                      <Avatar name={reply.user.name} src={getImg(reply.user.avatar)} size="8" frameKey={reply.user.selected_profile_frame} />
                       <div className="min-w-0 flex-1">
                         <div className="mb-1 flex items-center gap-2 text-xs font-black dark:text-gray-200">
                           {reply.user.name}
@@ -290,10 +291,18 @@ const ActionButton = ({ icon, onClick, active, count, title }: any) => (
   </button>
 );
 
-const Avatar = ({ name, src, size }: any) => {
+const Avatar = ({ name, src, size, frameKey }: any) => {
   const sizeClass = size === '8' ? 'h-8 w-8 text-xs' : size === '10' ? 'h-10 w-10 text-sm' : 'h-10 w-10 sm:h-12 sm:w-12 text-sm';
-  return src ? <img src={src} className={`${sizeClass} shrink-0 rounded-full object-cover border-2 border-brand`} alt="" />
-    : <div className={`${sizeClass} brand-bg shrink-0 rounded-full flex items-center justify-center text-white font-bold`}>{name?.[0]?.toUpperCase()}</div>;
+  const avatarSize = size === '8' ? 32 : size === '10' ? 40 : 48;
+  const hasFrame = Boolean(getAvatarFramePath(frameKey));
+  return (
+    <div className={`${sizeClass} relative shrink-0`}>
+      {src
+        ? <img src={src} className={`h-full w-full rounded-full object-cover ${hasFrame ? '' : 'border-2 border-brand'}`} alt="" />
+        : <div className="brand-bg flex h-full w-full items-center justify-center rounded-full font-bold text-white">{name?.[0]?.toUpperCase()}</div>}
+      <AvatarFrameOverlay frameKey={frameKey} avatarSize={avatarSize} />
+    </div>
+  );
 };
 
 const Prompt = () => (

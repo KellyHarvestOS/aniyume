@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaPlay, FaChevronRight } from 'react-icons/fa';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface AnimeItem {
   id: number;
@@ -14,16 +15,17 @@ interface AnimeItem {
 }
 
 const DAYS_INFO = [
-  { full: 'Понедельник', short: 'Пн' },
-  { full: 'Вторник', short: 'Вт' },
-  { full: 'Среда', short: 'Ср' },
-  { full: 'Четверг', short: 'Чт' },
-  { full: 'Пятница', short: 'Пт' },
-  { full: 'Суббота', short: 'Сб' },
-  { full: 'Воскресенье', short: 'Вс' }
+  { full: 'day.monday', short: 'day.mon' },
+  { full: 'day.tuesday', short: 'day.tue' },
+  { full: 'day.wednesday', short: 'day.wed' },
+  { full: 'day.thursday', short: 'day.thu' },
+  { full: 'day.friday', short: 'day.fri' },
+  { full: 'day.saturday', short: 'day.sat' },
+  { full: 'day.sunday', short: 'day.sun' }
 ];
 
 export default function SchedulePage() {
+  const { t } = useI18n();
   const [schedule, setSchedule] = useState<Record<number, AnimeItem[]>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [todayIndex, setTodayIndex] = useState(0);
@@ -76,9 +78,9 @@ export default function SchedulePage() {
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 hover:bg-brand dark:hover:text-white hover:text-dark'
                 }`}
             >
-              {day.short}
+              {t(day.short)}
               <span className="absolute right-12 bg-gray-900 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                {day.full}
+                {t(day.full)}
               </span>
               {isToday && (
                 <span className="absolute inset-0 rounded-full bg-brand animate-ping opacity-30"></span>
@@ -91,7 +93,7 @@ export default function SchedulePage() {
       <div className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-10 backdrop-blur-xl">
         <div className="container mx-auto px-4 md:px-8 pt-8">
           <h1 className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
-            Расписание <span className="text-brand w-70">новых серий</span>
+            {t('schedule.title1')} <span className="text-brand w-70">{t('schedule.title2')}</span>
           </h1>
         </div>
       </div>
@@ -133,11 +135,11 @@ export default function SchedulePage() {
                 <div className="flex items-center gap-4 mb-8 relative z-10">
                   <h2 className={`text-3xl font-bold tracking-tight ${isToday ? 'text-gray-900 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400'
                     }`}>
-                    {day.full}
+                    {t(day.full)}
                   </h2>
                   {isToday && (
                     <span className="bg-brand text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg shadow-brand/40 animate-pulse">
-                      Сегодня выходит
+                      {t('schedule.today')}
                     </span>
                   )}
                   {!isToday && <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800 ml-4"></div>}
@@ -159,7 +161,7 @@ export default function SchedulePage() {
                           unoptimized
                         />
                         <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-lg">
-                          {anime.id % 24 + 1} серия
+                          {t('schedule.episodeN', { n: anime.id % 24 + 1 })}
                         </div>
 
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -174,7 +176,7 @@ export default function SchedulePage() {
                           {anime.title}
                         </h3>
                         <div className="flex items-center justify-between text-xs text-gray-400 mt-1">
-                          <span className="whitespace-nowrap">Новая серия</span>
+                          <span className="whitespace-nowrap">{t('schedule.newEpisode')}</span>
                           <FaChevronRight size={10} className="icon-brand shrink-0" />
                         </div>
                       </div>

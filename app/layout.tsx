@@ -4,6 +4,7 @@ import LayoutClient from './layoutClient'
 import ScrollToTop from "@/components/layout/FloatingActions";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { I18nProvider } from "@/contexts/I18nContext";
 import { FingerprintInit } from "@/components/FingerprintInit";
 
 const inter = Inter({ subsets: ['latin'] })
@@ -17,13 +18,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ru" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider>
-          <AuthProvider>
-            <FingerprintInit />
-            <LayoutClient>
-              {children}
-              <ScrollToTop />
-            </LayoutClient>
-          </AuthProvider>
+          <I18nProvider>
+            <AuthProvider>
+              <FingerprintInit />
+              <LayoutClient>
+                {children}
+                <ScrollToTop />
+              </LayoutClient>
+            </AuthProvider>
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>

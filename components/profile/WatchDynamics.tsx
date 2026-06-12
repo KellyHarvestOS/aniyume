@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useI18n } from "@/contexts/I18nContext";
 
 interface DynamicPoint {
   date: string;
@@ -12,6 +13,7 @@ export const WatchDynamics = ({
 }: {
   dynamics: DynamicPoint[];
 }) => {
+  const { t } = useI18n();
   const data = dynamics || [];
   const maxValue = Math.max(...data.map((d) => d.episodes_count), 1);
 
@@ -20,16 +22,16 @@ export const WatchDynamics = ({
       <div className="flex items-center justify-between mb-8">
         <div>
           <h2 className="font-black text-gray-800 dark:text-gray-200 text-lg tracking-tight">
-            Динамика просмотров
+            {t('dynamics.title')}
           </h2>
           <p className="text-xs text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1">
-            За последние 10 дней
+            {t('dynamics.last10')}
           </p>
         </div>
 
         <div className="bg-gray-100 dark:bg-white/5 px-3 py-1 rounded-full">
           <span className="text-brand text-xs font-black">
-            Активность
+            {t('dynamics.activity')}
           </span>
         </div>
       </div>
@@ -54,7 +56,7 @@ export const WatchDynamics = ({
               {isActive && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-20">
                   <div className="bg-gray-900 text-white text-[10px] font-black py-1 px-2 rounded-lg shadow-xl whitespace-nowrap relative">
-                    {d.episodes_count} эп.
+                    {t('dynamics.episodes', { n: d.episodes_count })}
                     <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-900" />
                   </div>
                 </div>

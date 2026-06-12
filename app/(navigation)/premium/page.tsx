@@ -8,7 +8,9 @@ import { HiGif } from "react-icons/hi2";
 import { RiVipCrownFill } from "react-icons/ri";
 import { HiCursorClick } from "react-icons/hi";
 import Link from "next/link";
+import { useI18n } from "@/contexts/I18nContext";
 export default function PremiumAuthPage() {
+    const { t } = useI18n();
     const containerVariants = {
         hidden: { opacity: 0 },
         show: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -22,7 +24,7 @@ export default function PremiumAuthPage() {
     return (
         <div className="relative min-h-dvh lg:h-dvh w-full bg-white dark:bg-[#0a0a0a] lg:bg-[#010606] lg:dark:bg-[#010606] overflow-x-hidden lg:overflow-hidden font-sans flex flex-col lg:block">
             <Link href="/" className="absolute top-4 sm:top-6 left-4 sm:left-6 z-50 flex items-center gap-2 text-slate-400 hover:text-slate-900 dark:hover:text-white lg:hover:text-slate-500 transition-colors font-bold text-sm bg-white/50 dark:bg-black/50 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none px-3 py-2 rounded-full lg:p-0">
-                <FaArrowLeft /> На главную
+                <FaArrowLeft /> {t('premium.toHome')}
             </Link>
 
             <div className="absolute inset-0 w-full h-full z-0 hidden lg:block overflow-hidden bg-[#010606]">
@@ -73,15 +75,15 @@ export default function PremiumAuthPage() {
                 <div className="w-full lg:w-[45%] min-h-[50vh] lg:min-h-full flex flex-col items-center justify-center px-6 pt-24 pb-12 lg:p-12 bg-white dark:bg-[#0a0a0a] lg:bg-transparent lg:dark:bg-transparent">
                     <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }} className="max-w-md w-full space-y-8 lg:space-y-10">
                         <div className="space-y-2">
-                            <span className="inline-block py-1 px-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">Текущий тариф</span>
+                            <span className="inline-block py-1 px-3 rounded-full bg-slate-200 dark:bg-slate-800 text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">{t('premium.currentPlan')}</span>
                             <h2 className="text-5xl sm:text-6xl md:text-7xl font-black text-slate-900 dark:text-white tracking-tighter">FREE<span className="text-slate-400">.</span></h2>
-                            <p className="text-slate-500 font-medium">Базовые возможности для начала.</p>
+                            <p className="text-slate-500 font-medium">{t('premium.freeDesc')}</p>
                         </div>
                         <ul className="space-y-4 lg:space-y-6">
-                            {["Full HD 1080p", "Стандартный плеер", "Общий каталог", "Стандартный стиль сайта", "Обычный никнейм"].map((item, i) => (
+                            {["premium.free1", "premium.free2", "premium.free3", "premium.free4", "premium.free5"].map((item, i) => (
                                 <li key={i} className="flex items-center gap-4 text-slate-600 dark:text-slate-300 font-bold text-sm sm:text-base">
                                     <div className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-500"><FaCheck className="text-sm" /></div>
-                                    {item}
+                                    {t(item)}
                                 </li>
                             ))}
                         </ul>
@@ -99,27 +101,27 @@ export default function PremiumAuthPage() {
                                     <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black italic tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-white to-[#a7ffeb] w-full sm:w-[285px]!">
                                         PREMIUM
                                     </h2>
-                                    <p className="text-white/80 font-bold tracking-widest text-[10px] sm:text-xs uppercase mt-1">AniYume возможности</p>
+                                    <p className="text-white/80 font-bold tracking-widest text-[10px] sm:text-xs uppercase mt-1">{t('premium.features')}</p>
                                 </div>
                             </div>
 
-                            <p className="text-base sm:text-lg font-medium text-white/95 leading-relaxed">Разблокируй истинный потенциал своего профиля и смотри без границ.</p>
+                            <p className="text-base sm:text-lg font-medium text-white/95 leading-relaxed">{t('premium.unlock')}</p>
 
                             <motion.ul variants={containerVariants} initial="hidden" animate="show" className="space-y-5 lg:space-y-6">
                                 {[
-                                    { icon: <HiGif />, t: "GIF Аватарки", d: "Живой профиль" },
-                                    { icon: <BsFillPeopleFill />, t: "Совместный просмотр", d: "До 10 человек одновременно" },
-                                    { icon: <FaMagic />, t: "Свои темы", d: "Персональный стиль сайта" },
-                                    { icon: <HiCursorClick />, t: "Уникальные курсоры мыши", d: "Выделяйся в каждом клике" },
-                                    { icon: <FaShieldAlt />, t: "Приоритетная поддержка", d: "Помощь в первую очередь" },
+                                    { icon: <HiGif />, titleKey: "premium.feat1Title", descKey: "premium.feat1Desc" },
+                                    { icon: <BsFillPeopleFill />, titleKey: "premium.feat2Title", descKey: "premium.feat2Desc" },
+                                    { icon: <FaMagic />, titleKey: "premium.feat3Title", descKey: "premium.feat3Desc" },
+                                    { icon: <HiCursorClick />, titleKey: "premium.feat4Title", descKey: "premium.feat4Desc" },
+                                    { icon: <FaShieldAlt />, titleKey: "premium.feat5Title", descKey: "premium.feat5Desc" },
                                 ].map((item, i) => (
                                     <motion.li key={i} variants={itemVariants} className="flex items-center gap-4 sm:gap-5 group">
                                         <div className="shrink-0 p-2.5 sm:p-3 rounded-full bg-white/10 text-[#fdfefe] shadow-lg group-hover:bg-[#f1f1f1] group-hover:text-[#16758a] transition-all duration-300">
                                             <div className="text-lg sm:text-xl">{item.icon}</div>
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-base sm:text-lg font-bold text-white tracking-tight leading-none">{item.t}</span>
-                                            <span className="text-xs sm:text-sm font-medium text-white/60 mt-1">{item.d}</span>
+                                            <span className="text-base sm:text-lg font-bold text-white tracking-tight leading-none">{t(item.titleKey)}</span>
+                                            <span className="text-xs sm:text-sm font-medium text-white/60 mt-1">{t(item.descKey)}</span>
                                         </div>
                                     </motion.li>
                                 ))}
@@ -135,7 +137,7 @@ export default function PremiumAuthPage() {
                                     className="block w-full bg-white text-[#168a7f] py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base uppercase tracking-[0.15em] shadow-xl transition-all relative overflow-hidden group text-center"
                                 >
                                     <span className="relative z-10 flex items-center justify-center gap-1 sm:gap-2">
-                                        Получить за 199₽ <span className="text-[10px] sm:text-xs opacity-60">/ мес</span>
+                                        {t('premium.getFor')} <span className="text-[10px] sm:text-xs opacity-60">{t('premium.perMonth')}</span>
                                     </span>
                                     <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-black/5 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
                                 </Link>

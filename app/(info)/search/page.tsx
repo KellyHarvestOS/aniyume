@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FaSadCry, FaChevronLeft, FaChevronRight, FaPlay, FaStar } from "react-icons/fa";
 import AnimeCardSkeleton from "@/components/skeletons/AnimeCardSkeleton";
 import { AnimeDetails } from "@/types/anime";
+import { useI18n } from "@/contexts/I18nContext";
 
 const PageButton = ({
   page,
@@ -32,6 +33,7 @@ const PageButton = ({
 );
 
 function AnimeCard({ anime }: { anime: AnimeDetails }) {
+  const { t } = useI18n();
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -69,12 +71,12 @@ function AnimeCard({ anime }: { anime: AnimeDetails }) {
           </div>
 
           <p className="text-white text-[11px] leading-relaxed line-clamp-4 mb-4 font-medium opacity-90">
-            {(anime as any).description || "Описание временно отсутствует..."}
+            {(anime as any).description || t("search.noDescription")}
           </p>
 
           <div className="w-full bg-[#21D0B8] hover:bg-[#1bb8a3] text-white py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg">
             <FaPlay className="text-[10px]" />
-            <span className="text-sm font-bold">Смотреть</span>
+            <span className="text-sm font-bold">{t("card.watch")}</span>
           </div>
         </div>
       </div>
@@ -93,6 +95,7 @@ function AnimeCard({ anime }: { anime: AnimeDetails }) {
 }
 
 function SearchContent() {
+  const { t } = useI18n();
   const searchParams = useSearchParams();
   const router = useRouter();
   const query = searchParams.get("q") || "";
@@ -133,7 +136,7 @@ function SearchContent() {
     <div className="container mx-auto px-4 md:px-12 py-10">
       <div className="mb-10 text-center md:text-left">
         <h1 className="text-3xl font-black text-gray-900 dark:text-gray-200 uppercase tracking-tight">
-          Поиск: <span className="text-[#21D0B8]">«{query}»</span>
+          {t("search.label")} <span className="text-[#21D0B8]">«{query}»</span>
         </h1>
       </div>
 
@@ -194,7 +197,7 @@ function SearchContent() {
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-500">
           <FaSadCry size={80} className="mb-4 opacity-20" />
-          <p className="text-xl font-medium">Ничего не найдено</p>
+          <p className="text-xl font-medium">{t("filter.nothingFound")}</p>
         </div>
       )}
     </div>

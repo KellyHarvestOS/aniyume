@@ -463,7 +463,7 @@ export default function FriendsPage() {
                       type="text"
                       value={nickname}
                       onChange={e => setNickname(e.target.value)}
-                      placeholder="Точный никнейм для заявки..."
+                      placeholder="Точное имя для заявки..."
                       className="w-full pl-10 pr-4 py-3 bg-black/10 border border-white/10 rounded-xl text-white placeholder-white/30 outline-none focus:border-[#00E2C4]/50 transition-colors"
                     />
                   </div>

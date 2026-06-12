@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import EditProfileSkeleton from "@/components/skeletons/EditProfileSkeleton";
-import { FaDiscord, FaGithub, FaGlobe, FaInstagram, FaPencilAlt, FaPlus, FaQuoteLeft, FaTelegramPlane, FaTimes, FaUser, FaVk, FaYoutube, FaInfoCircle, FaChevronLeft, FaCheckCircle, FaExclamationCircle, FaPalette } from 'react-icons/fa';
+import { FaPencilAlt, FaQuoteLeft, FaUser, FaChevronLeft, FaLanguage } from 'react-icons/fa';
 import ImageCropModal from "@/components/modals/ImageCropModal";
 import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -14,66 +14,12 @@ import { HiCursorClick } from "react-icons/hi";
 import { getAvatarUrl } from "@/lib/storage";
 import { getAvatarFrameFit } from "@/lib/avatarFrames";
 import { getProfilePreference, setProfilePreference } from "@/lib/profilePreferences";
-
-const MAX_SOCIAL_LINKS = 10;
-
-const getUrlHost = (url: string) => {
-  const trimmed = url.trim();
-  if (!trimmed) return "";
-
-  try {
-    const normalized = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
-    return new URL(normalized).hostname.toLowerCase().replace(/^www\./, "");
-  } catch {
-    return "";
-  }
-};
-
-const isHost = (host: string, domains: string[]) => domains.some((domain) => host === domain || host.endsWith(`.${domain}`));
-
-const detectSocial = (url: string) => {
-  const host = getUrlHost(url);
-  if (isHost(host, ["instagram.com"])) return { label: "Instagram", icon: FaInstagram };
-  if (isHost(host, ["t.me", "telegram.me", "telegram.org"])) return { label: "Telegram", icon: FaTelegramPlane };
-  if (isHost(host, ["vk.com", "vk.ru"])) return { label: "VK", icon: FaVk };
-  if (isHost(host, ["youtube.com", "youtu.be"])) return { label: "YouTube", icon: FaYoutube };
-  if (isHost(host, ["discord.gg", "discord.com", "discordapp.com"])) return { label: "Discord", icon: FaDiscord };
-  if (isHost(host, ["github.com"])) return { label: "GitHub", icon: FaGithub };
-  return { label: "Ссылка", icon: FaGlobe };
-};
-
-const validateSocialLink = (url: string) => {
-  const trimmed = url.trim();
-  if (!trimmed) return true;
-
-  try {
-    const normalized = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
-    const parsed = new URL(normalized);
-    const host = parsed.hostname.toLowerCase();
-
-    if (!['http:', 'https:'].includes(parsed.protocol)) return false;
-    if (!host.includes('.') || host.startsWith('.') || host.endsWith('.')) return false;
-
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-const normalizeSocialLink = (url: string) => {
-  const trimmed = url.trim();
-  if (!trimmed) return "";
-  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
-};
-
-const normalizeSocialLinks = (value: unknown) => {
-  if (!Array.isArray(value)) return [""];
-  const links = value.filter((item): item is string => typeof item === "string");
-  return links.length > 0 ? links.slice(0, MAX_SOCIAL_LINKS) : [""];
-};
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
+import { useI18n } from "@/contexts/I18nContext";
 
 export default function EditProfilePage() {
   const router = useRouter();
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPremium, setIsPremium] = useState(false);
   const [hasAdminGrantedFrames, setHasAdminGrantedFrames] = useState(false);
@@ -86,8 +32,6 @@ export default function EditProfilePage() {
     name: "",
     status_text: "",
   });
-  const [socialLinks, setSocialLinks] = useState<string[]>([""]);
-  const [socialLinkErrors, setSocialLinkErrors] = useState<Record<number, string>>({});
   const [initialName, setInitialName] = useState("");
   const [nameState, setNameState] = useState<{ checking: boolean; available: boolean | null; suggestions: string[] }>({ checking: false, available: null, suggestions: [] });
 
@@ -137,7 +81,6 @@ export default function EditProfilePage() {
             name: user.name || "",
             status_text: user.custom_status || user.status_text || "",
           });
-          setSocialLinks(normalizeSocialLinks(user.social_links || user.socials));
 
           const avatar = user.avatar || user.avatar_url;
           if (avatar) {
@@ -216,52 +159,17 @@ export default function EditProfilePage() {
     window.dispatchEvent(new Event("premiumUpdate"));
   };
 
-  const handleSocialLinkChange = (index: number, value: string) => {
-    setSocialLinks((current) => current.map((link, linkIndex) => linkIndex === index ? value : link));
-    setSocialLinkErrors((current) => {
-      if (validateSocialLink(value)) {
-        const next = { ...current };
-        delete next[index];
-        return next;
-      }
-
-      return { ...current, [index]: "Некорректная ссылка" };
-    });
-  };
-
-  const addSocialLink = () => {
-    setSocialLinks((current) => current.length >= MAX_SOCIAL_LINKS ? current : [...current, ""]);
-  };
-
-  const removeSocialLink = (index: number) => {
-    setSocialLinks((current) => current.length === 1 ? [""] : current.filter((_, linkIndex) => linkIndex !== index));
-    setSocialLinkErrors({});
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setMessage(null);
     try {
       const token = localStorage.getItem("userToken");
-      const nextSocialErrors = socialLinks.reduce<Record<number, string>>((errors, link, index) => {
-        if (!validateSocialLink(link)) errors[index] = "Некорректная ссылка";
-        return errors;
-      }, {});
-
-      if (Object.keys(nextSocialErrors).length > 0) {
-        setSocialLinkErrors(nextSocialErrors);
-        setMessage({ type: "error", text: "Проверьте ссылки на социальные сети" });
-        setSaving(false);
-        return;
-      }
-
-      const normalizedSocialLinks = socialLinks.map(normalizeSocialLink).filter(Boolean).slice(0, MAX_SOCIAL_LINKS);
       if (nameState.available === false) throw new Error("Это имя уже занято");
       const profileRes = await fetch("/api/external/profile/me", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, Accept: "application/json" },
-        body: JSON.stringify({ name: formData.name, custom_status: formData.status_text, social_links: normalizedSocialLinks }),
+        body: JSON.stringify({ name: formData.name, custom_status: formData.status_text }),
       });
 
       if (!profileRes.ok) {
@@ -345,7 +253,7 @@ export default function EditProfilePage() {
                     >
                       <FaPencilAlt className="text-brand w-6 h-6 mb-1" />
                       <span className="text-[10px] font-black text-white uppercase">
-                        Изменить
+                        {t("profile.edit.change")}
                       </span>
                     </button>
                   </div>
@@ -383,7 +291,7 @@ export default function EditProfilePage() {
 
               <div className="space-y-1 flex-1">
                 <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-                  Фото профиля
+                  {t("profile.edit.photoTitle")}
                   {isPremium && (
                     <span className="text-[10px] bg-gray-200 text-brand border border-gray-300 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                       Premium
@@ -392,9 +300,9 @@ export default function EditProfilePage() {
                 </h3>
 
                 <p className="text-sm text-slate-500 dark:text-gray-400 max-w-sm">
-                  Используйте уникальное изображение.
+                  {t("profile.edit.photoDesc")}
                   <br className="hidden md:block" />
-                  Поддерживаются{" "}
+                  {t("profile.edit.supported")}{" "}
                   <span className="text-brand font-bold">
                     JPG • PNG {isPremium && "• GIF"}
                   </span>
@@ -407,7 +315,7 @@ export default function EditProfilePage() {
                   className="inline-flex items-center gap-3 px-6 py-3 bg-brand text-white dark:text-black rounded-lg font-black text-[11px] uppercase tracking-[0.15em] hover:scale-105 transition-all shadow-xl shadow-black/10 whitespace-nowrap"
                 >
                   <SiCodemagic className="text-lg text-white dark:text-black" />
-                  Кастомизация
+                  {t("profile.edit.customization")}
                 </Link>
               )}
             </div>
@@ -416,15 +324,15 @@ export default function EditProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
               <div className="space-y-3">
                 <label className="flex items-center gap-2 text-[11px] font-black text-slate-900 dark:text-gray-100 uppercase tracking-[0.15em] ml-1">
-                  <FaUser className="text-brand" /> Никнейм
+                  <FaUser className="text-brand" /> {t("profile.edit.nickname")}
                 </label>
-                <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-6 py-4 bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-white/5 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white dark:focus:bg-[#1a1a1a] transition-all shadow-sm" placeholder="Ваше имя" required />
+                <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-6 py-4 bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-white/5 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white dark:focus:bg-[#1a1a1a] transition-all shadow-sm" placeholder={t("profile.edit.nicknamePlaceholder")} required />
                 <div className="min-h-5 px-1 text-[11px] font-bold">
-                  {nameState.checking && <span className="text-slate-400">Проверяем имя...</span>}
-                  {!nameState.checking && nameState.available === true && <span className="text-emerald-500">Имя свободно</span>}
+                  {nameState.checking && <span className="text-slate-400">{t("profile.edit.checkingName")}</span>}
+                  {!nameState.checking && nameState.available === true && <span className="text-emerald-500">{t("profile.edit.nameAvailable")}</span>}
                   {!nameState.checking && nameState.available === false && (
                     <span className="text-red-500">
-                      Имя занято{nameState.suggestions.length ? ` · свободные варианты: ${nameState.suggestions.join(", ")}` : ""}
+                      {t("profile.edit.nameTaken")}{nameState.suggestions.length ? ` · ${t("profile.edit.nameOptions")}: ${nameState.suggestions.join(", ")}` : ""}
                     </span>
                   )}
                 </div>
@@ -432,71 +340,26 @@ export default function EditProfilePage() {
 
               <div className="space-y-3">
                 <label className="flex items-center gap-2 text-[11px] font-black text-slate-900 dark:text-gray-100 uppercase tracking-[0.15em] ml-1">
-                  <FaQuoteLeft className="text-brand" /> Статус
+                  <FaQuoteLeft className="text-brand" /> {t("profile.edit.status")}
                 </label>
-                <input type="text" value={formData.status_text} onChange={(e) => setFormData({ ...formData, status_text: e.target.value })} className="w-full px-6 py-4 bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-white/5 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white dark:focus:bg-[#1a1a1a] transition-all shadow-sm" placeholder="Ваш статус" />
+                <input type="text" value={formData.status_text} onChange={(e) => setFormData({ ...formData, status_text: e.target.value })} className="w-full px-6 py-4 bg-slate-50 dark:bg-[#161616] border border-slate-200 dark:border-white/5 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand/50 focus:bg-white dark:focus:bg-[#1a1a1a] transition-all shadow-sm" placeholder={t("profile.edit.statusPlaceholder")} />
               </div>
 
               <div className="md:col-span-2 space-y-3">
-                <div className="flex items-center justify-between gap-4">
-                  <label className="flex items-center gap-2 text-[11px] font-black text-slate-900 dark:text-gray-100 uppercase tracking-[0.15em] ml-1">
-                    <FaGlobe className="text-brand" /> Социальные сети
-                  </label>
-                  <button
-                    type="button"
-                    onClick={addSocialLink}
-                    disabled={socialLinks.length >= MAX_SOCIAL_LINKS}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand text-white shadow-lg shadow-[#2EC4B6]/20 transition-all hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
-                    aria-label="Добавить ссылку"
-                  >
-                    <FaPlus className="text-xs" />
-                  </button>
-                </div>
+                <label className="flex items-center gap-2 text-[11px] font-black text-slate-900 dark:text-gray-100 uppercase tracking-[0.15em] ml-1">
+                  <FaLanguage className="text-brand text-base" /> {t("profile.edit.language")}
+                </label>
                 <p className="ml-1 text-xs font-semibold text-slate-400">
-                  Максимум {MAX_SOCIAL_LINKS} ссылок. Введите настоящий URL, например https://t.me/username
+                  {t("profile.edit.languageDesc")}
                 </p>
-
-                <div className="space-y-3">
-                  {socialLinks.map((link, index) => {
-                    const social = detectSocial(link);
-                    const Icon = social.icon;
-                    const hasError = Boolean(socialLinkErrors[index]);
-
-                    return (
-                      <div key={index} className={`group flex items-center gap-3 rounded-lg border px-4 py-3 transition-all focus-within:bg-white dark:bg-[#161616] dark:focus-within:bg-[#1a1a1a] ${hasError ? "border-red-400 bg-red-50 dark:border-red-500/60" : "border-slate-200 bg-slate-50 focus-within:border-brand dark:border-white/5"}`}>
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-brand shadow-sm dark:bg-[#111111]">
-                          <Icon className="text-lg" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className={`mb-1 text-[10px] font-black uppercase tracking-[0.14em] ${hasError ? "text-red-500" : "text-slate-400"}`}>{hasError ? socialLinkErrors[index] : social.label}</p>
-                          <input
-                            type="url"
-                            value={link}
-                            onChange={(e) => handleSocialLinkChange(index, e.target.value)}
-                            className="w-full bg-transparent text-sm font-bold text-slate-900 outline-none placeholder:text-slate-400 dark:text-white"
-                            placeholder="https://..."
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeSocialLink(index)}
-                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-300 transition hover:bg-red-500/10 hover:text-red-500"
-                          aria-label="Удалить ссылку"
-                        >
-                          <FaTimes className="text-xs" />
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
+                <LanguageSwitcher />
               </div>
-
 
               {isPremium && (
                 <div className="md:col-span-2">
                   <p className="mb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.15em] text-slate-900 dark:text-gray-100">
                     <HiCursorClick className="text-brand h-4 w-4" />
-                    Кастомная мышка
+                    {t("profile.edit.customCursor")}
                   </p>
 
                   <div className="rounded-lg border border-slate-200 bg-slate-50 p-5 dark:border-white/5 dark:bg-[#161616]">
@@ -514,7 +377,7 @@ export default function EditProfilePage() {
                           className="h-4 w-4 accent-black"
                         />
                         <span className="text-sm font-bold text-slate-700 dark:text-gray-500">
-                          Включить кастомную мышку
+                          {t("profile.edit.cursorEnable")}
                         </span>
                       </label>
 
@@ -530,7 +393,7 @@ export default function EditProfilePage() {
                           className="h-4 w-4 accent-black"
                         />
                         <span className="text-sm font-bold text-slate-700 dark:text-gray-500">
-                          Отключить кастомную мышку
+                          {t("profile.edit.cursorDisable")}
                         </span>
                       </label>
 
@@ -548,10 +411,10 @@ export default function EditProfilePage() {
 
             <div className="flex flex-col sm:flex-row gap-4 pt-6 pb-20">
               <button type="submit" disabled={saving} className="px-10 py-4 bg-brand text-white font-black uppercase tracking-tighter rounded-lg shadow-lg shadow-[#2EC4B6]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50">
-                {saving ? "СОХРАНЕНИЕ..." : "Сохранить профиль"}
+                {saving ? t("profile.edit.saving") : t("profile.edit.save")}
               </button>
               <button type="button" onClick={() => router.push("/profile")} className="px-10 py-4 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-gray-400 font-bold uppercase tracking-tighter rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 transition-all">
-                Отмена
+                {t("profile.edit.cancel")}
               </button>
             </div>
           </div>

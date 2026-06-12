@@ -52,7 +52,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
       <div className="bg-background text-foreground min-h-screen transition-colors duration-300">
         {!hideLayout && <Header />}
 
-        <main className="w-full min-h-screen ">
+        <main className={`w-full ${isChatPage ? 'min-h-0' : 'min-h-screen'}`}>
           {children}
         </main>
 

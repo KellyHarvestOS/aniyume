@@ -2,6 +2,7 @@
 
 import React, { FormEvent, useState, useRef, useEffect } from 'react';
 import { submitContactMessage } from '@/lib/api';
+import { useI18n } from '@/contexts/I18nContext';
 import {
   FaBug,
   FaLightbulb,
@@ -15,11 +16,11 @@ import {
 } from 'react-icons/fa6';
 
 const categories = [
-  { value: 'bug', label: 'Баг / ошибка', icon: <FaBug /> },
-  { value: 'idea', label: 'Идея', icon: <FaLightbulb /> },
-  { value: 'feedback', label: 'Обратная связь', icon: <FaCommentDots /> },
-  { value: 'content', label: 'Контент', icon: <FaClapperboard /> },
-  { value: 'other', label: 'Другое', icon: <FaWandMagicSparkles /> },
+  { value: 'bug', labelKey: 'contacts.catBug', icon: <FaBug /> },
+  { value: 'idea', labelKey: 'contacts.catIdea', icon: <FaLightbulb /> },
+  { value: 'feedback', labelKey: 'contacts.catFeedback', icon: <FaCommentDots /> },
+  { value: 'content', labelKey: 'contacts.catContent', icon: <FaClapperboard /> },
+  { value: 'other', labelKey: 'contacts.catOther', icon: <FaWandMagicSparkles /> },
 ];
 
 interface ContactForm {
@@ -32,6 +33,7 @@ interface ContactForm {
 }
 
 export default function ContactsPage() {
+  const { t } = useI18n();
   const [form, setForm] = useState<ContactForm>({
     name: '',
     email: '',
@@ -64,11 +66,11 @@ export default function ContactsPage() {
     try {
       const result = await submitContactMessage(form);
       setStatus('success');
-      setNotice(result.message ?? 'Сообщение отправлено. Спасибо!');
+      setNotice(result.message ?? t('contacts.successDefault'));
       setForm({ name: '', email: '', category: 'bug', subject: '', message: '', attachment: null });
     } catch (error) {
       setStatus('error');
-      setNotice(error instanceof Error ? error.message : 'Не удалось отправить сообщение');
+      setNotice(error instanceof Error ? error.message : t('contacts.errorDefault'));
     }
   }
 
@@ -82,13 +84,13 @@ export default function ContactsPage() {
         <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-12 items-start">
           <div className="sticky  flex flex-col items-center lg:items-start text-center lg:text-left">
             <h1 className="text-4xl sm:text-6xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-gray-100 mb-6">
-              Контакты <span className="text-brand w-[20rem]">AniYume</span>
+              {t('contacts.title1')} <span className="text-brand w-[20rem]">{t('contacts.title2')}</span>
             </h1>
 
             <div className="w-24 h-1.5 bg-brand rounded-full mb-6 shadow-lg shadow-brand/20 lg:mx-0 mx-auto" />
 
             <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base font-medium leading-relaxed mb-10 max-w-md">
-              Нашёл баг, хочешь предложить фичу или написать разработчикам? Отправь сообщение сюда — оно попадёт прямо к команде AniYume.
+              {t('contacts.intro')}
             </p>
 
             <div className="grid gap-3 w-full max-w-md">
@@ -108,7 +110,7 @@ export default function ContactsPage() {
                       {item.icon}
                     </span>
                     <span className="font-bold uppercase tracking-wider text-sm">
-                      {item.label}
+                      {t(item.labelKey)}
                     </span>
                   </button>
                 );
@@ -122,30 +124,30 @@ export default function ContactsPage() {
           >
             <div className="grid sm:grid-cols-2 gap-5 mb-5">
               <label className="flex flex-col gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">Имя</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">{t('contacts.name')}</span>
                 <input
                   required
                   className="rounded-xl border border-gray-200 dark:border-[#232323] bg-gray-50 dark:bg-[#111111] px-4 py-3 outline-none focus:border-brand dark:focus:border-brand transition-colors text-sm"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Как к тебе обращаться"
+                  placeholder={t('contacts.namePlaceholder')}
                 />
               </label>
 
               <label className="flex flex-col gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">Email</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">{t('contacts.email')}</span>
                 <input
                   type="email"
                   className="rounded-xl border border-gray-200 dark:border-[#232323] bg-gray-50 dark:bg-[#111111] px-4 py-3 outline-none focus:border-brand dark:focus:border-brand transition-colors text-sm"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="Для ответа (необязательно)"
+                  placeholder={t('contacts.emailPlaceholder')}
                 />
               </label>
             </div>
 
             <div className="flex flex-col gap-2 mb-5 relative" ref={dropdownRef}>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">Категория</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">{t('contacts.category')}</span>
 
               <button
                 type="button"
@@ -157,7 +159,7 @@ export default function ContactsPage() {
               >
                 <div className="flex items-center gap-3">
                   <span className="text-gray-400 text-base">{selectedCategory.icon}</span>
-                  <span className="text-gray-800 dark:text-gray-200">{selectedCategory.label}</span>
+                  <span className="text-gray-800 dark:text-gray-200">{t(selectedCategory.labelKey)}</span>
                 </div>
                 <FaChevronDown
                   className={`text-gray-400 text-xs transition-transform duration-300 ${isDropdownOpen ? 'rotate-180 text-brand' : ''}`}
@@ -185,7 +187,7 @@ export default function ContactsPage() {
                       <span className={`text-base ${form.category === item.value ? 'text-brand' : 'text-gray-400'}`}>
                         {item.icon}
                       </span>
-                      {item.label}
+                      {t(item.labelKey)}
                     </button>
                   ))}
                 </div>
@@ -193,19 +195,19 @@ export default function ContactsPage() {
             </div>
 
             <label className="flex flex-col gap-2 mb-5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">Тема</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">{t('contacts.subject')}</span>
               <input
                 required
                 maxLength={180}
                 className="rounded-xl border border-gray-200 dark:border-[#232323] bg-gray-50 dark:bg-[#111111] px-4 py-3 outline-none focus:border-brand dark:focus:border-brand transition-colors text-sm"
                 value={form.subject}
                 onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                placeholder="Например: не работает плеер..."
+                placeholder={t('contacts.subjectPlaceholder')}
               />
             </label>
 
             <label className="flex flex-col gap-2 mb-5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">Сообщение</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1">{t('contacts.message')}</span>
               <textarea
                 required
                 minLength={10}
@@ -214,16 +216,16 @@ export default function ContactsPage() {
                 className="rounded-xl border border-gray-200 dark:border-[#232323] bg-gray-50 dark:bg-[#111111] px-4 py-3 outline-none focus:border-brand dark:focus:border-brand transition-colors text-sm resize-none"
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                placeholder="Опиши проблему, шаги воспроизведения, устройство/браузер или идею для улучшения."
+                placeholder={t('contacts.messagePlaceholder')}
               />
             </label>
 
             <div className="mb-6">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1 block mb-2">Скриншот / Фото</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 ml-1 block mb-2">{t('contacts.screenshot')}</span>
               {!form.attachment ? (
                 <label className="flex items-center justify-center gap-3 w-full rounded-xl border border-dashed border-gray-300 dark:border-[#333] hover:border-brand dark:hover:border-brand bg-gray-50/50 dark:bg-[#111]/50 px-4 py-4 cursor-pointer transition-colors text-sm text-gray-500 hover:text-brand">
                   <FaImage className="text-xl" />
-                  <span>Прикрепить изображение</span>
+                  <span>{t('contacts.attach')}</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -272,12 +274,12 @@ export default function ContactsPage() {
               {status === 'loading' ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 dark:border-gray-900/30 border-t-white dark:border-t-gray-900 rounded-full animate-spin" />
-                  <span>Отправляем...</span>
+                  <span>{t('contacts.sending')}</span>
                 </>
               ) : (
                 <>
                   <FaPaperPlane className="text-lg" />
-                  <span>Отправить разработчикам</span>
+                  <span>{t('contacts.submit')}</span>
                 </>
               )}
             </button>

@@ -8,6 +8,7 @@ import {
   FaServer,
   FaFingerprint,
 } from 'react-icons/fa6';
+import { useI18n } from '@/contexts/I18nContext';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -23,6 +24,7 @@ const itemVariants = {
 };
 
 export default function PrivacyPage() {
+  const { t } = useI18n();
   return (
     <section className="min-h-screen w-full bg-white dark:bg-[#111111] text-gray-800 dark:text-gray-200 py-10 md:py-16 relative overflow-hidden transition-colors duration-300">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand/10 rounded-full blur-[120px] pointer-events-none -z-10" />
@@ -35,47 +37,31 @@ export default function PrivacyPage() {
       >
         <motion.div variants={itemVariants} className="flex flex-col items-center text-center mb-12 sm:mb-16">
           <h1 className="text-4xl sm:text-6xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-gray-100 mb-6">
-            Политика <span className="text-brand">конфиденциальности</span>
+            {t('privacy.title1')} <span className="text-brand">{t('privacy.title2')}</span>
           </h1>
 
           <div className="w-24 h-1.5 bg-brand rounded-full mb-6 shadow-lg shadow-brand/20 mx-auto" />
 
           <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto">
-            Ваша приватность — наш приоритет. Мы собираем только те данные, которые необходимы для полноценной работы сервиса.
+            {t('privacy.intro')}
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-          <PolicySection
-            variants={itemVariants}
-            icon={<FaUserLock />}
-            title="1. Данные аккаунта"
-          >
-            При регистрации мы запрашиваем минимальный набор данных: <strong>Имя пользователя (никнейм)</strong> и <strong>Email</strong>. Пароли хранятся исключительно в зашифрованном виде (Hash). Мы не имеем доступа к вашему паролю в открытом виде.
+          <PolicySection variants={itemVariants} icon={<FaUserLock />} title={t('privacy.s1Title')}>
+            <span dangerouslySetInnerHTML={{ __html: t('privacy.s1Body') }} />
           </PolicySection>
 
-          <PolicySection
-            variants={itemVariants}
-            icon={<FaDatabase />}
-            title="2. История и списки"
-          >
-            Для обеспечения синхронизации между вашими устройствами мы сохраняем информацию о просмотренных сериях, текущем прогрессе в плеере и списки аниме («Смотрю», «В планах» и т.д.). Эти данные привязаны к вашему профилю.
+          <PolicySection variants={itemVariants} icon={<FaDatabase />} title={t('privacy.s2Title')}>
+            <span dangerouslySetInnerHTML={{ __html: t('privacy.s2Body') }} />
           </PolicySection>
 
-          <PolicySection
-            variants={itemVariants}
-            icon={<FaServer />}
-            title="3. Техническая информация"
-          >
-            Наши серверы могут автоматически регистрировать стандартную техническую информацию: IP-адрес, тип браузера, время посещения. Это необходимо исключительно для защиты от спама, предотвращения кибератак и анализа общей аудитории сайта.
+          <PolicySection variants={itemVariants} icon={<FaServer />} title={t('privacy.s3Title')}>
+            <span dangerouslySetInnerHTML={{ __html: t('privacy.s3Body') }} />
           </PolicySection>
 
-          <PolicySection
-            variants={itemVariants}
-            icon={<FaFingerprint />}
-            title="4. Передача данных"
-          >
-            AniYume <strong>не продает</strong> и не передает ваши персональные данные третьим лицам. Мы используем публичные API (Kodik, Shikimori) только для отображения контента. Ваш профиль на AniYume остается полностью изолированным.
+          <PolicySection variants={itemVariants} icon={<FaFingerprint />} title={t('privacy.s4Title')}>
+            <span dangerouslySetInnerHTML={{ __html: t('privacy.s4Body') }} />
           </PolicySection>
         </div>
       </motion.div>

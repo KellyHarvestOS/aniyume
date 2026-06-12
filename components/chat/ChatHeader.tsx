@@ -5,16 +5,19 @@ import { FaArrowLeft, FaEllipsisV, FaBan, FaTrashAlt, FaPlay } from 'react-icons
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getStorageAssetUrl } from '@/lib/storage';
+import AvatarFrameOverlay, { getAvatarFramePath } from '@/components/profile/AvatarFrameOverlay';
 interface ChatHeaderProps {
     friendId: number;
     friendName: string;
     friendAvatar?: string | null;
+    friendFrame?: string | null;
     isOnline: boolean;
     isBlocked?: boolean;
     onClear?: () => void | Promise<void>;
     onBlock?: () => void | Promise<void>;
 }
-export default function ChatHeader({ friendId, friendName, friendAvatar, isOnline, isBlocked = false, onClear, onBlock }: ChatHeaderProps) {
+export default function ChatHeader({ friendId, friendName, friendAvatar, friendFrame, isOnline, isBlocked = false, onClear, onBlock }: ChatHeaderProps) {
+    const friendFramePath = getAvatarFramePath(friendFrame);
     const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -61,8 +64,9 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, isOnlin
                             <img
                                 src={getStorageAssetUrl(friendAvatar) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${friendId}`}
                                 alt="Avatar"
-                                className="relative w-10 h-10 md:w-12 h-12 rounded-full border-2 border-white dark:border-[#151515] object-cover bg-gray-800 z-10 transition-transform duration-300 group-hover:scale-105"
+                                className={`relative w-10 h-10 md:w-12 h-12 rounded-full ${friendFramePath ? 'border-0' : 'border-2 border-white dark:border-[#151515]'} object-cover bg-gray-800 z-10 transition-transform duration-300 group-hover:scale-105`}
                             />
+                            <AvatarFrameOverlay frameKey={friendFrame} avatarSize={48} />
                             <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 md:w-4 md:h-4 border-2 border-white dark:border-[#111111] rounded-full z-20 ${isOnline ? 'bg-brand' : 'bg-gray-500'}`} />
                         </div>
 

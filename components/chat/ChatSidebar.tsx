@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { getStorageAssetUrl } from '@/lib/storage';
+import AvatarFrameOverlay, { getAvatarFramePath } from '@/components/profile/AvatarFrameOverlay';
 export interface Message {
     id: string;
     text?: string;
@@ -18,6 +19,7 @@ export interface ChatPreview {
     name: string;
     avatar?: string | null;
     is_online: boolean;
+    selected_profile_frame?: string | null;
     lastMessage?: string;
     unreadCount?: number;
 }
@@ -73,9 +75,10 @@ export default function ChatSidebar({ chats, activeChatId, searchQuery, setSearc
                                     <img
                                         src={getStorageAssetUrl(chat.avatar) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${chat.id}`}
                                         alt={chat.name}
-                                        className="w-11 h-11 lg:w-10 lg:h-10 rounded-full border border-gray-200 dark:border-white/10 object-cover bg-gray-800 transition-transform group-active:scale-95"
+                                        className={`w-11 h-11 lg:w-10 lg:h-10 rounded-full ${getAvatarFramePath(chat.selected_profile_frame) ? 'border-0' : 'border border-gray-200 dark:border-white/10'} object-cover bg-gray-800 transition-transform group-active:scale-95`}
                                     />
-                                    <div className={`absolute bottom-0 right-0 w-3 lg:w-3.5 h-3 lg:h-3.5 border-2 border-white dark:border-[#111111] rounded-full ${chat.is_online ? 'bg-brand' : 'bg-gray-400'}`} />
+                                    <AvatarFrameOverlay frameKey={chat.selected_profile_frame} avatarSize={40} />
+                                    <div className={`absolute bottom-0 right-0 z-20 w-3 lg:w-3.5 h-3 lg:h-3.5 border-2 border-white dark:border-[#111111] rounded-full ${chat.is_online ? 'bg-brand' : 'bg-gray-400'}`} />
                                 </div>
 
                                 <div className="flex-1 min-w-0 text-left">

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, Suspense, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FaChevronDown, FaCheck, FaSearch } from 'react-icons/fa';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface Genre { id: number; name: string; slug: string; }
 
@@ -15,11 +16,12 @@ interface FilterSelectProps {
 }
 
 const CustomSelect: React.FC<FilterSelectProps> = ({ label, value, onChange, options, showSearch = false }) => {
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const selectedLabel = options.find(opt => opt.value === value)?.label || 'Не важно';
+  const selectedLabel = options.find(opt => opt.value === value)?.label || t('filter.notImportant');
 
   const filteredOptions = useMemo(() => {
     return options.filter(opt => 
@@ -70,7 +72,7 @@ const CustomSelect: React.FC<FilterSelectProps> = ({ label, value, onChange, opt
                   autoFocus
                   type="text"
                   className="w-full h-9 pl-9 pr-4 bg-gray-50 dark:bg-white/5 rounded-xl text-sm outline-none focus:ring-1 ring-brand/50 transition-all"
-                  placeholder="Поиск..."
+                  placeholder={t('filter.search')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -89,7 +91,7 @@ const CustomSelect: React.FC<FilterSelectProps> = ({ label, value, onChange, opt
                 ${value === '' ? 'border-brand bg-brand' : 'border-gray-300 dark:border-white/20 group-hover:border-brand/50'}`}>
                 {value === '' && <FaCheck className="w-2.5 h-2.5 text-white" />}
               </div>
-              Не важно
+              {t('filter.notImportant')}
             </button>
 
             {filteredOptions.length > 0 ? (
@@ -109,7 +111,7 @@ const CustomSelect: React.FC<FilterSelectProps> = ({ label, value, onChange, opt
                 </button>
               ))
             ) : (
-              <div className="py-8 text-center text-gray-400 text-xs italic">Ничего не найдено</div>
+              <div className="py-8 text-center text-gray-400 text-xs italic">{t('filter.nothingFound')}</div>
             )}
           </div>
         </div>
@@ -125,6 +127,7 @@ const CustomSelect: React.FC<FilterSelectProps> = ({ label, value, onChange, opt
 };
 
 function FilterPageContent() {
+  const { t } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -185,41 +188,41 @@ function FilterPageContent() {
       <header className="bg-white/90 dark:bg-[#111111]/90 border-b border-gray-200 dark:border-white/5 sticky top-0 z-40 backdrop-blur-xl">
         <div className="container mx-auto px-6 pt-8">
           <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-8 text-gray-900 dark:text-white">
-            Настройка <span className="text-brand">Фильтров</span>
+            {t('filter.title1')} <span className="text-brand">{t('filter.title2')}</span>
           </h1>
         </div>
       </header>
       
       <main className="container mx-auto px-6 py-10 max-w-6xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
-          <CustomSelect 
-            label="Жанры" 
-            showSearch 
-            value={filters.genre} 
-            onChange={v => handleChange('genre', v)} 
-            options={genres.map(g => ({ value: g.slug, label: g.name }))} 
+          <CustomSelect
+            label={t('filter.genres')}
+            showSearch
+            value={filters.genre}
+            onChange={v => handleChange('genre', v)}
+            options={genres.map(g => ({ value: g.slug, label: g.name }))}
           />
-          <CustomSelect 
-            label="Озвучка" 
-            showSearch 
-            value={filters.translator} 
-            onChange={v => handleChange('translator', v)} 
-            options={translators.map(t => ({ value: t, label: t }))} 
+          <CustomSelect
+            label={t('filter.voice')}
+            showSearch
+            value={filters.translator}
+            onChange={v => handleChange('translator', v)}
+            options={translators.map(tr => ({ value: tr, label: tr }))}
           />
-          <CustomSelect 
-            label="Сортировка" 
-            value={filters.sort} 
-            onChange={v => handleChange('sort', v)} 
+          <CustomSelect
+            label={t('filter.sort')}
+            value={filters.sort}
+            onChange={v => handleChange('sort', v)}
             options={[
-                { value: 'newest', label: 'Новые' }, 
-                { value: 'rating', label: 'По рейтингу' }, 
-                { value: 'popularity', label: 'Популярные' }, 
-                { value: 'title', label: 'По алфавиту' }
-            ]} 
+                { value: 'newest', label: t('filter.sortNewest') },
+                { value: 'rating', label: t('filter.sortRating') },
+                { value: 'popularity', label: t('filter.sortPopularity') },
+                { value: 'title', label: t('filter.sortTitle') }
+            ]}
           />
-          <CustomSelect label="Год выпуска" showSearch value={filters.year} onChange={v => handleChange('year', v)} options={years} />
-          <CustomSelect label="Статус" value={filters.status} onChange={v => handleChange('status', v)} options={[{ value: 'finished', label: 'Завершен' }, { value: 'ongoing', label: 'Онгоинг' }, { value: 'planned', label: 'Анонс' }]} />
-          <CustomSelect label="Тип контента" value={filters.type} onChange={v => handleChange('type', v)} options={[{ value: 'tv', label: 'TV Сериал' }, { value: 'movie', label: 'Фильм' }, { value: 'ova', label: 'OVA' }]} />
+          <CustomSelect label={t('filter.year')} showSearch value={filters.year} onChange={v => handleChange('year', v)} options={years} />
+          <CustomSelect label={t('filter.status')} value={filters.status} onChange={v => handleChange('status', v)} options={[{ value: 'finished', label: t('filter.statusFinished') }, { value: 'ongoing', label: t('filter.statusOngoing') }, { value: 'planned', label: t('filter.statusAnnounced') }]} />
+          <CustomSelect label={t('filter.contentType')} value={filters.type} onChange={v => handleChange('type', v)} options={[{ value: 'tv', label: t('filter.typeTv') }, { value: 'movie', label: t('filter.typeMovie') }, { value: 'ova', label: t('filter.typeOva') }]} />
         </div>
 
         <div className="mt-16 flex flex-col sm:flex-row gap-4 items-center justify-center pt-10 border-t border-gray-100 dark:border-white/5">
@@ -227,13 +230,13 @@ function FilterPageContent() {
             onClick={() => setFilters({ genre: '', translator: '', year: '', season: '', status: '', type: '', sort: 'newest', ageRating: '', country: '' })}
             className="w-full sm:w-auto px-10 h-14 rounded-2xl text-sm font-bold text-gray-400 hover:text-red-500 transition-colors"
           >
-            Сбросить всё
+            {t('filter.reset')}
           </button>
           <button
             onClick={handleApply}
             className="w-full sm:w-auto px-16 h-14 rounded-2xl bg-brand text-white font-bold shadow-2xl shadow-brand/30 hover:scale-[1.02] active:scale-95 transition-all"
           >
-            Применить фильтры
+            {t('filter.apply')}
           </button>
         </div>
       </main>
@@ -241,9 +244,14 @@ function FilterPageContent() {
   );
 }
 
+function FilterFallback() {
+  const { t } = useI18n();
+  return <div className="h-screen flex items-center justify-center dark:bg-[#0A0A0A] text-gray-500">{t('common.loading')}</div>;
+}
+
 export default function FilterPage() {
   return (
-    <Suspense fallback={<div className="h-screen flex items-center justify-center dark:bg-[#0A0A0A] text-gray-500">Загрузка...</div>}>
+    <Suspense fallback={<FilterFallback />}>
       <FilterPageContent />
     </Suspense>
   );

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FaStar, FaPlay } from 'react-icons/fa';
 import { Genre } from '@/types/anime';
+import { useI18n } from '@/contexts/I18nContext';
 
 
 interface AnimeCardProps {
@@ -28,7 +29,7 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
   type,
   genres,
 }) => {
-
+  const { t } = useI18n();
 
   const genreList = Array.isArray(genres)
     ? genres.slice(0, 3).map((g: any) => (typeof g === 'string' ? g : g.name))
@@ -84,12 +85,12 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
             )}
 
             <p className="text-gray-300 text-xs line-clamp-3 mb-3 leading-snug">
-              {description ? description.replace(/<[^>]*>?/gm, '') : 'Нет описания...'}
+              {description ? description.replace(/<[^>]*>?/gm, '') : t('card.noDescription')}
             </p>
 
             <button className="w-full bg-brand hover:bg-brand/90 text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg active:scale-95
             dark:text-gray-800">
-              <FaPlay className="text-xs dark:text-gray-800" /> Смотреть
+              <FaPlay className="text-xs dark:text-gray-800" /> {t('card.watch')}
             </button>
           </div>
         </div>

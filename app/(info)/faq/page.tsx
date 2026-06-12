@@ -26,8 +26,10 @@ import {
   BiMinus
 } from 'react-icons/bi';
 import { FaWandMagicSparkles } from "react-icons/fa6";
+import { useI18n } from '@/contexts/I18nContext';
 
 export default function FAQPage() {
+  const { t } = useI18n();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleQuestion = (index: number) => {
@@ -39,11 +41,11 @@ export default function FAQPage() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-[#21D0B8] rounded-full blur-[160px] opacity-[0.04] dark:opacity-[0.07] pointer-events-none" />
 
       <h1 className="text-4xl md:text-6xl text-center mb-6 relative z-10 font-extrabold tracking-tight text-gray-900 dark:text-gray-200">
-        Центр <span className="text-brand">Поддержки</span>
+        {t('faq.title1')} <span className="text-brand">{t('faq.title2')}</span>
       </h1>
 
       <p className="text-gray-500 dark:text-gray-400 text-lg md:text-xl font-medium max-w-2xl mx-auto mb-10 text-center">
-        Мы подготовили ответы на самые популярные вопросы, чтобы помочь вам разобраться с функционалом платформы.
+        {t('faq.subtitle')}
       </p>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-6 relative z-10">
@@ -76,7 +78,7 @@ export default function FAQPage() {
               <div className="flex-1">
                 <div className="flex justify-between items-center w-full">
                   <h3 className="text-lg font-bold pr-4 text-gray-800 dark:text-gray-200">
-                    {item.question}
+                    {t(item.questionKey)}
                   </h3>
                   <span
                     className={`transition-transform duration-300 ${openIndex === index
@@ -96,7 +98,7 @@ export default function FAQPage() {
                 >
                   <div className="overflow-hidden">
                     <p className="text-gray-500 dark:text-gray-400 text-base leading-relaxed font-medium">
-                      {item.answer}
+                      {t(item.answerKey)}
                     </p>
                   </div>
                 </div>
@@ -114,7 +116,7 @@ export default function FAQPage() {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 text-brand font-bold hover:text-brand/80 text-lg transition-colors bg-black/10 px-6 py-2 rounded-xl hover:bg-black/20"
         >
-          <BiMessageRounded /> Написать идею в Telegram
+          <BiMessageRounded /> {t('faq.telegram')}
         </Link>
       </div>
     </div>
@@ -122,16 +124,16 @@ export default function FAQPage() {
 }
 
 const faqData = [
-  { icon: <BiWifi />, question: "Видео постоянно тормозит, что делать?", answer: "Попробуйте снизить качество видео или проверить интернет-соединение." },
-  { icon: <BiMobile />, question: "Есть ли мобильное приложение?", answer: "Отдельного приложения пока нет — сайт адаптивный и полноценно работает в браузере телефона." },
-  { icon: <BiDownload />, question: "Можно ли скачивать серии?", answer: "Скачивание недоступно из-за ограничений правообладателей." },
-  { icon: <BiCalendar />, question: "Когда выходят новые серии?", answer: "Обычно через 30–60 минут после релиза." },
-  { icon: <BiUser />, question: "Как синхронизировать просмотр?", answer: "Войдите в аккаунт — данные синхронизируются автоматически." },
-  { icon: <BiLock />, question: "Забыл пароль, что делать?", answer: "Нажмите «Забыли пароль?» в окне входа — код для сброса придёт на вашу почту, после чего вы зададите новый пароль." },
-  { icon: <BiTrash />, question: "Как удалить аккаунт?", answer: "Напишите на zanshugurov07@gmail.com или через форму «Контакты» — мы удалим ваш аккаунт и связанные данные." },
-  { icon: <FaWandMagicSparkles />, question: "Как работает умный поиск?", answer: "Поиск учитывает альтернативные названия." },
-  { icon: <BiLogoChrome />, question: "Какой браузер лучше?", answer: "Chrome, Firefox или Safari последних версий." },
-  { icon: <BiGlobe />, question: "Нужен ли VPN?", answer: "Обычно нет, но иногда помогает." },
-  { icon: <BiBug />, question: "Нашел баг, куда писать?", answer: "Напишите в поддержку с описанием проблемы." },
-  { icon: <BiMessageRounded />, question: "Как предложить идею?", answer: "Напишите нам в Telegram или Discord." }
+  { icon: <BiWifi />, questionKey: "faq.q1", answerKey: "faq.a1" },
+  { icon: <BiMobile />, questionKey: "faq.q2", answerKey: "faq.a2" },
+  { icon: <BiDownload />, questionKey: "faq.q3", answerKey: "faq.a3" },
+  { icon: <BiCalendar />, questionKey: "faq.q4", answerKey: "faq.a4" },
+  { icon: <BiUser />, questionKey: "faq.q5", answerKey: "faq.a5" },
+  { icon: <BiLock />, questionKey: "faq.q6", answerKey: "faq.a6" },
+  { icon: <BiTrash />, questionKey: "faq.q7", answerKey: "faq.a7" },
+  { icon: <FaWandMagicSparkles />, questionKey: "faq.q8", answerKey: "faq.a8" },
+  { icon: <BiLogoChrome />, questionKey: "faq.q9", answerKey: "faq.a9" },
+  { icon: <BiGlobe />, questionKey: "faq.q10", answerKey: "faq.a10" },
+  { icon: <BiBug />, questionKey: "faq.q11", answerKey: "faq.a11" },
+  { icon: <BiMessageRounded />, questionKey: "faq.q12", answerKey: "faq.a12" }
 ];

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/contexts/I18nContext";
 
 interface ActivityItem {
   anime_id: number;
@@ -18,11 +19,12 @@ export const RecentActivity = ({
   activity: ActivityItem[];
 }) => {
   const router = useRouter();
+  const { t } = useI18n();
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     const now = new Date();
-    if (date.toDateString() === now.toDateString()) return "Сегодня";
+    if (date.toDateString() === now.toDateString()) return t("activity.today");
 
     return date.toLocaleDateString("ru-RU", {
       day: "numeric",
@@ -34,10 +36,10 @@ export const RecentActivity = ({
     <div className="bg-white dark:bg-[#161616] rounded-lx p-6 shadow-sm border border-slate-200 dark:border-white/5 transition-colors">
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-bold text-gray-800 dark:text-gray-200">
-          Недавние активности
+          {t("activity.title")}
         </h2>
         <span className="text-xs text-slate-400 dark:text-gray-500 font-medium">
-          Последние 10 дней
+          {t("activity.last10")}
         </span>
       </div>
 
@@ -68,7 +70,7 @@ export const RecentActivity = ({
                   {item.title}
                 </h4>
                 <p className="text-[11px] text-slate-500 dark:text-gray-400 font-bold uppercase tracking-wider mt-0.5">
-                  Серия {item.episode_number ?? 1}
+                  {t("activity.episode", { n: item.episode_number ?? 1 })}
                 </p>
               </div>
 
@@ -95,7 +97,7 @@ export const RecentActivity = ({
               <span className="text-slate-400 dark:text-gray-500">⏳</span>
             </div>
             <p className="text-sm text-slate-400 dark:text-gray-500 font-medium">
-              История просмотров пуста
+              {t("activity.empty")}
             </p>
           </div>
         )}

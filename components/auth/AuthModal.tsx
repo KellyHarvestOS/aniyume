@@ -4,12 +4,14 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useAuthModal } from '@/contexts/AuthModalContext';
+import { useI18n } from '@/contexts/I18nContext';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import ForgotPasswordForm from './ForgotPasswordForm';
 
 export default function AuthModal() {
   const { view, openAuth, closeAuth } = useAuthModal();
+  const { t } = useI18n();
   const isOpen = view !== null;
 
   useEffect(() => {
@@ -45,7 +47,7 @@ export default function AuthModal() {
           >
             <button
               onClick={closeAuth}
-              aria-label="Закрыть"
+              aria-label={t('auth.close')}
               className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-white/5 dark:hover:text-white"
             >
               <X className="h-5 w-5" />

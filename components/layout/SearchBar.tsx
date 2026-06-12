@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaSearch, FaSadCry, FaStar } from 'react-icons/fa';
 import { ImSpinner9 } from "react-icons/im";
+import { useI18n } from '@/contexts/I18nContext';
 
 interface SearchResult {
   id: number;
@@ -63,6 +64,7 @@ function filterByFuzzyMatch(
 }
 
 export default function SearchBar() {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -135,7 +137,7 @@ export default function SearchBar() {
 
         <input
           type="text"
-          placeholder="Поиск аниме..."
+          placeholder={t('search.placeholder')}
           value={query}
           maxLength={60}
           onChange={(e) => setQuery(e.target.value.slice(0, 60))}
@@ -186,7 +188,7 @@ export default function SearchBar() {
                   onClick={() => handleSearchSubmit()}
                   className="w-full py-2 text-xs font-medium text-[#39bcba] hover:underline"
                 >
-                  Показать все результаты для "{query}"
+                  {t('search.showAll', { query })}
                 </button>
               </li>
             </ul>
@@ -194,7 +196,7 @@ export default function SearchBar() {
             !isLoading && query.trim().length >= 1 && (
               <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm flex flex-col items-center justify-center gap-2">
                 <FaSadCry className="text-2xl" />
-                По запросу "{query}" ничего не найдено
+                {t('search.notFound', { query })}
               </div>
             )
           )}

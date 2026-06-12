@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useI18n } from "@/contexts/I18nContext";
 
 interface StatsOverviewProps {
   stats: {
@@ -24,6 +25,7 @@ export const StatsOverview = ({
   watchTime,
   historyCount,
 }: StatsOverviewProps) => {
+  const { t } = useI18n();
   const { watching, planned, completed, on_hold, dropped } = stats;
   const total = watching + planned + completed + on_hold + dropped || 0;
 
@@ -63,33 +65,33 @@ export const StatsOverview = ({
               {total}
             </span>
             <span className="text-[10px] text-slate-500 dark:text-gray-500 font-bold uppercase tracking-wider">
-              Тайтлов
+              {t('stats.titles')}
             </span>
           </div>
         </div>
 
         <div className="space-y-2 w-full flex-1">
-          <StatRow label="Смотрю" count={watching} color="bg-green-500" />
-          <StatRow label="В планах" count={planned} color="bg-purple-500" />
-          <StatRow label="Завершено" count={completed} color="bg-blue-500" />
-          <StatRow label="Отложено" count={on_hold} color="bg-yellow-500" />
-          <StatRow label="Брошено" count={dropped} color="bg-red-500" />
+          <StatRow label={t('stats.watching')} count={watching} color="bg-green-500" />
+          <StatRow label={t('stats.planned')} count={planned} color="bg-purple-500" />
+          <StatRow label={t('stats.completed')} count={completed} color="bg-blue-500" />
+          <StatRow label={t('stats.onHold')} count={on_hold} color="bg-yellow-500" />
+          <StatRow label={t('stats.dropped')} count={dropped} color="bg-red-500" />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-col justify-center gap-6 bg-slate-50 dark:bg-white/3 p-6 rounded-2xl border border-slate-100 dark:border-white/5">
         <div>
           <p className="text-slate-500 dark:text-gray-500 text-[10px] md:text-xs uppercase font-bold mb-1 tracking-tight">
-            Затрачено времени
+            {t('stats.timeSpent')}
           </p>
           <p className="text-xl md:text-2xl font-black text-gray-800 dark:text-gray-200 wrap-break-word">
-            {watchTime.days}д {watchTime.hours}ч {watchTime.minutes}м
+            {t('stats.dhm', { d: watchTime.days, h: watchTime.hours, m: watchTime.minutes })}
           </p>
         </div>
 
         <div className="sm:border-l sm:pl-6 lg:border-l-0 lg:pl-0 lg:mt-0">
           <p className="text-slate-500 dark:text-gray-500 text-[10px] md:text-xs uppercase font-bold mb-1 tracking-tight">
-            Просмотрено эпизодов
+            {t('stats.episodesWatched')}
           </p>
           <p className="text-xl md:text-2xl font-black text-gray-800 dark:text-gray-200">
             {historyCount}

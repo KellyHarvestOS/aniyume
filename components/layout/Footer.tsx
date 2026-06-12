@@ -10,11 +10,13 @@ import {
   FaShieldAlt,
   FaBalanceScale,
   FaQuestionCircle,
+  FaYoutube,
 } from 'react-icons/fa';
 import { IoCall } from "react-icons/io5";
 import { HiAdjustmentsHorizontal, HiMiniBookmark, HiFire } from 'react-icons/hi2';
 import { IoCalendarNumberSharp } from 'react-icons/io5';
 import { getProfilePreference } from '@/lib/profilePreferences';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface FooterLinkProps {
   href: string;
@@ -23,6 +25,7 @@ interface FooterLinkProps {
 }
 
 export default function Footer() {
+  const { t } = useI18n();
   const year = new Date().getFullYear();
   const [logoPaths, setLogoPaths] = useState({
     light: '/images/logo0.png',
@@ -78,8 +81,7 @@ export default function Footer() {
             </Link>
 
             <p className="mt-6 text-lg leading-relaxed text-slate-700 dark:text-gray-300">
-              AniYume — современная платформа для просмотра аниме.
-              Новинки, расписание, коллекции и живое сообщество в одном месте.
+              {t('footer.tagline')}
             </p>
           </div>
 
@@ -104,22 +106,22 @@ export default function Footer() {
         </div>
 
         <div className="grid grid-cols-1 gap-14 border-t border-slate-400 pt-20 px-10 sm:grid-cols-2 lg:grid-cols-4 dark:border-gray-700 dark:border-t">
-          <Block title="Навигация">
-            <FooterLink href="/popular" icon={HiFire}>Популярное</FooterLink>
-            <FooterLink href="/schedule" icon={IoCalendarNumberSharp}>Расписание</FooterLink>
-            <FooterLink href="/filter" icon={HiAdjustmentsHorizontal}>Фильтр</FooterLink>
-            <FooterLink href="/bookmarks" icon={HiMiniBookmark}>Закладки</FooterLink>
+          <Block title={t('footer.navigation')}>
+            <FooterLink href="/popular" icon={HiFire}>{t('nav.popular')}</FooterLink>
+            <FooterLink href="/schedule" icon={IoCalendarNumberSharp}>{t('nav.schedule')}</FooterLink>
+            <FooterLink href="/filter" icon={HiAdjustmentsHorizontal}>{t('nav.filter')}</FooterLink>
+            <FooterLink href="/bookmarks" icon={HiMiniBookmark}>{t('nav.bookmarks')}</FooterLink>
           </Block>
 
-          <Block title="Информация">
-            <FooterLink href="/privacy" icon={FaShieldAlt}>Приватность</FooterLink>
-            <FooterLink href="/terms" icon={FaBalanceScale}>Условия</FooterLink>
-            <FooterLink href="/faq" icon={FaQuestionCircle}>FAQ</FooterLink>
-            <FooterLink href="/contacts" icon={IoCall}>Контакты</FooterLink>
+          <Block title={t('footer.information')}>
+            <FooterLink href="/privacy" icon={FaShieldAlt}>{t('footer.privacy')}</FooterLink>
+            <FooterLink href="/terms" icon={FaBalanceScale}>{t('footer.terms')}</FooterLink>
+            <FooterLink href="/faq" icon={FaQuestionCircle}>{t('footer.faq')}</FooterLink>
+            <FooterLink href="/contacts" icon={IoCall}>{t('footer.contacts')}</FooterLink>
           </Block>
 
-          <Block title="Поддержка">
-            <p className="text-slate-600 dark:text-gray-400">Наша команда отвечает на сообщения</p>
+          <Block title={t('footer.support')}>
+            <p className="text-slate-600 dark:text-gray-400">{t('footer.supportText')}</p>
             <a
               href="mailto:zanshugurov07@gmail.com"
               className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-brand px-6 py-4 font-semibold text-white transition hover:brightness-110 shadow-lg shadow-brand/20"
@@ -128,16 +130,17 @@ export default function Footer() {
             </a>
           </Block>
 
-          <Block title="Мы в соцсетях">
-            <div className="grid grid-cols-2 gap-3 justify-items-center lg:justify-items-start">
+          <Block title={t('footer.social')}>
+            <div className="grid grid-cols-3 gap-3 justify-items-center lg:justify-items-start">
               <SocialCard href="https://discord.com/invite/PYMXhXcR5Y" icon={FaDiscord} label="Discord" hoverClass="hover:bg-[#5865F2]! hover:text-white!" />
               <SocialCard href="https://t.me/aniYume_group" icon={FaTelegram} label="Telegram" hoverClass="hover:bg-[#2ca0de]! hover:text-white!" />
+              <SocialCard href="https://www.youtube.com" icon={FaYoutube} label="YouTube" hoverClass="hover:bg-[#FF0000]! hover:text-white!" />
             </div>
           </Block>
         </div>
 
         <div className="mt-20 border-t border-slate-300 py-10 text-center text-sm text-slate-400 dark:border-gray-700 dark:text-gray-400">
-          © {year} AniYume. Все права защищены
+          {t('footer.rights', { year })}
         </div>
       </div>
     </footer>
