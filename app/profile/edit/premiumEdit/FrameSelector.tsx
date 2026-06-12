@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { FaCheck, FaLock } from "react-icons/fa";
 import { avatarFrames, TEMP_UNLOCK_ALL_AVATAR_FRAMES } from "./constants";
+import { useI18n } from "@/contexts/I18nContext";
 
 interface FrameSelectorProps {
     avatarFrameKey: string;
@@ -13,13 +14,14 @@ interface FrameSelectorProps {
 type Category = 'all' | 'level' | 'secret' | 'other';
 
 export default function FrameSelector({ avatarFrameKey, currentLevel, frameObtainedDates, onSelectFrame }: FrameSelectorProps) {
+    const { t } = useI18n();
     const [activeCategory, setActiveCategory] = useState<Category>('all');
 
     const categories: { id: Category; label: string }[] = [
-        { id: 'all', label: 'Все' },
-        { id: 'level', label: 'За уровень' },
-        { id: 'secret', label: 'Секретные' },
-        { id: 'other', label: 'Другое' }
+        { id: 'all', label: t('frameSel.catAll') },
+        { id: 'level', label: t('frameSel.catLevel') },
+        { id: 'secret', label: t('frameSel.catSecret') },
+        { id: 'other', label: t('frameSel.catOther') }
     ];
 
     const isFrameUnlocked = (frame: typeof avatarFrames[number]) => {
@@ -31,10 +33,10 @@ export default function FrameSelector({ avatarFrameKey, currentLevel, frameObtai
     };
 
     const getFrameStatus = (frame: typeof avatarFrames[number], unlocked: boolean) => {
-        if (frame.key === "none") return "Доступно";
-        if (unlocked) return "Получено";
-        if (frame.secret) return "Можно получить";
-        return frame.canStillObtain ? "Можно получить" : "Уже нельзя получить";
+        if (frame.key === "none") return t('frameSel.available');
+        if (unlocked) return t('frameSel.obtained');
+        if (frame.secret) return t('frameSel.obtainable');
+        return frame.canStillObtain ? t('frameSel.obtainable') : t('frameSel.noLonger');
     };
 
     const filteredFrames = avatarFrames.filter(frame => {
@@ -57,9 +59,9 @@ export default function FrameSelector({ avatarFrameKey, currentLevel, frameObtai
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                 <div>
-                    <h2 className="text-xl font-black uppercase italic dark:text-white tracking-tight">Рамки аватара</h2>
+                    <h2 className="text-xl font-black uppercase italic dark:text-white tracking-tight">{t('frameSel.title')}</h2>
                     <p className="mt-1 text-xs font-bold uppercase tracking-widest text-slate-400">
-                        Особые рамки за условия и события
+                        {t('frameSel.subtitle')}
                     </p>
                 </div>
             </div>
@@ -125,13 +127,13 @@ export default function FrameSelector({ avatarFrameKey, currentLevel, frameObtai
 
                             <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-2">
-                                    <p className="truncate text-sm font-black text-slate-900 dark:text-white transition-colors duration-300 ">{frame.name}</p>
+                                    <p className="truncate text-sm font-black text-slate-900 dark:text-white transition-colors duration-300 ">{t(frame.name)}</p>
                                     {isSelected && <FaCheck className="shrink-0 text-brand text-xs" />}
                                 </div>
-                                <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">{frame.description}</p>
+                                <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">{t(frame.description)}</p>
                                 <div className="mt-2 flex flex-wrap gap-2">
                                     <p className="inline-flex rounded-xl bg-white px-2 py-1 text-[10px] font-black uppercase tracking-wider text-slate-500 border border-slate-200 dark:bg-zinc-700 dark:border-zinc-600 dark:text-slate-200">
-                                        {frame.condition}
+                                        {t(frame.condition)}
                                     </p>
                                     <p className={`inline-flex rounded-xl px-2 py-1 text-[10px] font-black uppercase tracking-wider border ${
                                         isUnlocked
@@ -145,7 +147,7 @@ export default function FrameSelector({ avatarFrameKey, currentLevel, frameObtai
                                 </div>
                                 {obtainedDate && (
                                     <p className="mt-2 text-[10px] font-bold text-slate-400 dark:text-slate-500">
-                                        Получено: {new Date(obtainedDate).toLocaleDateString("ru-RU")}
+                                        {t('frameSel.obtainedOn', { date: new Date(obtainedDate).toLocaleDateString() })}
                                     </p>
                                 )}
                             </div>
@@ -159,7 +161,7 @@ export default function FrameSelector({ avatarFrameKey, currentLevel, frameObtai
                     className="py-10 text-center"
                     style={{ animation: 'smoothFadeIn 0.3s ease-out forwards' }}
                 >
-                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">В этой категории пока ничего нет</p>
+                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{t('frameSel.emptyCategory')}</p>
                 </div>
             )}
         </div>

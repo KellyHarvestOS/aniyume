@@ -3,6 +3,7 @@ import React from "react";
 import { MdOutlineDownloadDone } from "react-icons/md";
 import { avatarFrames } from "./constants";
 import { getAvatarFrameFit } from "@/lib/avatarFrames";
+import { useI18n } from "@/contexts/I18nContext";
 
 interface ProfilePreviewProps {
     themeType: 'gradient' | 'solid';
@@ -14,11 +15,12 @@ interface ProfilePreviewProps {
 }
 
 export default function ProfilePreview({ themeType, profileValue, previewAvatarUrl, previewUserName, selectedFrame, onSave }: ProfilePreviewProps) {
+    const { t } = useI18n();
     const selectedFrameFit = getAvatarFrameFit(selectedFrame.key);
 
     return (
         <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
-            <h3 className="text-xs font-black uppercase text-slate-400 tracking-widest ml-2">Предпросмотр компонентов</h3>
+            <h3 className="text-xs font-black uppercase text-slate-400 tracking-widest ml-2">{t('preview.title')}</h3>
 
             <div className="rounded-[1rem] overflow-hidden border border-slate-200 dark:border-white/10 shadow-2xl bg-white dark:bg-zinc-900">
                 <div
@@ -72,7 +74,7 @@ export default function ProfilePreview({ themeType, profileValue, previewAvatarU
                 onClick={onSave}
                 className="w-full py-6 bg-brand text-white dark:text-black font-black uppercase tracking-[0.2em] italic rounded-[1rem] flex items-center justify-center gap-3 shadow-xl hover:brightness-110 active:scale-[0.98] transition-all"
             >
-                <MdOutlineDownloadDone className="text-2xl" /> Сохранить изменения
+                <MdOutlineDownloadDone className="text-2xl" /> {t('preview.save')}
             </button>
         </div>
     );

@@ -6,6 +6,7 @@ import { SiCodemagic } from "react-icons/si";
 import { getProfileLevel, ProfileWatchTime } from "@/lib/profileLevel";
 import { getAvatarUrl } from "@/lib/storage";
 import { getProfilePreference, setProfilePreference } from "@/lib/profilePreferences";
+import { useI18n } from "@/contexts/I18nContext";
 
 import { avatarFrames } from "./constants";
 import ThemeSelector from "./ThemeSelector";
@@ -14,6 +15,7 @@ import ProfilePreview from "./ProfilePreview";
 
 export default function PremiumEditPage() {
     const router = useRouter();
+    const { t } = useI18n();
     const [loading, setLoading] = useState(true);
     const [isPremium, setIsPremium] = useState(false);
 
@@ -110,7 +112,7 @@ export default function PremiumEditPage() {
         const savedCursor = getProfilePreference("cursor_path", "/images/cursor/Mouse-cursor.png")!;
         const savedCursorKey = getProfilePreference("cursor_key", "default")!;
         updateGlobalStyles(profileValue, themeType, savedCursor, savedCursorKey);
-        alert("Настройки оформления сохранены!");
+        alert(t("premiumEdit.saved"));
         router.back();
     };
 
@@ -171,7 +173,7 @@ export default function PremiumEditPage() {
                     onClick={() => router.back()}
                     className="flex items-center gap-2 text-[#000000] dark:text-white hover:text-brand transition-colors font-bold text-xs uppercase tracking-widest mb-6"
                 >
-                    <FaChevronLeft /> Назад к настройкам
+                    <FaChevronLeft /> {t("premiumEdit.back")}
                 </button>
 
                 <div className="flex items-center gap-4 mb-10">
@@ -180,9 +182,9 @@ export default function PremiumEditPage() {
                     </div>
                     <div>
                         <h1 className="text-4xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">
-                            Кастомизация
+                            {t("profile.edit.customization")}
                         </h1>
-                        <p className="text-slate-500 text-sm font-medium italic tracking-tight">Управление оформлением вашего профиля</p>
+                        <p className="text-slate-500 text-sm font-medium italic tracking-tight">{t("premiumEdit.subtitle")}</p>
                     </div>
                 </div>
 

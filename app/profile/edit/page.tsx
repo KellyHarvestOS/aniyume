@@ -122,7 +122,7 @@ export default function EditProfilePage() {
       const isGif = file.type === 'image/gif';
 
       if (isGif && !isPremium) {
-        setMessage({ type: "error", text: "GIF-аватарки доступны только для Premium пользователей! 💎" });
+        setMessage({ type: "error", text: t("profile.edit.gifPremiumOnly") });
         if (fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
@@ -165,7 +165,7 @@ export default function EditProfilePage() {
     setMessage(null);
     try {
       const token = localStorage.getItem("userToken");
-      if (nameState.available === false) throw new Error("Это имя уже занято");
+      if (nameState.available === false) throw new Error(t("profile.edit.nameTakenErr"));
       const profileRes = await fetch("/api/external/profile/me", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, Accept: "application/json" },
@@ -174,7 +174,7 @@ export default function EditProfilePage() {
 
       if (!profileRes.ok) {
         const error = await profileRes.json().catch(() => ({}));
-        throw new Error(error.errors?.name?.[0] || error.message || "Не удалось обновить профиль");
+        throw new Error(error.errors?.name?.[0] || error.message || t("profile.edit.updateFailed"));
       }
 
       if (selectedFile) {
@@ -185,16 +185,16 @@ export default function EditProfilePage() {
           headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
           body: avatarData,
         });
-        if (!avatarRes.ok) throw new Error("Ошибка загрузки аватара");
+        if (!avatarRes.ok) throw new Error(t("profile.edit.avatarUploadError"));
       }
 
-      setMessage({ type: "success", text: "Профиль успешно обновлен!" });
+      setMessage({ type: "success", text: t("profile.edit.profileUpdated") });
       setTimeout(() => {
         router.refresh();
         router.push("/profile");
       }, 1500);
     } catch (err: any) {
-      setMessage({ type: "error", text: err.message || "Не удалось сохранить" });
+      setMessage({ type: "error", text: err.message || t("profile.edit.saveFailed") });
     } finally {
       setSaving(false);
     }
@@ -207,16 +207,16 @@ export default function EditProfilePage() {
       <div className="w-full border-b border-slate-300 dark:border-white/15 bg-slate-50/50 dark:bg-[#111111]/50 backdrop-blur-md px-6 py-3 flex items-center justify-between">
         <button onClick={() => router.back()} className="group flex items-center gap-2 text-slate-500 dark:text-gray-400 hover:text-brand transition-all font-bold text-sm">
           <FaChevronLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
-          ВЕРНУТЬСЯ В ПРОФИЛЬ
+          {t("profile.edit.backToProfile")}
         </button>
       </div>
 
       <div className="flex-1 flex overflow-hidden">
         <div className="hidden lg:flex w-72 border-r border-b border-slate-300 dark:border-white/15 p-10 flex-col gap-6 bg-slate-50/30 dark:bg-[#111111]">
-          <h1 className="text-4xl font-black text-brand tracking-tighter italic">Настройки</h1>
-          <h1 className="text-4xl font-black text-black dark:text-white tracking-tighter italic -mt-5">профиля</h1>
+          <h1 className="text-4xl font-black text-brand tracking-tighter italic">{t("profile.edit.settingsTitle1")}</h1>
+          <h1 className="text-4xl font-black text-black dark:text-white tracking-tighter italic -mt-5">{t("profile.edit.settingsTitle2")}</h1>
           <p className="text-xs text-slate-500 dark:text-gray-400 font-medium leading-relaxed">
-            Настройте свой профиль так, чтобы он выделялся. Ваши данные обновятся мгновенно.
+            {t("profile.edit.sidebarDesc")}
           </p>
         </div>
 
