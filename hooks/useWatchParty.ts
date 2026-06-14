@@ -219,6 +219,12 @@ export function useWatchParty({
 
     try {
       const res = await api.post(`/watch-party/${roomCode}/message`, { message });
+      if (!res.ok) {
+        // 429 (антиспам/дубликат), 403, 422 (модерация) и т.п. — НЕ подставляем
+        // тело ошибки как сообщение (у него нет user_name → краш рендера). Откатываем.
+        setMessages(prev => prev.filter(m => m.id !== optimistic.id));
+        return;
+      }
       const data = await res.json();
       // Заменяем оптимистичное сообщение реальным
       setMessages(prev => prev.map(m => m.id === optimistic.id ? { ...data } : m));

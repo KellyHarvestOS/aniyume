@@ -88,7 +88,7 @@ export default function WatchPartyChat({ messages, onSend, currentUserId, classN
                     <img src={msg.user_avatar} alt={msg.user_name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-500 dark:text-white/60 font-bold">
-                      {msg.user_name[0]?.toUpperCase()}
+                      {msg.user_name?.[0]?.toUpperCase() ?? '?'}
                     </div>
                   )}
                 </div>
