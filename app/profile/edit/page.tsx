@@ -17,6 +17,7 @@ import { getProfilePreference, setProfilePreference } from "@/lib/profilePrefere
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 import { useI18n } from "@/contexts/I18nContext";
 import PrivacySettings from "@/components/profile/PrivacySettings";
+import AccountSecuritySettings from "@/components/profile/AccountSecuritySettings";
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -34,6 +35,7 @@ export default function EditProfilePage() {
     status_text: "",
   });
   const [initialName, setInitialName] = useState("");
+  const [accountEmail, setAccountEmail] = useState("");
   const [nameState, setNameState] = useState<{ checking: boolean; available: boolean | null; suggestions: string[] }>({ checking: false, available: null, suggestions: [] });
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -78,6 +80,7 @@ export default function EditProfilePage() {
           setHasAdminGrantedFrames(Array.isArray(data.profile_frames) && data.profile_frames.some((frame: any) => frame.admin_granted));
           setIsCustomCursorDisabled(getProfilePreference("premium_cursor_disabled") === "true");
           setInitialName(user.name || "");
+          setAccountEmail(user.email || "");
           setFormData({
             name: user.name || "",
             status_text: user.custom_status || user.status_text || "",
@@ -357,6 +360,10 @@ export default function EditProfilePage() {
               </div>
 
               <PrivacySettings />
+
+              {accountEmail && (
+                <AccountSecuritySettings email={accountEmail} onEmailChange={setAccountEmail} />
+              )}
 
               {isPremium && (
                 <div className="md:col-span-2">
