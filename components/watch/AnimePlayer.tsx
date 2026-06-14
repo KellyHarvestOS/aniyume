@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Hls from 'hls.js';
 import EpisodePicker from './EpisodePicker';
+import SourceSelect, { SourceItem } from './SourceSelect';
 import { Episode } from '@/types/anime';
 import { FaStar } from 'react-icons/fa';
 import { useWatchTracker } from '@/hooks/useWatchTracker';
@@ -141,11 +142,24 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
 
   const sourceKey = (ep: Episode) => `${ep.source ?? 'unknown'}::${ep.translator ?? 'Без озвучки'}::${ep.translation_type ?? ''}`;
 
-  const sourceLabel = (ep: Episode) => {
-    const source = ep.source === 'anilibria' ? 'AniLibria' : ep.source === 'kodik' ? 'Kodik' : ep.source === 'videocdn' ? 'VideoCDN' : ep.source === 'allanime' ? 'AllAnime' : ep.source ?? t('player.source');
-    const translator = ep.translator && ep.translator !== source ? ` · ${ep.translator}` : '';
-    const ads = ep.source === 'kodik' ? t('player.mayHaveAds') : ep.source === 'anilibria' ? t('player.noAds') : '';
-    return `${source}${translator}${ads}`;
+  const sourceDisplayName = (ep: Episode) =>
+    ep.source === 'anilibria' ? 'AniLibria'
+      : ep.source === 'kodik' ? 'Kodik'
+      : ep.source === 'videocdn' ? 'VideoCDN'
+      : ep.source === 'allanime' ? 'AllAnime'
+      : ep.source ?? t('player.source');
+
+  // Убираем ведущий разделитель " · " из i18n-строк рекламы для отдельного бейджа.
+  const stripSep = (s: string) => s.replace(/^\s*·\s*/, '').trim();
+
+  const sourceItem = (ep: Episode): SourceItem => {
+    const name = sourceDisplayName(ep);
+    const translator = ep.translator && ep.translator !== name ? ep.translator : undefined;
+    const ads: SourceItem['ads'] =
+      ep.source === 'kodik' ? 'maybe' : ep.source === 'anilibria' ? 'none' : null;
+    const adsLabel =
+      ads === 'maybe' ? stripSep(t('player.mayHaveAds')) : ads === 'none' ? stripSep(t('player.noAds')) : undefined;
+    return { key: sourceKey(ep), name, translator, ads, adsLabel };
   };
 
   const sourceOptions = useMemo(() => {
@@ -159,6 +173,8 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
     });
     return Array.from(map.values()).sort((a, b) => sourceRank(a) - sourceRank(b) || (a.priority ?? 999) - (b.priority ?? 999));
   }, [episodes]);
+
+  const sourceItems = useMemo(() => sourceOptions.map(sourceItem), [sourceOptions, t]);
 
   useEffect(() => {
     if (!selectedSourceKey && sourceOptions.length > 0) {
@@ -435,13 +451,13 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
               )}
             </div>
             {sourceOptions.length > 1 && (
-              <select
-                className="w-full sm:w-[320px] bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-3 text-sm font-bold outline-none"
-                value={selectedSourceKey ?? ''}
-                onChange={(event) => handleSourceChange(event.target.value)}
-              >
-                {sourceOptions.map((ep) => <option key={sourceKey(ep)} value={sourceKey(ep)}>{sourceLabel(ep)}</option>)}
-              </select>
+              <SourceSelect
+                className="w-full sm:w-[320px]"
+                ariaLabel={t('player.source')}
+                items={sourceItems}
+                value={selectedSourceKey}
+                onChange={handleSourceChange}
+              />
             )}
           </div>
         </div>
