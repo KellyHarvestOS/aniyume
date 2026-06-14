@@ -67,8 +67,6 @@ export default function WatchPartyPage() {
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
   const [episodeOptions, setEpisodeOptions] = useState<EpisodeOption[]>([]);
-  const [volume, setVolume] = useState(1);
-  const [muted, setMuted] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
