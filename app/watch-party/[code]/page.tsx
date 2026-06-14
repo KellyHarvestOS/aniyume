@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Play, Link2, Crown,
+  Play, Link2,
   Check, Bell, Wifi, WifiOff, ChevronLeft, UserPlus, SkipBack, SkipForward, Volume2, VolumeX
 } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -781,14 +781,6 @@ export default function WatchPartyPage() {
                 </div>
                 <p className="text-white/40 text-sm">{t('wp.playerLoading')}</p>
               </div>
-            </div>
-          )}
-
-          {/* Host badge */}
-          {isHost && (
-            <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-[11px] sm:text-xs font-medium">
-              <Crown className="w-3 h-3" />
-              {t('wp.youAreHost')}
             </div>
           )}
 
