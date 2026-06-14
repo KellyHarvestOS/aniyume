@@ -98,7 +98,15 @@ export default function WatchPartyPage() {
     }
 
     const epData = await epRes.json();
-    const nextSource = epData?.data?.sources?.[0]
+    // В совместном просмотре контроль хоста и синхронизация работают только для
+    // нативного HLS-плеера (controls={isHost} + виртуальные часы + heartbeat).
+    // У iframe-источников (Kodik и т.п.) встроенный плеер даёт КАЖДОМУ зрителю
+    // перемотку и смену озвучки, и его нельзя залочить/синхронизировать из-за
+    // cross-origin. Поэтому всегда выбираем HLS, если он есть, и только при его
+    // отсутствии откатываемся на iframe.
+    const sources: any[] = epData?.data?.sources ?? [];
+    const nextSource = sources.find((s) => s?.type === 'hls')
+      ?? sources[0]
       ?? { type: 'iframe', url: epData?.player_url || '' };
 
     setActiveSource(nextSource);
