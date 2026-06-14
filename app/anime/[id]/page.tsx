@@ -51,7 +51,7 @@ export default function AnimeViewPage() {
         const [animeRes, epRes, recRes, statsRes] = await Promise.all([
           fetch(`${API_BASE}/public/anime/${id}`, fetchOpts),
           fetch(`${API_BASE}/public/anime/${id}/episodes`, fetchOpts),
-          fetch(`${API_BASE}/public/anime?sort=popularity&page=1`, fetchOpts),
+          fetch(`${API_BASE}/public/anime/${id}/recommendations`, fetchOpts),
           fetch(`${API_BASE}/public/anime/${id}/community-stats`, fetchOpts),
         ]);
 
@@ -64,7 +64,9 @@ export default function AnimeViewPage() {
         let epJson = { data: [] };
         if (epRes.ok) epJson = await epRes.json();
         
-        const recJson = await recRes.json();
+        const recJson = recRes.ok
+          ? await recRes.json()
+          : { similar: [], related: [] };
         let statsJson = null;
         if (statsRes.ok) statsJson = await statsRes.json();
 
@@ -89,7 +91,17 @@ export default function AnimeViewPage() {
           flatEpisodes = (Object.values(epData) as Episode[][]).flat();
         }
         setAllEpisodes(flatEpisodes);
-        setRecommendations((recJson.data || []).filter((a: any) => String(a.id) !== String(id)).slice(0, 4));
+        const genreMatches = Array.isArray(recJson.similar) ? recJson.similar : [];
+        const relatedFallback = Array.isArray(recJson.related) ? recJson.related : [];
+        const recommendationPool = recJson.has_official_related
+          ? [...genreMatches, ...relatedFallback]
+          : [...relatedFallback, ...genreMatches];
+        const uniqueRecommendations = recommendationPool.filter(
+          (item, index, items) =>
+            String(item.id) !== String(id) &&
+            items.findIndex((candidate) => String(candidate.id) === String(item.id)) === index
+        );
+        setRecommendations(uniqueRecommendations.slice(0, 4));
       } catch (err) {
         return notFound();
       } finally {

@@ -67,6 +67,8 @@ export default function WatchPartyPage() {
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
   const [episodeOptions, setEpisodeOptions] = useState<EpisodeOption[]>([]);
+  const [volume, setVolume] = useState(1);
+  const [muted, setMuted] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
@@ -789,6 +791,33 @@ export default function WatchPartyPage() {
             <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-[11px] sm:text-xs font-medium">
               <Crown className="w-3 h-3" />
               {t('wp.youAreHost')}
+            </div>
+          )}
+
+          {/* Громкость для зрителей (у гостей нет нативных контролов) */}
+          {!isHost && activeSource?.type === 'hls' && (
+            <div className="absolute bottom-3 right-3 flex items-center gap-2 rounded-full bg-black/60 px-3 py-1.5 backdrop-blur-md">
+              <button
+                onClick={() => setMuted((m) => !m)}
+                className="text-white/90 transition-colors hover:text-white"
+                title={muted ? 'Включить звук' : 'Выключить звук'}
+              >
+                {muted || volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={muted ? 0 : volume}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  setVolume(v);
+                  setMuted(v === 0);
+                }}
+                className="h-1 w-24 cursor-pointer accent-[#00E2C4]"
+                title="Громкость"
+              />
             </div>
           )}
 

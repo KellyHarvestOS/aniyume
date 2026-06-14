@@ -17,6 +17,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   const hideLayout = noLayoutPages.includes(pathname);
   const isChatPage = pathname?.startsWith('/profile/friends/chat');
 
+  const hideHeader = hideLayout || isChatPage;
   const hideFooter = hideLayout || isChatPage;
 
   useEffect(() => {
@@ -51,7 +52,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   return (
     <AuthModalProvider>
       <div className="bg-background text-foreground min-h-screen transition-colors duration-300">
-        {!hideLayout && <Header />}
+        {!hideHeader && <Header />}
 
         <main className={`w-full ${isChatPage ? 'min-h-0' : 'min-h-screen'}`}>
           {children}

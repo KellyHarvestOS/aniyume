@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState } from 'react';
 import { FaEnvelope, FaLock, FaShieldAlt } from 'react-icons/fa';
@@ -17,17 +17,24 @@ type ApiResponse = {
 
 const firstError = (data: ApiResponse) => {
   const error = data.errors ? Object.values(data.errors)[0] : null;
-  return (Array.isArray(error) ? error[0] : error) || data.message || 'Не удалось обновить данные аккаунта';
+  return (
+    (Array.isArray(error) ? error[0] : error) ||
+    data.message ||
+    "Не удалось обновить данные аккаунта"
+  );
 };
 
 export default function AccountSecuritySettings({ email, onEmailChange }: Props) {
   const { t } = useI18n();
   const [nextEmail, setNextEmail] = useState(email);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   const handleSubmit = async () => {
     setMessage(null);
@@ -42,8 +49,11 @@ export default function AccountSecuritySettings({ email, onEmailChange }: Props)
       return;
     }
 
-    const payload: Record<string, string> = { current_password: currentPassword };
-    if (nextEmail.trim().toLowerCase() !== email.toLowerCase()) payload.email = nextEmail.trim();
+    const payload: Record<string, string> = {
+      current_password: currentPassword,
+    };
+    if (nextEmail.trim().toLowerCase() !== email.toLowerCase())
+      payload.email = nextEmail.trim();
     if (password) {
       payload.password = password;
       payload.password_confirmation = passwordConfirmation;
@@ -56,17 +66,17 @@ export default function AccountSecuritySettings({ email, onEmailChange }: Props)
 
     setSaving(true);
     try {
-      const token = localStorage.getItem('userToken');
-      const response = await fetch('/api/external/profile/me/account', {
-        method: 'PATCH',
+      const token = localStorage.getItem("userToken");
+      const response = await fetch("/api/external/profile/me/account", {
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
+          "Content-Type": "application/json",
+          Accept: "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
-      const data = await response.json().catch(() => ({})) as ApiResponse;
+      const data = (await response.json().catch(() => ({}))) as ApiResponse;
       if (!response.ok) throw new Error(firstError(data));
 
       const updatedEmail = data.user?.email || nextEmail.trim();
@@ -83,7 +93,8 @@ export default function AccountSecuritySettings({ email, onEmailChange }: Props)
     }
   };
 
-  const inputClass = 'w-full rounded-lg border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-bold text-slate-900 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/30 dark:border-white/5 dark:bg-[#161616] dark:text-white';
+  const inputClass =
+    "w-full rounded-lg border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-bold text-slate-900 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/30 dark:border-white/5 dark:bg-[#161616] dark:text-white";
 
   return (
     <section className="md:col-span-2 space-y-5 rounded-xl border border-slate-200 bg-slate-50/60 p-6 dark:border-white/10 dark:bg-[#161616]">
@@ -99,14 +110,27 @@ export default function AccountSecuritySettings({ email, onEmailChange }: Props)
           <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.15em] text-slate-700 dark:text-gray-200">
             <FaEnvelope className="text-brand" /> {t('account.email')}
           </span>
-          <input type="email" value={nextEmail} onChange={(event) => setNextEmail(event.target.value)} className={inputClass} required />
+          <input
+            type="email"
+            value={nextEmail}
+            onChange={(event) => setNextEmail(event.target.value)}
+            className={inputClass}
+            required
+          />
         </label>
 
         <label className="space-y-2">
           <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.15em] text-slate-700 dark:text-gray-200">
             <FaLock className="text-brand" /> {t('account.currentPassword')}
           </span>
-          <input type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} className={inputClass} autoComplete="current-password" required />
+          <input
+            type="password"
+            value={currentPassword}
+            onChange={(event) => setCurrentPassword(event.target.value)}
+            className={inputClass}
+            autoComplete="current-password"
+            required
+          />
         </label>
 
         <label className="space-y-2">
@@ -120,7 +144,9 @@ export default function AccountSecuritySettings({ email, onEmailChange }: Props)
         </label>
 
         {message && (
-          <p className={`md:col-span-2 rounded-lg border p-3 text-sm font-bold ${message.type === 'success' ? 'border-green-500/20 bg-green-500/10 text-green-500' : 'border-red-500/20 bg-red-500/10 text-red-500'}`}>
+          <p
+            className={`md:col-span-2 rounded-lg border p-3 text-sm font-bold ${message.type === "success" ? "border-green-500/20 bg-green-500/10 text-green-500" : "border-red-500/20 bg-red-500/10 text-red-500"}`}
+          >
             {message.text}
           </p>
         )}

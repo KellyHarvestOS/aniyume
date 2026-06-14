@@ -105,13 +105,29 @@ export default function PremiumEditPage() {
             .catch(() => { });
     }, [router, updateGlobalStyles]);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setProfilePreference("theme_value", profileValue);
         setProfilePreference("theme_type", themeType);
         setProfilePreference("avatar_frame_key", avatarFrameKey);
         const savedCursor = getProfilePreference("cursor_path", "/images/cursor/Mouse-cursor.png")!;
         const savedCursorKey = getProfilePreference("cursor_key", "default")!;
         updateGlobalStyles(profileValue, themeType, savedCursor, savedCursorKey);
+        // Сохраняем тему на сервере, чтобы её видели другие пользователи на чужом профиле
+        const token = localStorage.getItem("userToken");
+        try {
+            await fetch("/api/external/profile/me", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({ theme_value: profileValue, theme_type: themeType }),
+            });
+        } catch {
+            /* офлайн — тема всё равно применена локально */
+        }
+
         alert(t("premiumEdit.saved"));
         router.back();
     };
