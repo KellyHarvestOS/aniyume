@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight, FaSearch, FaTimes, FaChevronDown } from 'react-icons/fa';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface Episode {
   episode_number: number;
@@ -20,6 +21,7 @@ export default function EpisodePicker({
   onSelect,
   rangeSize = 50,
 }: EpisodePickerProps) {
+  const { t } = useI18n();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeRangeIdx, setActiveRangeIdx] = useState(0);
@@ -136,12 +138,12 @@ export default function EpisodePicker({
             className="p-2.5 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400
                        hover:brand-bg-soft hover:brand-text disabled:opacity-30 disabled:cursor-default
                        transition-all duration-200 active:scale-95"
-            aria-label="Предыдущая серия"
+            aria-label={t('ep.prev')}
           >
             <FaChevronLeft size={14} />
           </button>
           <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 min-w-[80px] text-center">
-            Серия {currentEpisode}
+            {t('activity.episode', { n: currentEpisode })}
           </span>
           <button
             onClick={handleNext}
@@ -149,7 +151,7 @@ export default function EpisodePicker({
             className="p-2.5 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400
                        hover:brand-bg-soft hover:brand-text disabled:opacity-30 disabled:cursor-default
                        transition-all duration-200 active:scale-95"
-            aria-label="Следующая серия"
+            aria-label={t('ep.next')}
           >
             <FaChevronRight size={14} />
           </button>
@@ -184,7 +186,7 @@ export default function EpisodePicker({
             className="shrink-0 p-3 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400
                        hover:brand-bg-soft hover:brand-text disabled:opacity-30 disabled:cursor-default
                        transition-all duration-200 border border-gray-200 dark:border-gray-700/50 active:scale-95"
-            aria-label="Предыдущая серия"
+            aria-label={t('ep.prev')}
           >
             <FaChevronLeft size={13} />
           </button>
@@ -195,9 +197,9 @@ export default function EpisodePicker({
                        brand-bg-soft border brand-border text-sm font-bold brand-text
                        hover:brand-bg-soft transition-all duration-200 active:scale-[0.98]"
             aria-expanded={expanded}
-            aria-label="Показать список серий"
+            aria-label={t('ep.showList')}
           >
-            <span className="truncate">Серия {currentEpisode}</span>
+            <span className="truncate">{t('activity.episode', { n: currentEpisode })}</span>
             <FaChevronDown
               size={11}
               className={`shrink-0 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
@@ -210,7 +212,7 @@ export default function EpisodePicker({
             className="shrink-0 p-3 rounded-lg bg-gray-100 dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-400
                        hover:brand-bg-soft hover:brand-text disabled:opacity-30 disabled:cursor-default
                        transition-all duration-200 border border-gray-200 dark:border-gray-700/50 active:scale-95"
-            aria-label="Следующая серия"
+            aria-label={t('ep.next')}
           >
             <FaChevronRight size={13} />
           </button>
@@ -223,7 +225,7 @@ export default function EpisodePicker({
               ? 'brand-bg text-white brand-border'
               : 'bg-gray-100 dark:bg-[#1e1e1e] text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700/50 hover:brand-bg-soft hover:brand-text'
             }`}
-          aria-label="Поиск серии"
+          aria-label={t('ep.searchEp')}
         >
           {isSearchOpen ? <FaTimes size={13} /> : <FaSearch size={13} />}
         </button>
@@ -240,7 +242,7 @@ export default function EpisodePicker({
                 <input
                   type="text"
                   inputMode="numeric"
-                  placeholder="Введите номер серии..."
+                  placeholder={t('ep.enterNumber')}
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
                   autoFocus
@@ -299,14 +301,14 @@ export default function EpisodePicker({
                     ? 'brand-bg text-white shadow-lg ring-2 brand-ring'
                     : 'bg-gray-50 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:brand-bg-soft hover:brand-text border border-gray-200 dark:border-gray-700/40'
                   }`}
-                title={`Серия ${num}`}
+                title={t('activity.episode', { n: num })}
               >
                 {num}
               </button>
             ))}
             {visibleEpisodes.length === 0 && searchQuery && (
               <div className="col-span-full py-6 text-center text-gray-400 dark:text-gray-600 text-sm">
-                Серия {searchQuery} не найдена
+                {t('ep.notFound', { n: searchQuery })}
               </div>
             )}
           </div>
@@ -315,7 +317,7 @@ export default function EpisodePicker({
 
       {/* Episode count info */}
       <div className="mt-2 text-xs text-gray-400 dark:text-gray-600 text-right">
-        Всего серий: {episodeNumbers.length}
+        {t('ep.total', { n: episodeNumbers.length })}
       </div>
     </div>
   );

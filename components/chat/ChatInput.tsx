@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import { ALL_GIFS } from '@/app/profile/friends/chat/constants/gifs';
 import ImageCropModal from '@/components/modals/ImageCropModal';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface ChatInputProps {
     onSend: (data: { text?: string; gif?: string; image?: File }) => void;
@@ -17,6 +18,7 @@ interface ChatInputProps {
 const BANNED_WORDS = ['плохоеслово', 'мат', 'оскорбление'];
 
 export default function ChatInput({ onSend, disabled = false }: ChatInputProps) {
+    const { t } = useI18n();
     const [message, setMessage] = useState('');
     const [showEmoji, setShowEmoji] = useState(false);
     const [showGif, setShowGif] = useState(false);
@@ -158,7 +160,7 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
                             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs" />
                             <input
                                 type="text"
-                                placeholder="Поиск анимаций..."
+                                placeholder={t('chat.searchGifs')}
                                 value={gifSearch}
                                 onChange={(e) => setGifSearch(e.target.value)}
                                 className="w-full bg-gray-100 dark:bg-white/5 border border-transparent focus:border-brand/30 rounded-xl py-2 pl-9 pr-4 text-xs outline-none transition-all"
@@ -230,7 +232,7 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
                             }
                         }}
                         disabled={isMuted || disabled}
-                        placeholder={disabled ? "Пользователь заблокирован" : isMuted ? `Подождите ${muteTimer}с...` : "Написать сообщение..."}
+                        placeholder={disabled ? t('chat.userBlocked') : isMuted ? t('chat.waitSec', { n: muteTimer }) : t('chat.writeMessage')}
                         className="w-full bg-transparent resize-none outline-none text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-500 py-3 px-2 max-h-32 min-h-[44px] no-scrollbar"
                         rows={1}
                     />

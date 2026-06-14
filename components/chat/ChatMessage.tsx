@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FaCopy, FaTrashAlt } from 'react-icons/fa';
+import { useI18n } from '@/contexts/I18nContext';
 export interface Message {
     id: string;
     text?: string;
@@ -18,6 +19,7 @@ interface ChatMessageProps {
     onDelete?: (messageId: string) => void;
 }
 export default function ChatMessage({ msg, isMe, onCopy, onDelete }: ChatMessageProps) {
+    const { t } = useI18n();
 
     const isOnlyEmojis = (str: string) => {
         if (!str || !str.trim()) return false;
@@ -70,8 +72,8 @@ export default function ChatMessage({ msg, isMe, onCopy, onDelete }: ChatMessage
                             type="button"
                             onClick={() => onCopy?.(msg)}
                             className="h-7 w-7 rounded-full bg-gray-100 dark:bg-white/10 text-gray-500 hover:text-brand hover:bg-brand/10 flex items-center justify-center transition-colors"
-                            aria-label="Скопировать сообщение"
-                            title="Скопировать"
+                            aria-label={t('chat.copyMessage')}
+                            title={t('chat.copy')}
                         >
                             <FaCopy size={11} />
                         </button>
@@ -80,8 +82,8 @@ export default function ChatMessage({ msg, isMe, onCopy, onDelete }: ChatMessage
                         type="button"
                         onClick={() => onDelete?.(msg.id)}
                         className="h-7 w-7 rounded-full bg-gray-100 dark:bg-white/10 text-gray-500 hover:text-red-500 hover:bg-red-500/10 flex items-center justify-center transition-colors"
-                        aria-label="Удалить сообщение у себя"
-                        title="Удалить у себя"
+                        aria-label={t('chat.deleteForMe')}
+                        title={t('chat.deleteForMeTitle')}
                     >
                         <FaTrashAlt size={11} />
                     </button>

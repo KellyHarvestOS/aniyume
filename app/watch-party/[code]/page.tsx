@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useI18n } from '@/contexts/I18nContext';
 import { useWatchParty, type Participant } from '@/hooks/useWatchParty';
 import { useWatchTracker } from '@/hooks/useWatchTracker';
 import WatchPartyChat from '@/components/watch-party/WatchPartyChat';
@@ -49,6 +50,7 @@ export default function WatchPartyPage() {
   const { code } = useParams<{ code: string }>();
   const router = useRouter();
   const { user } = useAuth();
+  const { t } = useI18n();
 
   const [room, setRoom] = useState<RoomData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -139,7 +141,7 @@ export default function WatchPartyPage() {
         const joinRes = await api.post(`/watch-party/${code}/join`, {});
         if (!joinRes.ok) {
           const d = await joinRes.json();
-          setError(d.message || 'Не удалось войти в комнату');
+          setError(d.message || t('wp.joinFailed'));
           return;
         }
         const joinData = await joinRes.json();
@@ -150,7 +152,7 @@ export default function WatchPartyPage() {
           loadEpisodeOptions(joinData.room.anime.id),
         ]);
       } catch {
-        setError('Ошибка загрузки комнаты');
+        setError(t('wp.loadError'));
       } finally {
         setIsLoading(false);
       }
@@ -267,7 +269,7 @@ export default function WatchPartyPage() {
       }
     },
     onRoomClosed: () => {
-      setError('Хост закрыл комнату');
+      setError(t('wp.hostClosed'));
       setTimeout(() => router.push('/'), 3000);
     },
     onFriendInvite: (data) => {
@@ -523,7 +525,7 @@ export default function WatchPartyPage() {
       <div className="min-h-screen bg-white dark:bg-[#111111] flex items-center justify-center transition-colors">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 rounded-full border-2 border-[#00E2C4]/30 border-t-[#00E2C4] animate-spin mx-auto" />
-          <p className="text-gray-500 dark:text-white/50">Подключение к комнате...</p>
+          <p className="text-gray-500 dark:text-white/50">{t('wp.connecting')}</p>
         </div>
       </div>
     );
@@ -535,7 +537,7 @@ export default function WatchPartyPage() {
         <div className="text-center space-y-4">
           <p className="text-red-400 text-lg">{error}</p>
           <button onClick={() => router.push('/')} className="text-[#00E2C4] hover:underline">
-            На главную
+            {t('premium.toHome')}
           </button>
         </div>
       </div>
@@ -554,7 +556,7 @@ export default function WatchPartyPage() {
             className="flex shrink-0 items-center gap-1.5 text-gray-500 hover:text-gray-900 dark:text-white/50 dark:hover:text-white text-sm transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
-            Выйти
+            {t('profileCard.logout')}
           </button>
           <div className="w-px h-4 bg-gray-200 dark:bg-white/10" />
 
@@ -564,7 +566,7 @@ export default function WatchPartyPage() {
                 onClick={() => previousEpisode && switchEpisode(previousEpisode.episode_number)}
                 disabled={!previousEpisode}
                 className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-white hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-30 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
-                title="Предыдущий эпизод"
+                title={t('wp.prevEpisode')}
               >
                 <SkipBack className="h-4 w-4" />
               </button>
@@ -572,11 +574,11 @@ export default function WatchPartyPage() {
                 value={room.episode_number}
                 onChange={(event) => switchEpisode(Number(event.target.value))}
                 className="h-7 max-w-32 rounded-lg border-0 bg-transparent px-2 text-xs font-semibold text-gray-700 outline-none dark:text-white"
-                title="Переключить эпизод у всех"
+                title={t('wp.switchEpisodeAll')}
               >
                 {episodeOptions.map((episode) => (
                   <option key={episode.episode_number} value={episode.episode_number}>
-                    Серия {episode.episode_number}
+                    {t('activity.episode', { n: episode.episode_number })}
                   </option>
                 ))}
               </select>
@@ -584,7 +586,7 @@ export default function WatchPartyPage() {
                 onClick={() => nextEpisode && switchEpisode(nextEpisode.episode_number)}
                 disabled={!nextEpisode}
                 className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-white hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-30 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
-                title="Следующий эпизод"
+                title={t('wp.nextEpisode')}
               >
                 <SkipForward className="h-4 w-4" />
               </button>
@@ -598,7 +600,7 @@ export default function WatchPartyPage() {
             )}
             <div className="min-w-0">
               <p className="max-w-[150px] truncate text-sm font-semibold text-gray-900 dark:text-white leading-tight sm:max-w-[260px] md:max-w-[360px]">{room.anime.title}</p>
-              <p className="text-xs text-gray-500 dark:text-white/40">Эпизод {room.episode_number}</p>
+              <p className="text-xs text-gray-500 dark:text-white/40">{t('wp.episodeN', { n: room.episode_number })}</p>
             </div>
           </div>
         </div>
@@ -609,12 +611,12 @@ export default function WatchPartyPage() {
           <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs ${isConnected ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
             }`}>
             {isConnected ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
-            {isConnected ? 'Подключено' : 'Нет связи'}
+            {isConnected ? t('wp.connected') : t('wp.noConnection')}
           </div>
 
           {/* Code Badge */}
           <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-            <span className="hidden sm:inline text-xs text-gray-500 dark:text-white/50">Код:</span>
+            <span className="hidden sm:inline text-xs text-gray-500 dark:text-white/50">{t('wp.code')}</span>
             <span className="text-sm font-mono font-bold text-[#00E2C4] tracking-widest">{room.code}</span>
           </div>
 
@@ -624,7 +626,7 @@ export default function WatchPartyPage() {
             className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-sm text-gray-600 hover:text-gray-900 dark:text-white/70 dark:hover:text-white transition-all"
           >
             {copied ? <Check className="w-4 h-4 text-[#00E2C4]" /> : <Link2 className="w-4 h-4" />}
-            <span className="hidden sm:inline">{copied ? 'Скопировано!' : 'Ссылка'}</span>
+            <span className="hidden sm:inline">{copied ? t('common.copied') : t('wp.link')}</span>
           </button>
 
           {/* Invite Friends */}
@@ -633,7 +635,7 @@ export default function WatchPartyPage() {
             className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-sm text-gray-600 hover:text-gray-900 dark:text-white/70 dark:hover:text-white transition-all"
           >
             <UserPlus className="w-4 h-4" />
-            <span className="hidden sm:inline">Друзья</span>
+            <span className="hidden sm:inline">{t('friends.title2')}</span>
           </button>
         </div>
       </div>
@@ -671,7 +673,7 @@ export default function WatchPartyPage() {
                 <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto">
                   <Play className="w-8 h-8 text-white/30" />
                 </div>
-                <p className="text-white/40 text-sm">Плеер загружается...</p>
+                <p className="text-white/40 text-sm">{t('wp.playerLoading')}</p>
               </div>
             </div>
           )}
@@ -680,7 +682,7 @@ export default function WatchPartyPage() {
           {isHost && (
             <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-[11px] sm:text-xs font-medium">
               <Crown className="w-3 h-3" />
-              Вы хост — управляете воспроизведением
+              {t('wp.youAreHost')}
             </div>
           )}
 
@@ -697,7 +699,7 @@ export default function WatchPartyPage() {
                   <Bell className="w-5 h-5 text-[#00E2C4]" />
                   <div className="flex-1">
                     <p className="text-sm text-gray-900 dark:text-white font-medium">
-                      {friendInvitePopup.from_user_name} приглашает вас
+                      {t('wp.invitesYou', { name: friendInvitePopup.from_user_name })}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-white/40">{friendInvitePopup.anime_title}</p>
                   </div>
@@ -708,7 +710,7 @@ export default function WatchPartyPage() {
                     }}
                     className="px-3 py-1.5 rounded-lg bg-[#00E2C4]/20 border border-[#00E2C4]/40 text-[#00E2C4] text-xs font-semibold hover:bg-[#00E2C4]/30 transition-colors"
                   >
-                    Войти
+                    {t('common.login')}
                   </button>
                 </div>
               </motion.div>
@@ -721,7 +723,7 @@ export default function WatchPartyPage() {
           {/* Tabs */}
           <div className="flex border-b border-gray-200 dark:border-white/10">
             {([
-              { id: 'chat', label: 'Чат', icon: null },
+              { id: 'chat', label: t('friends.chat'), icon: null },
               { id: 'participants', label: `${visibleParticipants.length}`, icon: <IoPeople className="h-4 w-4" /> },
             ] as const).map(tab => (
               <button
@@ -768,11 +770,11 @@ export default function WatchPartyPage() {
             className="fixed top-20 right-3 z-50 w-[calc(100vw-1.5rem)] max-w-72 bg-white dark:bg-[#0d1117] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden sm:top-14 sm:right-4"
           >
             <div className="px-4 py-3 border-b border-gray-200 dark:border-white/10">
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">Пригласить друзей</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('wp.inviteFriends')}</p>
             </div>
             <div className="max-h-72 overflow-y-auto">
               {friends.length === 0 ? (
-                <p className="text-center text-gray-400 dark:text-white/30 text-sm py-6">Нет друзей для приглашения</p>
+                <p className="text-center text-gray-400 dark:text-white/30 text-sm py-6">{t('wp.noFriendsToInvite')}</p>
               ) : (
                 friends.map((f) => (
                   <div key={f.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
@@ -787,7 +789,7 @@ export default function WatchPartyPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-gray-900 dark:text-white truncate">{f.name}</p>
-                      {f.is_online && <p className="text-[10px] text-green-400">В сети</p>}
+                      {f.is_online && <p className="text-[10px] text-green-400">{t('friends.online')}</p>}
                     </div>
                     <button
                       onClick={() => handleInvite(f.id)}
@@ -797,7 +799,7 @@ export default function WatchPartyPage() {
                         : 'bg-[#00E2C4]/20 border border-[#00E2C4]/40 text-[#00E2C4] hover:bg-[#00E2C4]/30'
                         }`}
                     >
-                      {invitedIds.includes(f.id) ? '✓ Отправлено' : 'Пригласить'}
+                      {invitedIds.includes(f.id) ? t('wp.sent') : t('wp.invite')}
                     </button>
                   </div>
                 ))

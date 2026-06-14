@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FaCalendarAlt, FaChevronDown, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { useI18n } from "@/contexts/I18nContext";
 
 type DatePickerProps = {
   id?: string;
@@ -19,21 +20,21 @@ type PickerDropdownProps = {
 };
 
 const MONTHS = [
-  "Январь",
-  "Февраль",
-  "Март",
-  "Апрель",
-  "Май",
-  "Июнь",
-  "Июль",
-  "Август",
-  "Сентябрь",
-  "Октябрь",
-  "Ноябрь",
-  "Декабрь",
+  "date.jan",
+  "date.feb",
+  "date.mar",
+  "date.apr",
+  "date.may",
+  "date.jun",
+  "date.jul",
+  "date.aug",
+  "date.sep",
+  "date.oct",
+  "date.nov",
+  "date.dec",
 ];
 
-const WEEK_DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+const WEEK_DAYS = ["day.mon", "day.tue", "day.wed", "day.thu", "day.fri", "day.sat", "day.sun"];
 
 const pad = (value: number) => String(value).padStart(2, "0");
 
@@ -102,7 +103,8 @@ function PickerDropdown({ value, options, onChange, className = "" }: PickerDrop
   );
 }
 
-export default function DatePicker({ id, value, onChange, placeholder = "ДД.ММ.ГГГГ", hasError = false }: DatePickerProps) {
+export default function DatePicker({ id, value, onChange, placeholder, hasError = false }: DatePickerProps) {
+  const { t } = useI18n();
   const selectedDate = parseDateValue(value);
   const [isOpen, setIsOpen] = useState(false);
   const currentDate = new Date();
@@ -127,7 +129,7 @@ export default function DatePicker({ id, value, onChange, placeholder = "ДД.М
     return Array.from({ length: 101 }, (_, index) => currentYear - index);
   }, []);
 
-  const monthOptions = useMemo(() => MONTHS.map((month, index) => ({ label: month, value: index })), []);
+  const monthOptions = useMemo(() => MONTHS.map((month, index) => ({ label: t(month), value: index })), [t]);
   const yearOptions = useMemo(() => years.map((year) => ({ label: String(year), value: year })), [years]);
 
   const calendarDays = useMemo(() => {
@@ -162,7 +164,7 @@ export default function DatePicker({ id, value, onChange, placeholder = "ДД.М
           }`}
       >
         <span className={value ? "text-gray-700 dark:text-gray-200" : "text-gray-400"}>
-          {formatDisplayValue(value) || placeholder}
+          {formatDisplayValue(value) || (placeholder ?? t('date.placeholder'))}
         </span>
         <FaCalendarAlt className="text-xs text-gray-400 opacity-60 transition-colors group-hover:text-[#2EC4B6]" />
       </button>
@@ -179,7 +181,7 @@ export default function DatePicker({ id, value, onChange, placeholder = "ДД.М
             </button>
 
             <PickerDropdown
-              value={MONTHS[visibleMonth]}
+              value={t(MONTHS[visibleMonth])}
               options={monthOptions}
               onChange={(month) => setViewDate((current) => new Date(current.getFullYear(), month, 1))}
               className="flex-1"
@@ -202,7 +204,7 @@ export default function DatePicker({ id, value, onChange, placeholder = "ДД.М
           </div>
 
           <div className="mb-2 grid grid-cols-7 gap-1 text-center text-[10px] font-black uppercase text-gray-400">
-            {WEEK_DAYS.map((day) => <span key={day}>{day}</span>)}
+            {WEEK_DAYS.map((day) => <span key={day}>{t(day)}</span>)}
           </div>
 
           <div className="grid grid-cols-7 gap-1">

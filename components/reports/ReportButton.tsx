@@ -4,18 +4,20 @@ import { FormEvent, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BiFlag, BiSend, BiX, BiChevronDown, BiCheck, BiLoaderAlt, BiErrorCircle, BiCheckCircle } from "react-icons/bi";
 import { submitReport } from "@/lib/api";
+import { useI18n } from "@/contexts/I18nContext";
 
 const categories = [
-  { value: "spam", label: "Спам" },
-  { value: "abuse", label: "Оскорбления" },
-  { value: "toxicity", label: "Токсичность" },
-  { value: "bug", label: "Ошибка" },
-  { value: "content", label: "Проблема с контентом" },
-  { value: "copyright", label: "Авторские права" },
-  { value: "other", label: "Другое" },
+  { value: "spam", labelKey: "report.spam" },
+  { value: "abuse", labelKey: "report.abuse" },
+  { value: "toxicity", labelKey: "report.toxicity" },
+  { value: "bug", labelKey: "report.bug" },
+  { value: "content", labelKey: "report.content" },
+  { value: "copyright", labelKey: "report.copyright" },
+  { value: "other", labelKey: "report.other" },
 ] as const;
 
 export default function ReportButton({ targetType, targetId, compact = false }: { targetType: "anime" | "comment" | "user"; targetId: number; compact?: boolean }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
   const [form, setForm] = useState({ category: "content", reason: "", details: "" });
@@ -38,11 +40,11 @@ export default function ReportButton({ targetType, targetId, compact = false }: 
     try {
       const result = await submitReport({ target_type: targetType, target_id: targetId, category: form.category as any, reason: form.reason, details: form.details });
       setStatus("success");
-      setNotice(result.message ?? "Жалоба отправлена");
+      setNotice(result.message ?? t("report.sent"));
       setTimeout(() => { setOpen(false); setStatus("idle"); setNotice(""); }, 2000);
     } catch (error) {
       setStatus("error");
-      setNotice(error instanceof Error ? error.message : "Не удалось отправить");
+      setNotice(error instanceof Error ? error.message : t("report.sendFailed"));
     }
   }
 
@@ -56,7 +58,7 @@ export default function ReportButton({ targetType, targetId, compact = false }: 
         type="button"
       >
         <BiFlag />
-        {!compact && <span>Жалоба</span>}
+        {!compact && <span>{t("report.title")}</span>}
       </button>
 
       <AnimatePresence>
@@ -80,10 +82,10 @@ export default function ReportButton({ targetType, targetId, compact = false }: 
                 <div className="flex items-start justify-between mb-8">
                   <div>
                     <h3 className="text-4xl font-extrabold uppercase italic tracking-tighter text-black dark:text-gray-200 leading-none">
-                      Жалоба
+                      {t("report.title")}
                     </h3>
                     <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                      Сообщить о проблеме модераторам
+                      {t("report.subtitle")}
                     </p>
                   </div>
                   <button
@@ -98,14 +100,14 @@ export default function ReportButton({ targetType, targetId, compact = false }: 
                 <div className="space-y-6">
                   <div className="relative" ref={dropRef}>
                     <span className="block text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-2 ml-1">
-                      Категория
+                      {t("report.category")}
                     </span>
                     <button
                       type="button"
                       onClick={() => setDropOpen(!dropOpen)}
                       className="flex items-center justify-between w-full px-5 py-4 bg-gray-50/80 dark:bg-[#1a1a1a]/80 border border-gray-200 dark:border-gray-800 rounded-lg text-sm font-bold text-black dark:text-gray-200 focus:border-brand transition-all outline-none backdrop-blur-md"
                     >
-                      {activeCategory?.label}
+                      {activeCategory ? t(activeCategory.labelKey) : ''}
                       <BiChevronDown className={`text-xl transition-transform ${dropOpen ? 'rotate-180' : ''}`} />
                     </button>
 
@@ -124,7 +126,7 @@ export default function ReportButton({ targetType, targetId, compact = false }: 
                               onClick={() => { setForm({ ...form, category: c.value }); setDropOpen(false); }}
                               className="flex items-center justify-between w-full px-5 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#252525] transition-colors border-b last:border-0 border-gray-100 dark:border-gray-800"
                             >
-                              {c.label}
+                              {t(c.labelKey)}
                               {form.category === c.value && <BiCheck className="text-brand text-xl" />}
                             </button>
                           ))}
@@ -135,7 +137,7 @@ export default function ReportButton({ targetType, targetId, compact = false }: 
 
                   <div>
                     <div className="flex justify-between items-center mb-2 px-1">
-                      <span className="text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-wider">Причина</span>
+                      <span className="text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-wider">{t("report.reason")}</span>
                       <span className="text-[10px] text-gray-400 font-bold tracking-widest">{form.reason.length}/255</span>
                     </div>
                     <input
@@ -143,14 +145,14 @@ export default function ReportButton({ targetType, targetId, compact = false }: 
                       maxLength={255}
                       value={form.reason}
                       onChange={(e) => setForm({ ...form, reason: e.target.value })}
-                      placeholder="Что именно случилось?"
+                      placeholder={t("report.reasonPlaceholder")}
                       className="w-full px-5 py-4 bg-gray-50/80 dark:bg-[#1a1a1a]/80 border border-gray-200 dark:border-gray-800 rounded-lg text-sm font-bold text-black dark:text-gray-200 outline-none focus:border-brand transition-all backdrop-blur-md placeholder:text-gray-400 dark:placeholder:text-gray-600"
                     />
                   </div>
 
                   <div>
                     <div className="flex justify-between items-center mb-2 px-1">
-                      <span className="text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-wider">Детали</span>
+                      <span className="text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-wider">{t("report.details")}</span>
                       <span className="text-[10px] text-gray-400 font-bold tracking-widest">{form.details.length}/3000</span>
                     </div>
                     <textarea
@@ -158,7 +160,7 @@ export default function ReportButton({ targetType, targetId, compact = false }: 
                       rows={4}
                       value={form.details}
                       onChange={(e) => setForm({ ...form, details: e.target.value })}
-                      placeholder="Дополнительная информация..."
+                      placeholder={t("report.detailsPlaceholder")}
                       className="w-full px-5 py-4 bg-gray-50/80 dark:bg-[#1a1a1a]/80 border border-gray-200 dark:border-gray-800 rounded-lg text-sm font-bold text-black dark:text-gray-200 outline-none focus:border-brand transition-all backdrop-blur-md resize-none placeholder:text-gray-400 dark:placeholder:text-gray-600"
                     />
                   </div>
@@ -192,7 +194,7 @@ export default function ReportButton({ targetType, targetId, compact = false }: 
                   ) : (
                     <>
                       <BiSend className="text-lg" />
-                      <span>Отправить</span>
+                      <span>{t("comments.send")}</span>
                     </>
                   )}
                 </button>

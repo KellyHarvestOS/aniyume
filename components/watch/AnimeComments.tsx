@@ -6,6 +6,7 @@ import Modal from '@/components/modals/ErrorModal';
 import ReportButton from '@/components/reports/ReportButton';
 import { getStorageAssetUrl } from '@/lib/storage';
 import AvatarFrameOverlay, { getAvatarFramePath } from '@/components/profile/AvatarFrameOverlay';
+import { useI18n } from '@/contexts/I18nContext';
 
 const EMOJIS = ['😊', '😂', '😍', '🤔', '😎', '😭', '😮', '🔥', '✨', '👍', '👎', '❤️', '😱', '🙌', '👀'];
 
@@ -58,6 +59,7 @@ const PREVIEW_COMMENTS = [
 ];
 
 export default function AnimeComments({ animeId, preview = false }: { animeId: string | number; preview?: boolean }) {
+  const { t } = useI18n();
   const [comments, setComments] = useState<any[]>(preview ? PREVIEW_COMMENTS : []);
   const [user, setUser] = useState<any>({ name: null, avatar: null, ok: false, loading: true });
   const [cp, setCp] = useState({ input: '', text: '', t: 0, can: true });
@@ -109,8 +111,8 @@ export default function AnimeComments({ animeId, preview = false }: { animeId: s
     html = applyCensorship(html);
 
     const txt = edRef.current?.innerText.trim() || "";
-    if (txt.length < 3) return alert('Минимум 3 символа');
-    if (cp.input !== cp.text) return (alert('Капча!'), genCp());
+    if (txt.length < 3) return alert(t('comments.minChars'));
+    if (cp.input !== cp.text) return (alert(t('comments.captcha')), genCp());
 
     setUi(p => ({ ...p, sub: true }));
     const payload = { anime_id: +animeId, comment: html };
@@ -167,11 +169,11 @@ export default function AnimeComments({ animeId, preview = false }: { animeId: s
   };
 
   if (!ui.m) return null;
-  if (user.loading) return <div className="brand-text py-10 text-center animate-pulse font-bold">Загрузка...</div>;
+  if (user.loading) return <div className="brand-text py-10 text-center animate-pulse font-bold">{t('common.loading')}</div>;
 
   return (
     <div className="min-w-0 lg:col-span-2">
-      <h2 className="brand-border text-xl font-black mb-6 border-l-4 pl-3 uppercase">Отзывы</h2>
+      <h2 className="brand-border text-xl font-black mb-6 border-l-4 pl-3 uppercase">{t('comments.title')}</h2>
       {user.ok ? (
         <div className="bg-gray-50 border-gray-300 dark:bg-[#161616] p-4 sm:p-6 rounded-lg border dark:border-gray-800">
           <div className="mb-4 flex items-center gap-3">
@@ -193,7 +195,7 @@ export default function AnimeComments({ animeId, preview = false }: { animeId: s
           </div>
           <div className="text-right text-[10px] font-bold text-gray-400 my-2 uppercase">{ui.len} / 1000</div>
           <div className="flex flex-col sm:flex-row gap-4 mb-4">
-            <input className="grow p-3 rounded-lg border-gray-400 dark:bg-[#111111] border dark:border-gray-700 text-sm outline-none" placeholder="Код" value={cp.input} onChange={e => setCp(c => ({ ...c, input: e.target.value }))} />
+            <input className="grow p-3 rounded-lg border-gray-400 dark:bg-[#111111] border dark:border-gray-700 text-sm outline-none" placeholder={t('comments.codePlaceholder')} value={cp.input} onChange={e => setCp(c => ({ ...c, input: e.target.value }))} />
             <div className="flex items-center gap-3">
               <div
                 className="bg-gray-200 border-gray-600 dark:bg-[#1a1a1a] px-6 py-2 rounded-lg font-black tracking-widest italic text-xl border dark:border-gray-700 select-none cursor-default"
@@ -204,10 +206,10 @@ export default function AnimeComments({ animeId, preview = false }: { animeId: s
                 {cp.text}
               </div>
               <button onClick={genCp} disabled={!cp.can} className={!cp.can ? 'text-gray-600' : 'brand-text'}><FaSyncAlt /></button>
-              {!cp.can && <span className="text-[9px] font-bold text-gray-400 uppercase">через {cp.t}с</span>}
+              {!cp.can && <span className="text-[9px] font-bold text-gray-400 uppercase">{t('comments.inSec', { n: cp.t })}</span>}
             </div>
           </div>
-          <button onClick={send} disabled={ui.sub} className="bg-brand w-full text-white font-black py-4 rounded-lg uppercase text-xs tracking-widest disabled:opacity-50">{ui.sub ? '...' : 'Отправить'}</button>
+          <button onClick={send} disabled={ui.sub} className="bg-brand w-full text-white font-black py-4 rounded-lg uppercase text-xs tracking-widest disabled:opacity-50">{ui.sub ? '...' : t('comments.send')}</button>
         </div>
       ) : <Prompt />}
 
@@ -230,23 +232,23 @@ export default function AnimeComments({ animeId, preview = false }: { animeId: s
                     let cleanedHtml = upRef.current?.innerHTML.replace(/&nbsp;/g, ' ') || "";
                     cleanedHtml = applyCensorship(cleanedHtml);
                     call(`/api/external/comments/${c.id}`, "PATCH", { comment: cleanedHtml }).then(j => { setComments(prev => prev.map(x => x.id === c.id ? j.data : x)); setUi(p => ({ ...p, edit: null })); })
-                  }} className="brand-bg text-white px-4 py-1.5 rounded text-[10px] font-black uppercase flex items-center gap-2"><FaSave /> Ок</button>
+                  }} className="brand-bg text-white px-4 py-1.5 rounded text-[10px] font-black uppercase flex items-center gap-2"><FaSave /> {t('comments.ok')}</button>
                 </div>
               ) : (
                 <div className="text-sm dark:text-gray-400 prose dark:prose-invert wrap-break-word max-w-full" dangerouslySetInnerHTML={{ __html: applyCensorship(c.comment) }} />
               )}
               <div className="mt-4 flex flex-wrap items-center justify-end gap-1.5 sm:gap-2 text-xs text-gray-400">
-                <ActionButton title="Ответить" active={ui.reply === c.id} onClick={() => setUi(p => ({ ...p, reply: p.reply === c.id ? null : c.id, replyText: '' }))} icon={<FaReply />} />
-                <ActionButton title="Лайк" active={c.viewer_reaction === 'like'} onClick={() => reactToComment(c.id, 'like')} icon={<FaThumbsUp />} count={c.likes_count || 0} />
-                <ActionButton title="Дизлайк" active={c.viewer_reaction === 'dislike'} onClick={() => reactToComment(c.id, 'dislike')} icon={<FaThumbsDown />} count={c.dislikes_count || 0} />
-                {(user.is_admin || user.role === 'admin') && <ActionButton title="Сердце админа" active={!!c.admin_hearted} onClick={() => toggleAdminHeart(c.id)} icon={<FaHeart />} />}
+                <ActionButton title={t('comments.reply')} active={ui.reply === c.id} onClick={() => setUi(p => ({ ...p, reply: p.reply === c.id ? null : c.id, replyText: '' }))} icon={<FaReply />} />
+                <ActionButton title={t('comments.like')} active={c.viewer_reaction === 'like'} onClick={() => reactToComment(c.id, 'like')} icon={<FaThumbsUp />} count={c.likes_count || 0} />
+                <ActionButton title={t('comments.dislike')} active={c.viewer_reaction === 'dislike'} onClick={() => reactToComment(c.id, 'dislike')} icon={<FaThumbsDown />} count={c.dislikes_count || 0} />
+                {(user.is_admin || user.role === 'admin') && <ActionButton title={t('comments.adminHeart')} active={!!c.admin_hearted} onClick={() => toggleAdminHeart(c.id)} icon={<FaHeart />} />}
               </div>
               {ui.reply === c.id && (
                 <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-[#111111]">
-                  <textarea value={ui.replyText} onChange={e => setUi(p => ({ ...p, replyText: e.target.value }))} placeholder={`Ответить ${c.user.name}...`} className="brand-focus h-20 w-full resize-none rounded-lg border border-gray-200 bg-white p-3 text-sm outline-none dark:border-gray-700 dark:bg-[#181818] dark:text-gray-200" />
+                  <textarea value={ui.replyText} onChange={e => setUi(p => ({ ...p, replyText: e.target.value }))} placeholder={t('comments.replyTo', { name: c.user.name })} className="brand-focus h-20 w-full resize-none rounded-lg border border-gray-200 bg-white p-3 text-sm outline-none dark:border-gray-700 dark:bg-[#181818] dark:text-gray-200" />
                   <div className="mt-2 flex justify-end gap-2">
-                    <button onClick={() => setUi(p => ({ ...p, reply: null, replyText: '' }))} className="rounded-lg px-3 py-2 text-[10px] font-black uppercase text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">Отмена</button>
-                    <button onClick={() => sendReply(c.id)} className="bg-brand rounded-lg px-4 py-2 text-[10px] font-black uppercase text-white">Ответить</button>
+                    <button onClick={() => setUi(p => ({ ...p, reply: null, replyText: '' }))} className="rounded-lg px-3 py-2 text-[10px] font-black uppercase text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">{t('profile.edit.cancel')}</button>
+                    <button onClick={() => sendReply(c.id)} className="bg-brand rounded-lg px-4 py-2 text-[10px] font-black uppercase text-white">{t('comments.reply')}</button>
                   </div>
                 </div>
               )}
@@ -270,7 +272,7 @@ export default function AnimeComments({ animeId, preview = false }: { animeId: s
           </div>
         ))}
       </div>
-      <Modal isOpen={!!ui.del} onClose={() => setUi(p => ({ ...p, del: null }))} onConfirm={() => call(`/api/external/comments/${ui.del}`, "DELETE").then(() => { setComments(p => p.filter(x => x.id !== ui.del)); setUi(p => ({ ...p, del: null })); })} title="Удалить?" message="Это действие необратимо." />
+      <Modal isOpen={!!ui.del} onClose={() => setUi(p => ({ ...p, del: null }))} onConfirm={() => call(`/api/external/comments/${ui.del}`, "DELETE").then(() => { setComments(p => p.filter(x => x.id !== ui.del)); setUi(p => ({ ...p, del: null })); })} title={t('comments.deleteTitle')} message={t('comments.deleteMsg')} />
     </div>
   );
 }
@@ -305,9 +307,12 @@ const Avatar = ({ name, src, size, frameKey }: any) => {
   );
 };
 
-const Prompt = () => (
+const Prompt = () => {
+  const { t } = useI18n();
+  return (
   <div className="bg-gray-50 dark:bg-[#0b0f1a] p-10 rounded-lg border-2 border-dashed dark:border-gray-800 text-center">
     <FaLock className="mx-auto mb-4 text-gray-300" size={24} />
-    <Link href="/login" className="brand-bg text-white px-10 py-3 rounded-lg font-black text-xs uppercase inline-block">Войти</Link>
+    <Link href="/login" className="brand-bg text-white px-10 py-3 rounded-lg font-black text-xs uppercase inline-block">{t('common.login')}</Link>
   </div>
-);
+  );
+};

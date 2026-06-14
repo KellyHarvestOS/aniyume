@@ -11,6 +11,7 @@ import AnimeViewSkeleton from "@/components/skeletons/AnimeViewSkeleton";
 import ReportButton from "@/components/reports/ReportButton";
 import { AnimeDetails, Episode } from "@/types/anime";
 import { CommunityStats } from "@/types/profile";
+import { useI18n } from "@/contexts/I18nContext";
 
 const STATUS_CONFIG: Record<string, string> = {
   watching: "bg-green-500",
@@ -22,6 +23,7 @@ const STATUS_CONFIG: Record<string, string> = {
 
 export default function AnimeViewPage() {
   const { id } = useParams();
+  const { t } = useI18n();
   const API_BASE = "/api/external";
 
   const [anime, setAnime] = useState<AnimeDetails | null>(null);
@@ -176,8 +178,8 @@ export default function AnimeViewPage() {
               </div>
 
               <div className="flex justify-between text-xs text-gray-400 dark:text-gray-500 font-medium px-1">
-                <span>В списках: {totalStats}</span>
-                <span>{communityStats.watching} смотрят</span>
+                <span>{t('anime.inLists', { n: totalStats })}</span>
+                <span>{t('anime.watchingN', { n: communityStats.watching })}</span>
               </div>
             </div>
           )}

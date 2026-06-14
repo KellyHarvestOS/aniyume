@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Users, UserPlus, UserCheck, UserX, Clock, Check, X, Tv2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useI18n } from '@/contexts/I18nContext';
 import { useRouter } from 'next/navigation';
 import JoinRoomModal from '@/components/watch-party/JoinRoomModal';
 import { getStorageAssetUrl } from '@/lib/storage';
@@ -39,6 +40,7 @@ interface FriendProfile {
 
 export default function FriendsPage() {
   const { user, isLoading: authLoading } = useAuth();
+  const { t } = useI18n();
   const router = useRouter();
   const profileRequestSeq = useRef(0);
 
@@ -117,7 +119,7 @@ export default function FriendsPage() {
     setLoading(userId, true);
     try {
       const res = await api.post(`/friends/${userId}`, {});
-      if (!res.ok) throw new Error(await responseError(res, 'Не удалось отправить запрос'));
+      if (!res.ok) throw new Error(await responseError(res, t('friends.errSendRequest')));
       const found = searchResults.find(u => u.id === userId);
       if (found) setOutgoing(prev => prev.some(u => u.id === userId) ? prev : [...prev, found]);
       setSearchResults(prev => prev.map(u => u.id === userId ? { ...u, friendship_status: 'pending', is_sender: true } : u));
@@ -135,13 +137,13 @@ export default function FriendsPage() {
     setNicknameError('');
     try {
       const res = await api.post('/friends/by-nickname', { nickname: value });
-      if (!res.ok) throw new Error(await responseError(res, 'Не удалось отправить запрос'));
+      if (!res.ok) throw new Error(await responseError(res, t('friends.errSendRequest')));
       setNickname('');
       setSearchQuery(value);
       setActiveTab('requests');
       await loadData();
     } catch (err) {
-      setNicknameError(err instanceof Error ? err.message : 'Не удалось отправить запрос');
+      setNicknameError(err instanceof Error ? err.message : t('friends.errSendRequest'));
     } finally {
       setIsSendingNickname(false);
     }
@@ -151,7 +153,7 @@ export default function FriendsPage() {
     setLoading(userId, true);
     try {
       const res = await api.post(`/friends/${userId}/accept`, {});
-      if (!res.ok) throw new Error(await responseError(res, 'Не удалось принять заявку'));
+      if (!res.ok) throw new Error(await responseError(res, t('friends.errAccept')));
       const accepted = incoming.find(u => u.id === userId);
       if (accepted) {
         setFriends(prev => prev.some(u => u.id === userId) ? prev : [...prev, accepted]);
@@ -167,7 +169,7 @@ export default function FriendsPage() {
     setLoading(userId, true);
     try {
       const res = await api.post(`/friends/${userId}/decline`, {});
-      if (!res.ok) throw new Error(await responseError(res, 'Не удалось удалить заявку'));
+      if (!res.ok) throw new Error(await responseError(res, t('friendsPanel.errRemoveRequest')));
       setIncoming(prev => prev.filter(u => u.id !== userId));
       setFriends(prev => prev.filter(u => u.id !== userId));
       setSearchResults(prev => prev.map(u => u.id === userId ? { ...u, friendship_status: 'none', is_sender: false } : u));
@@ -180,7 +182,7 @@ export default function FriendsPage() {
     setLoading(userId, true);
     try {
       const res = await api.post(`/friends/${userId}/decline`, {});
-      if (!res.ok) throw new Error(await responseError(res, 'Не удалось отменить заявку'));
+      if (!res.ok) throw new Error(await responseError(res, t('friends.errCancel')));
       setOutgoing(prev => prev.filter(u => u.id !== userId));
       setSearchResults(prev => prev.map(u => u.id === userId ? { ...u, friendship_status: 'none', is_sender: false } : u));
     } finally {
@@ -208,9 +210,9 @@ export default function FriendsPage() {
   };
 
   const tabs = [
-    { id: 'friends' as const, label: 'Друзья', count: friends.length },
-    { id: 'requests' as const, label: 'Заявки', count: incoming.length },
-    { id: 'search' as const, label: 'Поиск', count: null },
+    { id: 'friends' as const, label: t('friends.title2'), count: friends.length },
+    { id: 'requests' as const, label: t('friendsPanel.tabRequests'), count: incoming.length },
+    { id: 'search' as const, label: t('friendsPanel.tabSearch'), count: null },
   ];
 
   const UserAvatar = ({ user, size = 10 }: { user: FriendUser | SearchUser; size?: number }) => {
@@ -253,17 +255,17 @@ export default function FriendsPage() {
                   <UserAvatar user={selectedProfile.user} size={16} />
                   <h2 className="mt-5 text-2xl font-bold text-white">{selectedProfile.user.name}</h2>
                   <p className={`mt-1 text-sm ${selectedProfile.user.is_online ? 'text-green-400' : 'text-white/40'}`}>
-                    {selectedProfile.user.custom_status || (selectedProfile.user.is_online ? 'В сети' : 'Не в сети')}
+                    {selectedProfile.user.custom_status || (selectedProfile.user.is_online ? t('friends.online') : t('friends.offline'))}
                   </p>
                 </div>
                 <div className="grid grid-cols-4 gap-2 mt-8">
-                  <div className="rounded-2xl bg-white/5 p-3 text-center"><p className="text-[#00E2C4] font-bold">{selectedProfile.counts.friends}</p><p className="text-[10px] text-white/35">друзья</p></div>
-                  <div className="rounded-2xl bg-white/5 p-3 text-center"><p className="text-[#00E2C4] font-bold">{selectedProfile.counts.comments}</p><p className="text-[10px] text-white/35">комм.</p></div>
-                  <div className="rounded-2xl bg-white/5 p-3 text-center"><p className="text-[#00E2C4] font-bold">{selectedProfile.counts.ratings}</p><p className="text-[10px] text-white/35">оценки</p></div>
-                  <div className="rounded-2xl bg-white/5 p-3 text-center"><p className="text-[#00E2C4] font-bold">{selectedProfile.counts.favorites}</p><p className="text-[10px] text-white/35">избр.</p></div>
+                  <div className="rounded-2xl bg-white/5 p-3 text-center"><p className="text-[#00E2C4] font-bold">{selectedProfile.counts.friends}</p><p className="text-[10px] text-white/35">{t('friendsPanel.friendsCount')}</p></div>
+                  <div className="rounded-2xl bg-white/5 p-3 text-center"><p className="text-[#00E2C4] font-bold">{selectedProfile.counts.comments}</p><p className="text-[10px] text-white/35">{t('friendsPanel.commentsAbbr')}</p></div>
+                  <div className="rounded-2xl bg-white/5 p-3 text-center"><p className="text-[#00E2C4] font-bold">{selectedProfile.counts.ratings}</p><p className="text-[10px] text-white/35">{t('friendsPanel.ratingsAbbr')}</p></div>
+                  <div className="rounded-2xl bg-white/5 p-3 text-center"><p className="text-[#00E2C4] font-bold">{selectedProfile.counts.favorites}</p><p className="text-[10px] text-white/35">{t('friendsPanel.favAbbr')}</p></div>
                 </div>
                 <p className="mt-6 text-center text-xs uppercase tracking-wider text-white/35">
-                  {selectedProfile.user.friendship_status === 'accepted' ? 'У вас в друзьях' : selectedProfile.user.friendship_status === 'pending' ? 'Заявка ожидает ответа' : 'Не в друзьях'}
+                  {selectedProfile.user.friendship_status === 'accepted' ? t('friendsPanel.statusAccepted') : selectedProfile.user.friendship_status === 'pending' ? t('friendsPanel.statusPending') : t('friendsPanel.statusNone')}
                 </p>
               </div>
             ) : null}
@@ -284,9 +286,9 @@ export default function FriendsPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white">Друзья</h1>
+              <h1 className="text-2xl font-bold text-white">{t('friends.title2')}</h1>
               <p className="text-white/40 text-sm mt-1">
-                {friends.length > 0 ? `${friends.filter(f => f.is_online).length} онлайн из ${friends.length}` : 'Найдите друзей по имени'}
+                {friends.length > 0 ? t('friendsPanel.onlineOf', { online: friends.filter(f => f.is_online).length, total: friends.length }) : t('friendsPanel.findByName')}
               </p>
             </div>
             <button
@@ -294,7 +296,7 @@ export default function FriendsPage() {
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#00E2C4]/10 border border-[#00E2C4]/30 text-[#00E2C4] text-sm font-medium hover:bg-[#00E2C4]/20 transition-colors"
             >
               <Tv2 className="w-4 h-4" />
-              Войти в комнату
+              {t('friendsPanel.enterRoom')}
             </button>
           </div>
         </motion.div>
@@ -337,9 +339,9 @@ export default function FriendsPage() {
                   <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto">
                     <Users className="w-8 h-8 text-white/20" />
                   </div>
-                  <p className="text-white/40">Пока нет друзей</p>
+                  <p className="text-white/40">{t('friendsPanel.noFriends')}</p>
                   <button onClick={() => setActiveTab('search')} className="text-[#00E2C4] text-sm hover:underline">
-                    Найти пользователей
+                    {t('friendsPanel.findUsers')}
                   </button>
                 </div>
               ) : (
@@ -356,7 +358,7 @@ export default function FriendsPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-white font-medium text-sm truncate">{f.name}</p>
                         <p className={`text-xs truncate ${f.is_online ? 'text-green-400' : 'text-white/30'}`}>
-                          {f.is_online ? 'В сети' : f.custom_status || 'Не в сети'}
+                          {f.is_online ? t('friends.online') : f.custom_status || t('friends.offline')}
                         </p>
                       </div>
                     </button>
@@ -367,7 +369,7 @@ export default function FriendsPage() {
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors"
                       >
                         <UserX className="w-3.5 h-3.5" />
-                        Удалить
+                        {t('friendsPanel.remove')}
                       </button>
                     </div>
                   </motion.div>
@@ -381,7 +383,7 @@ export default function FriendsPage() {
             <motion.div key="requests" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               {incoming.length > 0 && (
                 <div>
-                  <p className="text-xs text-white/40 font-semibold uppercase tracking-wider mb-2">Входящие</p>
+                  <p className="text-xs text-white/40 font-semibold uppercase tracking-wider mb-2">{t('friendsPanel.incoming')}</p>
                   <div className="space-y-2">
                     {incoming.map((f) => (
                       <div key={f.id} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-[#00E2C4]/10">
@@ -389,7 +391,7 @@ export default function FriendsPage() {
                           <UserAvatar user={f} size={10} />
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-medium text-sm truncate">{f.name}</p>
-                            <p className="text-xs text-white/40 truncate">Хочет добавить вас в друзья</p>
+                            <p className="text-xs text-white/40 truncate">{t('friendsPanel.wantsToAdd')}</p>
                           </div>
                         </button>
                         <div className="flex gap-2">
@@ -416,7 +418,7 @@ export default function FriendsPage() {
 
               {outgoing.length > 0 && (
                 <div>
-                  <p className="text-xs text-white/40 font-semibold uppercase tracking-wider mb-2">Исходящие</p>
+                  <p className="text-xs text-white/40 font-semibold uppercase tracking-wider mb-2">{t('friendsPanel.outgoing')}</p>
                   <div className="space-y-2">
                     {outgoing.map((f) => (
                       <div key={f.id} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/5">
@@ -424,7 +426,7 @@ export default function FriendsPage() {
                           <UserAvatar user={f} size={10} />
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-medium text-sm truncate">{f.name}</p>
-                            <p className="text-xs text-white/40 truncate">Ожидание ответа</p>
+                            <p className="text-xs text-white/40 truncate">{t('requests.waitingResponse')}</p>
                           </div>
                         </button>
                         <button
@@ -433,7 +435,7 @@ export default function FriendsPage() {
                           className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/40 text-xs hover:text-white hover:border-white/20 transition-colors"
                         >
                           <Clock className="w-3.5 h-3.5" />
-                          Отменить
+                          {t('requests.cancel')}
                         </button>
                       </div>
                     ))}
@@ -446,7 +448,7 @@ export default function FriendsPage() {
                   <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto">
                     <UserPlus className="w-8 h-8 text-white/20" />
                   </div>
-                  <p className="text-white/40">Нет активных заявок</p>
+                  <p className="text-white/40">{t('friendsPanel.noRequests')}</p>
                 </div>
               )}
             </motion.div>
@@ -463,7 +465,7 @@ export default function FriendsPage() {
                       type="text"
                       value={nickname}
                       onChange={e => setNickname(e.target.value)}
-                      placeholder="Точное имя для заявки..."
+                      placeholder={t('friendsPanel.exactNickname')}
                       className="w-full pl-10 pr-4 py-3 bg-black/10 border border-white/10 rounded-xl text-white placeholder-white/30 outline-none focus:border-[#00E2C4]/50 transition-colors"
                     />
                   </div>
@@ -472,7 +474,7 @@ export default function FriendsPage() {
                     disabled={isSendingNickname || !nickname.trim()}
                     className="px-4 py-3 rounded-xl bg-[#00E2C4]/20 border border-[#00E2C4]/40 text-[#00E2C4] text-xs font-semibold hover:bg-[#00E2C4]/30 transition-colors disabled:opacity-50"
                   >
-                    {isSendingNickname ? '...' : 'Отправить'}
+                    {isSendingNickname ? '...' : t('comments.send')}
                   </button>
                 </div>
                 {nicknameError ? <p className="mt-2 text-xs text-red-400">{nicknameError}</p> : null}
@@ -484,7 +486,7 @@ export default function FriendsPage() {
                   type="text"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Поиск пользователей по имени..."
+                  placeholder={t('friendsPanel.searchUsers')}
                   className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 outline-none focus:border-[#00E2C4]/50 transition-colors"
                   autoFocus
                 />
@@ -513,7 +515,7 @@ export default function FriendsPage() {
                         <div className="flex-1 min-w-0">
                           <p className="text-white font-medium text-sm truncate">{u.name}</p>
                           <p className={`text-xs truncate ${u.is_online ? 'text-green-400' : 'text-white/30'}`}>
-                            {u.is_online ? 'В сети' : u.custom_status || 'Не в сети'}
+                            {u.is_online ? t('friends.online') : u.custom_status || t('friends.offline')}
                           </p>
                         </div>
                       </button>
@@ -522,12 +524,12 @@ export default function FriendsPage() {
                       {isFriend ? (
                         <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 text-white/40 text-xs">
                           <UserCheck className="w-3.5 h-3.5" />
-                          Друзья
+                          {t('friends.title2')}
                         </span>
                       ) : isPendingOutgoing ? (
                         <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 text-white/40 text-xs">
                           <Clock className="w-3.5 h-3.5" />
-                          Отправлено
+                          {t('friendsPanel.sent')}
                         </span>
                       ) : isPendingIncoming ? (
                         <button
@@ -536,7 +538,7 @@ export default function FriendsPage() {
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00E2C4]/20 border border-[#00E2C4]/40 text-[#00E2C4] text-xs font-semibold hover:bg-[#00E2C4]/30 transition-colors"
                         >
                           <Check className="w-3.5 h-3.5" />
-                          Принять
+                          {t('friends.accept')}
                         </button>
                       ) : (
                         <button
@@ -549,7 +551,7 @@ export default function FriendsPage() {
                           ) : (
                             <UserPlus className="w-3.5 h-3.5" />
                           )}
-                          Добавить
+                          {t('friendsPanel.add')}
                         </button>
                       )}
                     </motion.div>
@@ -557,10 +559,10 @@ export default function FriendsPage() {
                 })}
 
                 {searchQuery.length >= 2 && !isSearching && searchResults.length === 0 && (
-                  <p className="text-center text-white/30 py-8 text-sm">Пользователи не найдены</p>
+                  <p className="text-center text-white/30 py-8 text-sm">{t('friendsPanel.noUsers')}</p>
                 )}
                 {searchQuery.length < 2 && (
-                  <p className="text-center text-white/20 py-8 text-sm">Введите минимум 2 символа</p>
+                  <p className="text-center text-white/20 py-8 text-sm">{t('friendsPanel.min2')}</p>
                 )}
               </div>
             </motion.div>

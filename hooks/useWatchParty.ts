@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import { api } from '@/lib/api';
+import { useI18n } from '@/contexts/I18nContext';
 
 // Make Pusher available globally for Laravel Echo
 if (typeof window !== 'undefined') {
@@ -63,6 +64,7 @@ export function useWatchParty({
   onFriendInvite,
   currentUserId,
 }: UseWatchPartyOptions): UseWatchPartyReturn {
+  const { t } = useI18n();
   const echoRef = useRef<Echo<any> | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -207,7 +209,7 @@ export function useWatchParty({
     const optimistic: ChatMessage = {
       id: Date.now(),
       user_id: currentUserId || 0,
-      user_name: 'Вы',
+      user_name: t('wp.you'),
       user_avatar: null,
       message,
       type: 'message',

@@ -4,6 +4,7 @@ import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { motion } from 'framer-motion';
 import { FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface ImageCropModalProps {
     image: string;
@@ -12,6 +13,7 @@ interface ImageCropModalProps {
 }
 
 export default function ImageCropModal({ image, onCropComplete, onClose }: ImageCropModalProps) {
+    const { t } = useI18n();
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
@@ -77,7 +79,7 @@ export default function ImageCropModal({ image, onCropComplete, onClose }: Image
             >
                 <div className="p-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-[#161616]">
                     <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
-                        Редактирование фото
+                        {t('crop.title')}
                     </h3>
                     <button onClick={onClose} className="text-slate-400 hover:text-red-500 transition-colors">
                         <FaTimes size={20} />
@@ -100,7 +102,7 @@ export default function ImageCropModal({ image, onCropComplete, onClose }: Image
                 <div className="p-6 space-y-6 bg-white dark:bg-[#111111]">
                     <div className="space-y-3">
                         <div className="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-                            <span>Масштаб</span>
+                            <span>{t('crop.scale')}</span>
                             <span className="text-brand">{Math.round(zoom * 100)}%</span>
                         </div>
                         <input
@@ -120,13 +122,13 @@ export default function ImageCropModal({ image, onCropComplete, onClose }: Image
                             onClick={getCroppedImg}
                             className="flex-1 py-3 bg-brand text-white dark:text-black font-black uppercase text-xs tracking-widest rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                         >
-                            <FaCheck /> Применить
+                            <FaCheck /> {t('crop.apply')}
                         </button>
                         <button
                             onClick={onClose}
                             className="px-6 py-3 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-gray-400 font-black uppercase text-xs tracking-widest rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-all"
                         >
-                            Отмена
+                            {t('profile.edit.cancel')}
                         </button>
                     </div>
                 </div>

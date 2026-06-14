@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown } from 'lucide-react';
 import type { Participant } from '@/hooks/useWatchParty';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface ParticipantsListProps {
   participants: Participant[];
@@ -17,13 +18,14 @@ export default function ParticipantsList({
   currentUserId,
   maxParticipants = 10,
 }: ParticipantsListProps) {
+  const { t } = useI18n();
   return (
     <div className="bg-white dark:bg-black/30 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-[#00E2C4] animate-pulse" />
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">Участники</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">{t('wp.participants')}</span>
         </div>
         <span className="text-xs text-gray-500 dark:text-white/40">
           {participants.length} / {maxParticipants}
@@ -68,7 +70,7 @@ export default function ParticipantsList({
                   <div className="flex items-center gap-1.5">
                     <span className={`text-sm font-medium truncate ${isCurrentUser ? 'text-[#00E2C4]' : 'text-gray-800 dark:text-white'}`}>
                       {p.name}
-                      {isCurrentUser && ' (вы)'}
+                      {isCurrentUser && t('wp.youSuffix')}
                     </span>
                     {isHost && (
                       <Crown className="w-3 h-3 text-yellow-400 flex-shrink-0" />
@@ -82,7 +84,7 @@ export default function ParticipantsList({
 
         {participants.length === 0 && (
           <div className="text-center text-gray-400 dark:text-white/30 text-sm py-4">
-            Подключение...
+            {t('wp.connectingShort')}
           </div>
         )}
       </div>

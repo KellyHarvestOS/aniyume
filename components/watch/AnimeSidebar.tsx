@@ -5,23 +5,25 @@ import React from 'react';
 import Link from 'next/link';
 import { FaStar } from 'react-icons/fa';
 import { AnimeDetails } from '@/types/anime';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface AnimeSidebarProps {
   recommendations: AnimeDetails[];
 }
 
 export default function AnimeSidebar({ recommendations }: AnimeSidebarProps) {
+  const { t } = useI18n();
   return (
     <div className="hidden lg:block">
       <div className="bg-gray-100 dark:bg-[#111111] p-5 rounded-xl border border-gray-300 dark:border-gray-800 sticky top-4 transition-colors">
         <h3 className="text-lg font-bold text-black dark:text-gray-200 mb-4">
-          Похожее (Топ)
+          {t('sidebar.similarTop')}
         </h3>
 
         <div className="space-y-4">
           {recommendations.length === 0 && (
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Загрузка...
+              {t('common.loading')}
             </p>
           )}
 

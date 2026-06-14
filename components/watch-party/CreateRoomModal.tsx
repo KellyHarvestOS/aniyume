@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Link2, Users, Lock, Tv, ChevronRight } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface Anime {
   id: number;
@@ -21,6 +22,7 @@ interface CreateRoomModalProps {
 
 export default function CreateRoomModal({ anime, episodeNumber, onClose, onCreated }: CreateRoomModalProps) {
   const { user } = useAuth();
+  const { t } = useI18n();
   const participantLimit = user?.is_premium ? 10 : 2;
   const [maxParticipants, setMaxParticipants] = useState(participantLimit);
   const [isPrivate, setIsPrivate] = useState(false);
@@ -43,12 +45,12 @@ export default function CreateRoomModal({ anime, episodeNumber, onClose, onCreat
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.message || 'Ошибка создания комнаты');
+        setError(data.message || t('wp.createRoomError'));
         return;
       }
       onCreated(data.room.code);
     } catch {
-      setError('Ошибка сети');
+      setError(t('auth.networkError'));
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +77,7 @@ export default function CreateRoomModal({ anime, episodeNumber, onClose, onCreat
               <div className="w-8 h-8 rounded-xl bg-brand/10 flex items-center justify-center">
                 <Tv className="w-4 h-4 text-brand" />
               </div>
-              <span className="font-semibold text-gray-900 dark:text-white">Создать комнату</span>
+              <span className="font-semibold text-gray-900 dark:text-white">{t('wp.createRoom')}</span>
             </div>
             <button onClick={onClose} className="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 flex items-center justify-center text-gray-500 dark:text-white/40 hover:text-gray-900 dark:hover:text-white transition-colors">
               <X className="w-4 h-4" />
@@ -89,16 +91,16 @@ export default function CreateRoomModal({ anime, episodeNumber, onClose, onCreat
                 <img src={anime.poster_url} alt={anime.title} className="w-10 h-14 object-cover rounded-lg" />
               )}
               <div>
-                <p className="text-xs text-gray-500 dark:text-white/40 mb-0.5">Будете смотреть</p>
+                <p className="text-xs text-gray-500 dark:text-white/40 mb-0.5">{t('wp.willWatch')}</p>
                 <p className="text-gray-900 dark:text-white font-medium text-sm leading-tight">{anime.title}</p>
-                <p className="text-brand text-xs mt-0.5">Эпизод {episodeNumber}</p>
+                <p className="text-brand text-xs mt-0.5">{t('wp.episodeN', { n: episodeNumber })}</p>
               </div>
             </div>
 
             <div>
               <label className="block text-sm text-gray-600 dark:text-white/60 mb-2">
                 <Users className="w-3.5 h-3.5 inline mr-1.5" />
-                Максимум участников: <span className="text-gray-900 dark:text-white font-semibold">{maxParticipants}</span>
+                {t('wp.maxParticipants')} <span className="text-gray-900 dark:text-white font-semibold">{maxParticipants}</span>
               </label>
               <input
                 type="range"
@@ -113,7 +115,7 @@ export default function CreateRoomModal({ anime, episodeNumber, onClose, onCreat
                 <span>{participantLimit}</span>
               </div>
               {!user?.is_premium && (
-                <p className="mt-2 text-xs text-white/40">Premium позволяет создавать комнаты до 10 участников.</p>
+                <p className="mt-2 text-xs text-white/40">{t('wp.premiumUpTo10')}</p>
               )}
             </div>
 
@@ -124,8 +126,8 @@ export default function CreateRoomModal({ anime, episodeNumber, onClose, onCreat
               <div className="flex items-center gap-2">
                 <Lock className="w-4 h-4 text-gray-500 dark:text-white/50" />
                 <div>
-                  <p className="text-sm text-gray-900 dark:text-white">Приватная комната</p>
-                  <p className="text-xs text-gray-500 dark:text-white/40">Только по коду или ссылке</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{t('wp.privateRoom')}</p>
+                  <p className="text-xs text-gray-500 dark:text-white/40">{t('wp.byCodeOrLink')}</p>
                 </div>
               </div>
               <div className={`w-10 h-5.5 rounded-full transition-colors relative ${isPrivate ? 'bg-brand' : 'bg-gray-300 dark:bg-white/20'}`}
@@ -147,7 +149,7 @@ export default function CreateRoomModal({ anime, episodeNumber, onClose, onCreat
                 <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
               ) : (
                 <>
-                  Создать комнату
+                  {t('wp.createRoom')}
                   <ChevronRight className="w-4 h-4"/>
                 </>
               )}

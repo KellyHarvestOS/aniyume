@@ -7,6 +7,7 @@ import ChatMessage, { Message } from '@/components/chat/ChatMessage';
 import ChatInput from '@/components/chat/ChatInput';
 import ChatSidebar, { ChatPreview } from '@/components/chat/ChatSidebar';
 import { useAuth } from '@/contexts/AuthContext';
+import { useI18n } from '@/contexts/I18nContext';
 import { getStorageAssetUrl } from '@/lib/storage';
 
 interface ApiMessage {
@@ -32,6 +33,7 @@ export default function ChatPage() {
     const params = useParams<{ id: string }>();
     const router = useRouter();
     const { user: me, isLoading } = useAuth();
+    const { t } = useI18n();
     const friendId = Number(params.id);
     const [friend, setFriend] = useState<ApiUser | null>(null);
     const [chats, setChats] = useState<ChatPreview[]>([]);
@@ -85,7 +87,7 @@ export default function ChatPage() {
             setHiddenMessageIds(hiddenIds);
             setMessages((data.messages || []).map(mapMessage).filter((message: Message) => !hiddenIds.has(message.id)));
         } else if (chatResponse.status === 403) {
-            setError('Чат доступен только между друзьями');
+            setError(t('chat.onlyFriends'));
         }
         if (listResponse.ok) {
             const data = await listResponse.json();
@@ -95,7 +97,7 @@ export default function ChatPage() {
                 avatar: chat.user.avatar,
                 is_online: chat.user.is_online,
                 selected_profile_frame: chat.user.selected_profile_frame ?? null,
-                lastMessage: chat.last_message?.photo_path ? 'Фотография' : chat.last_message?.body || 'Начните переписку',
+                lastMessage: chat.last_message?.photo_path ? t('chat.photo') : chat.last_message?.body || t('chat.startConversation'),
             })));
         }
     }, [friendId, getHiddenMessageIds]);
@@ -133,7 +135,7 @@ export default function ChatPage() {
         });
         const result = await response.json().catch(() => ({}));
         if (!response.ok) {
-            setError(response.status === 429 ? 'Повторяющиеся сообщения: отправка отключена на 5 секунд' : result.errors?.body?.[0] || result.message || 'Не удалось отправить сообщение');
+            setError(response.status === 429 ? t('chat.rateLimited') : result.errors?.body?.[0] || result.message || t('chat.sendFailed'));
             return;
         }
         setError('');
@@ -150,7 +152,7 @@ export default function ChatPage() {
             await navigator.clipboard.writeText(value);
             setError('');
         } catch {
-            setError('Не удалось скопировать сообщение');
+            setError(t('chat.copyFailed'));
         }
     };
 
@@ -185,7 +187,7 @@ export default function ChatPage() {
                 <header className="flex-none z-[100] bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-100 dark:border-white/5">
                     <ChatHeader
                         friendId={friendId}
-                        friendName={friend?.name || `Пользователь ${friendId}`}
+                        friendName={friend?.name || t('chat.userN', { id: friendId })}
                         friendAvatar={friend?.avatar}
                         friendFrame={friend?.selected_profile_frame}
                         isOnline={friend?.is_online || false}
@@ -219,7 +221,7 @@ export default function ChatPage() {
 
                     {!messages.length && !error && (
                         <p className="my-auto text-center text-xs md:text-sm text-gray-400">
-                            Здесь пока нет сообщений
+                            {t('chat.noMessages')}
                         </p>
                     )}
                 </main>

@@ -7,6 +7,7 @@ import { FaStar } from 'react-icons/fa';
 import { useWatchTracker } from '@/hooks/useWatchTracker';
 import { useRouter } from 'next/navigation';
 import CreateRoomModal from '@/components/watch-party/CreateRoomModal';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface AnimePlayerProps {
   animeId: number;
@@ -16,6 +17,7 @@ interface AnimePlayerProps {
 }
 
 export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect }: AnimePlayerProps) {
+  const { t } = useI18n();
   const [showCreateRoom, setShowCreateRoom] = useState(false);
   const router = typeof window !== 'undefined' ? useRouter() : null;
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
@@ -107,7 +109,7 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
   }, [animeId, token]);
 
   const handleRate = async (value: number) => {
-    if (!token) return alert("Пожалуйста, войдите в аккаунт");
+    if (!token) return alert(t('player.pleaseLogin'));
     setIsRatingLoading(true);
     try {
       const res = await fetch('/api/external/ratings', {
@@ -138,9 +140,9 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
   const sourceKey = (ep: Episode) => `${ep.source ?? 'unknown'}::${ep.translator ?? 'Без озвучки'}::${ep.translation_type ?? ''}`;
 
   const sourceLabel = (ep: Episode) => {
-    const source = ep.source === 'anilibria' ? 'AniLibria' : ep.source === 'kodik' ? 'Kodik' : ep.source === 'videocdn' ? 'VideoCDN' : ep.source === 'allanime' ? 'AllAnime' : ep.source ?? 'Источник';
+    const source = ep.source === 'anilibria' ? 'AniLibria' : ep.source === 'kodik' ? 'Kodik' : ep.source === 'videocdn' ? 'VideoCDN' : ep.source === 'allanime' ? 'AllAnime' : ep.source ?? t('player.source');
     const translator = ep.translator && ep.translator !== source ? ` · ${ep.translator}` : '';
-    const ads = ep.source === 'kodik' ? ' · возможна реклама' : ep.source === 'anilibria' ? ' · без рекламы' : '';
+    const ads = ep.source === 'kodik' ? t('player.mayHaveAds') : ep.source === 'anilibria' ? t('player.noAds') : '';
     return `${source}${translator}${ads}`;
   };
 
@@ -375,7 +377,7 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
         <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
           <div className="flex items-center gap-6">
             <h2 className="text-2xl font-semibold text-black dark:text-gray-200">
-              {currentEpisode ? `Серия ${currentEpisode.episode_number}` : 'Плеер'}
+              {currentEpisode ? t('activity.episode', { n: currentEpisode.episode_number }) : t('player.player')}
             </h2>
             <div className="flex items-center gap-1.5 bg-white dark:bg-[#1a1a1a] px-4 py-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -431,7 +433,7 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
               className="bg-brand text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-105 hover:shadow-lg transition-all active:scale-95"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
-              Включить вместе (Watch Party)
+              {t('player.watchTogether')}
             </button>
           </div>
         )}
@@ -461,7 +463,7 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
             )
           ) : (
             <div className="flex items-center justify-center w-full h-full text-white">
-              Видео недоступно
+              {t('player.videoUnavailable')}
             </div>
           )}
         </div>

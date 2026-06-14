@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getStorageAssetUrl } from '@/lib/storage';
 import AvatarFrameOverlay, { getAvatarFramePath } from '@/components/profile/AvatarFrameOverlay';
+import { useI18n } from '@/contexts/I18nContext';
 interface ChatHeaderProps {
     friendId: number;
     friendName: string;
@@ -19,6 +20,7 @@ interface ChatHeaderProps {
 export default function ChatHeader({ friendId, friendName, friendAvatar, friendFrame, isOnline, isBlocked = false, onClear, onBlock }: ChatHeaderProps) {
     const friendFramePath = getAvatarFramePath(friendFrame);
     const router = useRouter();
+    const { t } = useI18n();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -39,7 +41,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, friendF
 
     const handleClearChat = async () => {
         setIsMenuOpen(false);
-        if (window.confirm('Очистить всю переписку?')) await onClear?.();
+        if (window.confirm(t('chat.clearConfirm'))) await onClear?.();
     };
 
     const handleBlockUser = async () => {
@@ -75,7 +77,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, friendF
                                 {friendName}
                             </h2>
                             <p className={`text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] mt-1 md:mt-1.5 flex items-center gap-1.5 ${isOnline ? 'text-brand' : 'text-gray-400'}`}>
-                                {isOnline ? 'В сети' : 'Оффлайн'}
+                                {isOnline ? t('friends.online') : t('chat.offline')}
                             </p>
                         </div>
                     </button>
@@ -108,7 +110,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, friendF
                                     className="w-full flex items-center gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] text-brand hover:bg-brand/10 transition-all group"
                                 >
                                     <FaPlay size={10} className="group-hover:scale-110 transition-transform" />
-                                    Пригласить на просмотр
+                                    {t('chat.inviteToWatch')}
                                 </button>
 
                                 <div className="h-px w-full bg-gray-200 dark:bg-white/5 my-1" />
@@ -118,7 +120,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, friendF
                                     className="w-full flex items-center gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] text-orange-500 hover:bg-orange-500/10 transition-all group"
                                 >
                                     <FaTrashAlt size={12} className="group-hover:scale-110 transition-transform" />
-                                    Очистить чат
+                                    {t('chat.clearChat')}
                                 </button>
 
                                 <button
@@ -126,7 +128,7 @@ export default function ChatHeader({ friendId, friendName, friendAvatar, friendF
                                     className="w-full flex items-center gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] text-red-600 dark:text-red-500 hover:bg-red-500/10 transition-all group"
                                 >
                                     <FaBan size={12} className="group-hover:scale-110 transition-transform" />
-                                    {isBlocked ? 'Разблокировать' : 'Заблокировать'}
+                                    {isBlocked ? t('chat.unblock') : t('chat.block')}
                                 </button>
                             </motion.div>
                         )}

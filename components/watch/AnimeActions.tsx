@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { FaChevronDown, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface AnimeActionsProps {
   animeId: number;
@@ -10,35 +11,35 @@ interface AnimeActionsProps {
 
 const STATUS_MAP: Record<
   string,
-  { label: string; color: string; dot: string }
+  { labelKey: string; color: string; dot: string }
 > = {
   not_watching: {
-    label: 'Не смотрю',
+    labelKey: 'anime.notWatching',
     color: 'bg-[#303030]  hover:bg-[#1a202c] text-white',
     dot: 'bg-gray-400',
   },
   watching: {
-    label: 'Смотрю',
+    labelKey: 'stats.watching',
     color: 'bg-green-500 hover:bg-green-600 text-white',
     dot: 'bg-green-500',
   },
   planned: {
-    label: 'В планах',
+    labelKey: 'stats.planned',
     color: 'bg-purple-500 hover:bg-purple-600 text-white',
     dot: 'bg-purple-500',
   },
   completed: {
-    label: 'Просмотрено',
+    labelKey: 'bookmarks.completed',
     color: 'bg-blue-500 hover:bg-blue-600 text-white',
     dot: 'bg-blue-500',
   },
   on_hold: {
-    label: 'Отложено',
+    labelKey: 'stats.onHold',
     color: 'bg-yellow-500 hover:bg-yellow-600 text-white',
     dot: 'bg-yellow-500',
   },
   dropped: {
-    label: 'Брошено',
+    labelKey: 'stats.dropped',
     color: 'bg-red-500 hover:bg-red-600 text-white',
     dot: 'bg-red-500',
   },
@@ -48,6 +49,7 @@ export default function AnimeActions({
   animeId,
   initialFavCount = 0,
 }: AnimeActionsProps) {
+  const { t } = useI18n();
   const [status, setStatus] = useState<string>('not_watching');
   const [isFavorite, setIsFavorite] = useState(false);
   const [favCount, setFavCount] = useState(initialFavCount);
@@ -100,7 +102,7 @@ export default function AnimeActions({
 
   const handleStatusChange = async (newStatus: string) => {
     const token = localStorage.getItem('userToken');
-    if (!token) return alert('Нужна авторизация');
+    if (!token) return alert(t('anime.needAuth'));
 
     const previousStatus = status;
     setStatus(newStatus);
@@ -130,7 +132,7 @@ export default function AnimeActions({
 
   const toggleFavorite = async () => {
     const token = localStorage.getItem('userToken');
-    if (!token) return alert('Нужна авторизация');
+    if (!token) return alert(t('anime.needAuth'));
 
     try {
       const res = await fetch(
@@ -168,7 +170,7 @@ export default function AnimeActions({
           onClick={() => setIsOpen(!isOpen)}
           className={`${activeStyle.color} px-5 py-3 rounded-xl font-bold text-sm flex items-center justify-between gap-3 min-w-[180px] transition-all shadow-md`}
         >
-          <span>{activeStyle.label}</span>
+          <span>{t(activeStyle.labelKey)}</span>
           <FaChevronDown
             className={`transition-transform duration-200 ${
               isOpen ? 'rotate-180' : ''
@@ -187,7 +189,7 @@ export default function AnimeActions({
                 <span
                   className={`w-2 h-2 rounded-full ${val.dot}`}
                 />
-                {val.label}
+                {t(val.labelKey)}
               </button>
             ))}
           </div>

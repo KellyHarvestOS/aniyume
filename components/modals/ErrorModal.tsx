@@ -3,6 +3,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface ModalProps {
   isOpen: boolean;
@@ -19,13 +20,19 @@ export default function Modal({
   isOpen,
   onClose,
   onConfirm,
-  title = 'Подтверждение',
-  message = 'Вы уверены, что хотите выполнить это действие?',
-  confirmText = 'Подтвердить',
-  cancelText = 'Отмена',
+  title,
+  message,
+  confirmText,
+  cancelText,
   type = 'danger',
 }: ModalProps) {
+  const { t } = useI18n();
   if (!isOpen) return null;
+
+  const resolvedTitle = title ?? t('modal.confirmTitle');
+  const resolvedMessage = message ?? t('modal.confirmMsg');
+  const resolvedConfirm = confirmText ?? t('modal.confirm');
+  const resolvedCancel = cancelText ?? t('profile.edit.cancel');
 
   return (
     <div className="fixed inset-0 z-1000 flex items-center justify-center p-4">
@@ -47,12 +54,12 @@ export default function Modal({
           </div>
 
           <h3 className="text-center text-2xl font-black uppercase tracking-tighter text-gray-900 dark:text-gray-100">
-            {title}
+            {resolvedTitle}
           </h3>
         </div>
 
         <p className="mb-10 px-2 text-center text-sm font-medium leading-relaxed text-gray-500 dark:text-gray-400">
-          {message}
+          {resolvedMessage}
         </p>
 
         <div className="flex flex-col gap-3">
@@ -66,14 +73,14 @@ export default function Modal({
                 : 'bg-brand '
               }`}
           >
-            {confirmText}
+            {resolvedConfirm}
           </button>
 
           <button
             onClick={onClose}
             className="w-full rounded-xl bg-transparent py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 transition-all hover:bg-gray-50 hover:text-gray-900 active:scale-[0.98] dark:text-gray-500 dark:hover:bg-white/5 dark:hover:text-gray-200"
           >
-            {cancelText}
+            {resolvedCancel}
           </button>
         </div>
 

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Hash, ArrowRight, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface JoinRoomModalProps {
   onClose: () => void;
@@ -12,6 +13,7 @@ interface JoinRoomModalProps {
 }
 
 export default function JoinRoomModal({ onClose, defaultCode = '' }: JoinRoomModalProps) {
+  const { t } = useI18n();
   const [code, setCode] = useState(defaultCode.toUpperCase());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,7 +22,7 @@ export default function JoinRoomModal({ onClose, defaultCode = '' }: JoinRoomMod
   const handleJoin = async () => {
     const trimmed = code.trim().toUpperCase();
     if (!trimmed || trimmed.length < 4) {
-      setError('Введите код комнаты');
+      setError(t('wp.enterRoomCode'));
       return;
     }
     setIsLoading(true);
@@ -29,13 +31,13 @@ export default function JoinRoomModal({ onClose, defaultCode = '' }: JoinRoomMod
       const res = await api.post(`/watch-party/${trimmed}/join`, {});
       const data = await res.json();
       if (!res.ok) {
-        setError(data.message || 'Не удалось войти в комнату');
+        setError(data.message || t('wp.joinFailed'));
         return;
       }
       router.push(`/watch-party/${trimmed}`);
       onClose();
     } catch {
-      setError('Ошибка сети');
+      setError(t('auth.networkError'));
     } finally {
       setIsLoading(false);
     }
@@ -63,14 +65,14 @@ export default function JoinRoomModal({ onClose, defaultCode = '' }: JoinRoomMod
         >
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-            <span className="font-semibold text-white">Войти в комнату</span>
+            <span className="font-semibold text-white">{t('wp.joinRoom')}</span>
             <button onClick={onClose} className="w-7 h-7 rounded-lg hover:bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
 
           <div className="p-5 space-y-4">
-            <p className="text-sm text-white/50">Введите 6-значный код комнаты, который дал вам друг</p>
+            <p className="text-sm text-white/50">{t('wp.enter6Digit')}</p>
 
             {/* Code Input */}
             <div className="relative">
@@ -101,7 +103,7 @@ export default function JoinRoomModal({ onClose, defaultCode = '' }: JoinRoomMod
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  Войти <ArrowRight className="w-4 h-4" />
+                  {t('common.login')} <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>

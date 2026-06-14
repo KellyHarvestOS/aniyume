@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaPlay, FaStar, FaShareAlt, FaCheck, FaChevronDown } from 'react-icons/fa';
 import { AnimeDetails } from '@/types/anime';
 import { BiMessageSquareDetail } from "react-icons/bi";
+import { useI18n } from '@/contexts/I18nContext';
 
 interface AnimeHeroProps {
   anime: AnimeDetails;
@@ -9,21 +10,22 @@ interface AnimeHeroProps {
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  tv: 'TV',
-  movie: 'Фильм',
-  ova: 'OVA',
-  ona: 'ONA',
-  special: 'Special',
+  tv: 'animeType.tv',
+  movie: 'animeType.movie',
+  ova: 'animeType.ova',
+  ona: 'animeType.ona',
+  special: 'animeType.special',
 };
 
-const STATUS_LABELS: Record<string, { label: string; dot: string }> = {
-  ongoing: { label: 'Онгоинг', dot: 'bg-brand' },
-  finished: { label: 'Завершён', dot: 'bg-brand' },
-  completed: { label: 'Завершён', dot: 'bg-brand' },
-  announced: { label: 'Анонс', dot: 'bg-brand' },
+const STATUS_LABELS: Record<string, { labelKey: string; dot: string }> = {
+  ongoing: { labelKey: 'filter.statusOngoing', dot: 'bg-brand' },
+  finished: { labelKey: 'anime.finished', dot: 'bg-brand' },
+  completed: { labelKey: 'anime.finished', dot: 'bg-brand' },
+  announced: { labelKey: 'filter.statusAnnounced', dot: 'bg-brand' },
 };
 
 export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
+  const { t } = useI18n();
   const [copied, setCopied] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -35,10 +37,13 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
   const cleanDescription = anime.description ? anime.description.replace(/<[^>]+>/g, '') : '';
   const isLong = cleanDescription.length > 250;
 
-  const statusInfo = STATUS_LABELS[anime.status?.toLowerCase()] || {
-    label: anime.status || 'Неизвестно',
-    dot: 'bg-gray-500'
+  const statusEntry = STATUS_LABELS[anime.status?.toLowerCase()];
+  const statusInfo = {
+    label: statusEntry ? t(statusEntry.labelKey) : (anime.status || t('anime.unknown')),
+    dot: statusEntry?.dot || 'bg-gray-500',
   };
+  const typeKey = TYPE_LABELS[anime.type?.toLowerCase()];
+  const typeLabel = typeKey ? t(typeKey) : (anime.type || 'TV');
 
   const handleShare = async () => {
     try {
@@ -75,7 +80,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
 
             <div className="flex flex-wrap items-center gap-3 mb-5 text-sm font-semibold tracking-wide">
               <span className="bg-gray-200 dark:bg-[#1a1a1a] text-black dark:text-gray-200 px-3 py-1 rounded border border-gray-300 dark:border-gray-700 uppercase shadow-sm">
-                {TYPE_LABELS[anime.type?.toLowerCase()] || anime.type || 'TV'}
+                {typeLabel}
               </span>
               <div className="flex items-center gap-2 bg-white/50 dark:bg-[#1a1a1a]/50 text-gray-800 dark:text-gray-300 px-3 py-1 rounded border border-gray-300 dark:border-gray-700 backdrop-blur-sm">
                 <span className={`w-2 h-2 rounded-full ${statusInfo.dot}`} />
@@ -100,7 +105,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
                 </span>
                 {anime.popularity > 0 && (
                   <span className="text-gray-500 dark:text-gray-400 text-sm font-medium pl-2 border-l border-gray-300 dark:border-gray-600">
-                    {(anime.popularity / 1000).toFixed(1)}K оценок
+                    {t('anime.ratingsK', { n: (anime.popularity / 1000).toFixed(1) })}
                   </span>
                 )}
               </div>
@@ -126,13 +131,13 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full " />
                 <FaPlay className="text-sm relative z-10" />
-                <span className="relative z-10">СМОТРЕТЬ</span>
+                <span className="relative z-10">{t('anime.watchBtn')}</span>
               </button>
 
               <div className="relative">
                 <button
                   onClick={handleShare}
-                  title="Скопировать ссылку"
+                  title={t('anime.copyLink')}
                   className={`w-14 h-14 flex items-center justify-center border-2 rounded-lg transition-all duration-300 bg-white/40 dark:bg-[#1a1a1a]/70 backdrop-blur-sm 
                     ${copied
                       ? 'border-brand text-brand shadow-lg'
@@ -144,7 +149,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
 
                 {copied && (
                   <span className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black text-white font-semibold text-xs py-2 px-3 rounded shadow-xl whitespace-nowrap z-50">
-                    Скопировано!
+                    {t('common.copied')}
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-black rotate-45" />
                   </span>
                 )}
@@ -162,7 +167,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
                       : 'line-clamp-4 relative overflow-hidden'
                   }`}
                 >
-                  <p dangerouslySetInnerHTML={{ __html: anime.description || 'Описание отсутствует' }} />
+                  <p dangerouslySetInnerHTML={{ __html: anime.description || t('anime.noDesc') }} />
 
                   {!isExpanded && isLong && (
                     <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white dark:from-[#111111] to-transparent pointer-events-none" />
@@ -174,7 +179,7 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
                     onClick={() => setIsExpanded(!isExpanded)}
                     className="text-brand text-sm font-bold uppercase tracking-wider transition-colors  mt-3 flex items-center gap-2 group"
                   >
-                    {isExpanded ? 'Свернуть текст' : 'Читать далее'}
+                    {isExpanded ? t('anime.collapseText') : t('anime.readMore')}
                     <FaChevronDown 
                       className={`text-xs transform transition-transform duration-300 ${
                         isExpanded ? 'rotate-180' : 'group-hover:translate-y-1'
@@ -187,26 +192,26 @@ export default function AnimeHero({ anime, episodesCount }: AnimeHeroProps) {
               <div className="lg:col-span-4 flex flex-col gap-4 text-sm text-gray-800 dark:text-gray-300 bg-gray-50/80 dark:bg-[#1a1a1a]/80 p-6 rounded-xl border border-gray-200 dark:border-gray-800 backdrop-blur-md shadow-sm h-fit">
                 <div className="flex items-center gap-2 mb-2 text-black dark:text-white font-bold text-base border-b border-gray-200 dark:border-gray-800 pb-3">
                   <BiMessageSquareDetail className="text-brand text-lg" />
-                  <span>Детали</span>
+                  <span>{t('anime.details')}</span>
                 </div>
 
                 <div className="space-y-3 font-medium">
                   {anime.title_english && (
                     <p>
-                      <span className="block text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-0.5">Оригинал</span>
+                      <span className="block text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-0.5">{t('anime.original')}</span>
                       <span className="text-black dark:text-gray-200">{anime.title_english}</span>
                     </p>
                   )}
                   <p>
-                    <span className="block text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-0.5">Всего серий</span>
+                    <span className="block text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-0.5">{t('anime.totalEpisodes')}</span>
                     <span className="text-black dark:text-gray-200">
-                      {anime.episodes_count || episodesCount > 0 ? anime.episodes_count || episodesCount : 'Неизвестно'}
+                      {anime.episodes_count || episodesCount > 0 ? anime.episodes_count || episodesCount : t('anime.unknown')}
                     </span>
                   </p>
                   {anime.duration && (
                     <p>
-                      <span className="block text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-0.5">Длительность</span>
-                      <span className="text-black dark:text-gray-200">{anime.duration} мин.</span>
+                      <span className="block text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-0.5">{t('anime.durationLabel')}</span>
+                      <span className="text-black dark:text-gray-200">{t('anime.minutes', { n: anime.duration })}</span>
                     </p>
                   )}
                 </div>

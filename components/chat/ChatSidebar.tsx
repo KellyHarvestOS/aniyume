@@ -6,6 +6,7 @@ import { FaSearch } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { getStorageAssetUrl } from '@/lib/storage';
 import AvatarFrameOverlay, { getAvatarFramePath } from '@/components/profile/AvatarFrameOverlay';
+import { useI18n } from '@/contexts/I18nContext';
 export interface Message {
     id: string;
     text?: string;
@@ -31,6 +32,7 @@ interface ChatSidebarProps {
 }
 export default function ChatSidebar({ chats, activeChatId, searchQuery, setSearchQuery }: ChatSidebarProps) {
     const router = useRouter();
+    const { t } = useI18n();
     const filteredChats = chats.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     return (
@@ -40,15 +42,15 @@ export default function ChatSidebar({ chats, activeChatId, searchQuery, setSearc
     `}>
             <div className="h-16 lg:h-14 shrink-0 px-4 lg:px-4 border-b border-gray-100 dark:border-white/5 flex flex-col justify-center gap-1.5 lg:gap-1">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-xs lg:text-sm font-black uppercase tracking-widest text-gray-900 dark:text-white">Чаты</h3>
-                    <span className="text-[9px] lg:text-[10px] font-bold text-gray-400">{chats.length} всего</span>
+                    <h3 className="text-xs lg:text-sm font-black uppercase tracking-widest text-gray-900 dark:text-white">{t('chat.chats')}</h3>
+                    <span className="text-[9px] lg:text-[10px] font-bold text-gray-400">{t('chat.totalCount', { n: chats.length })}</span>
                 </div>
 
                 <div className="relative group">
                     <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand transition-colors text-[10px] lg:text-xs" />
                     <input
                         type="text"
-                        placeholder="Поиск..."
+                        placeholder={t('filter.search')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full bg-gray-100 dark:bg-white/5 rounded-lg py-1.5 lg:py-1.5 pl-8 pr-3 text-[11px] lg:text-xs font-medium text-gray-900 dark:text-white outline-none border border-transparent focus:border-brand/50 transition-all placeholder:text-gray-500"
@@ -103,7 +105,7 @@ export default function ChatSidebar({ chats, activeChatId, searchQuery, setSearc
                 </AnimatePresence>
                 {filteredChats.length === 0 && (
                     <div className="p-6 text-center text-[10px] lg:text-xs font-bold text-gray-500 uppercase tracking-widest">
-                        Ничего не найдено
+                        {t('filter.nothingFound')}
                     </div>
                 )}
             </div>
