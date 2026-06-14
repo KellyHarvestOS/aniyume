@@ -401,7 +401,7 @@ export default function WatchPartyPage() {
         hlsRef.current = null;
       }
     };
-  }, [activeSource]);
+  }, [activeSource, isLoading]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -441,7 +441,7 @@ export default function WatchPartyPage() {
       video.removeEventListener('loadedmetadata', applyPendingState);
       video.removeEventListener('canplay', applyPendingState);
     };
-  }, [activeSource]);
+  }, [activeSource, isLoading]);
 
   // Late joiner: подхватить текущую позицию хоста при первом входе.
   // room.current_time/is_playing хранят последнее состояние, сохранённое хостом
@@ -483,7 +483,7 @@ export default function WatchPartyPage() {
       v.addEventListener('loadedmetadata', apply, { once: true });
       v.addEventListener('canplay', apply, { once: true });
     }
-  }, [room, user, activeSource]);
+  }, [room, user, activeSource, isLoading]);
 
   // Host: sync events
   const handleHostPlay = () => {
