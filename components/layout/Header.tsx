@@ -122,7 +122,7 @@ export default function Header() {
           setChatHref(`/profile/friends/chat/${latestId}`);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [user]);
 
   useEffect(() => {
@@ -232,7 +232,7 @@ export default function Header() {
               >
                 <HiOutlineChatBubbleOvalLeftEllipsis
                   size={26}
-                  className={`transition-colors ${isChatActive ? 'text-brand' : 'text-gray-400 dark:text-gray-500 group-hover:text-brand'}`}
+                  className={`transition-colors ${isChatActive ? 'text-brand' : 'text-gray-400 dark:text-gray-500'}`}
                 />
 
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />

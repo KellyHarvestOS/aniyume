@@ -687,6 +687,8 @@ const ru: Dictionary = {
   'date.oct': 'Октябрь',
   'date.nov': 'Ноябрь',
   'date.dec': 'Декабрь',
+  'privacy.settingsTitle': 'Приватность профиля',
+  'account.securityTitle': 'Безопасность аккаунта',
 };
 
 const kk: Dictionary = {
@@ -1350,6 +1352,8 @@ const kk: Dictionary = {
   'date.oct': 'Қазан',
   'date.nov': 'Қараша',
   'date.dec': 'Желтоқсан',
+  'privacy.settingsTitle': 'Профиль құпиялылығы',
+  'account.securityTitle': 'Аккаунт қауіпсіздігі',
 };
 
 const en: Dictionary = {
@@ -2013,6 +2017,8 @@ const en: Dictionary = {
   'date.oct': 'October',
   'date.nov': 'November',
   'date.dec': 'December',
+  'privacy.settingsTitle': 'Profile privacy',
+  'account.securityTitle': 'Account security',
 };
 
 export const translations: Record<Language, Dictionary> = { ru, kk, en };

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FaHeart, FaHistory, FaStar, FaLock, FaCheck } from "react-icons/fa";
+import { useI18n } from "@/contexts/I18nContext";
 
 type Level = "everyone" | "friends" | "nobody";
 
@@ -28,6 +29,7 @@ const OPTIONS: { value: Level; label: string }[] = [
 const DEFAULTS: PrivacyState = { favorites: "friends", watch_history: "friends", ratings: "friends" };
 
 export default function PrivacySettings() {
+  const { t } = useI18n();
   const [privacy, setPrivacy] = useState<PrivacyState>(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [savedAt, setSavedAt] = useState<number | null>(null);
@@ -82,7 +84,7 @@ export default function PrivacySettings() {
     <div className="md:col-span-2 space-y-3">
       <div className="flex items-center justify-between gap-4">
         <label className="flex items-center gap-2 text-[11px] font-black text-slate-900 dark:text-gray-100 uppercase tracking-[0.15em] ml-1">
-          <FaLock className="text-brand" /> Приватность профиля
+          <FaLock className="text-brand" /> {t("privacy.settingsTitle")}
         </label>
         {savedAt && !error && (
           <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.14em] text-emerald-500">

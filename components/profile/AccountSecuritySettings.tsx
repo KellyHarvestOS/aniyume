@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { FaEnvelope, FaLock, FaShieldAlt } from 'react-icons/fa';
+import { useI18n } from '@/contexts/I18nContext';
 
 type Props = {
   email: string;
@@ -20,6 +21,7 @@ const firstError = (data: ApiResponse) => {
 };
 
 export default function AccountSecuritySettings({ email, onEmailChange }: Props) {
+  const { t } = useI18n();
   const [nextEmail, setNextEmail] = useState(email);
   const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
@@ -87,7 +89,7 @@ export default function AccountSecuritySettings({ email, onEmailChange }: Props)
     <section className="md:col-span-2 space-y-5 rounded-xl border border-slate-200 bg-slate-50/60 p-6 dark:border-white/10 dark:bg-[#161616]">
       <div>
         <h2 className="flex items-center gap-2 text-lg font-black text-slate-900 dark:text-white">
-          <FaShieldAlt className="text-brand" /> Безопасность аккаунта
+          <FaShieldAlt className="text-brand" /> {t('account.securityTitle')}
         </h2>
         <p className="mt-1 text-xs font-semibold text-slate-400">Для смены email или пароля укажите текущий пароль.</p>
       </div>
