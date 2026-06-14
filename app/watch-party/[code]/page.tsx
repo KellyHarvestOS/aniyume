@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play, Link2, Crown,
-  Check, Bell, Wifi, WifiOff, ChevronLeft, UserPlus, SkipBack, SkipForward
+  Check, Bell, Wifi, WifiOff, ChevronLeft, UserPlus, SkipBack, SkipForward, Volume2, VolumeX
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -63,6 +63,8 @@ export default function WatchPartyPage() {
   const [sidePanel, setSidePanel] = useState<'chat' | 'participants'>('chat');
   const [friendInvitePopup, setFriendInvitePopup] = useState<any>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [muted, setMuted] = useState(false);
   const [episodeOptions, setEpisodeOptions] = useState<EpisodeOption[]>([]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -485,6 +487,15 @@ export default function WatchPartyPage() {
     }
   }, [room, user, activeSource, isLoading]);
 
+  // Локальная громкость. Особенно важна для гостей — у них нет нативных
+  // контролов (controls={isHost}); это их единственный способ менять звук.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.volume = volume;
+    v.muted = muted;
+  }, [volume, muted, activeSource, isLoading]);
+
   // Host: sync events
   const handleHostPlay = () => {
     setIsVideoPlaying(true);
@@ -673,13 +684,64 @@ export default function WatchPartyPage() {
           </button>
 
           {/* Invite Friends */}
-          <button
-            onClick={() => setShowFriends(!showFriends)}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-sm text-gray-600 hover:text-gray-900 dark:text-white/70 dark:hover:text-white transition-all"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span className="hidden sm:inline">{t('friends.title2')}</span>
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowFriends(!showFriends)}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-sm text-gray-600 hover:text-gray-900 dark:text-white/70 dark:hover:text-white transition-all"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('friends.title2')}</span>
+            </button>
+
+            {/* Friends Dropdown — anchored under the button */}
+            <AnimatePresence>
+              {showFriends && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="absolute right-0 top-full mt-2 z-50 w-72 max-w-[calc(100vw-1.5rem)] bg-white dark:bg-[#0d1117] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+                >
+                  <div className="px-4 py-3 border-b border-gray-200 dark:border-white/10">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('wp.inviteFriends')}</p>
+                  </div>
+                  <div className="max-h-72 overflow-y-auto">
+                    {friends.length === 0 ? (
+                      <p className="text-center text-gray-400 dark:text-white/30 text-sm py-6">{t('wp.noFriendsToInvite')}</p>
+                    ) : (
+                      friends.map((f) => (
+                        <div key={f.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
+                          <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 dark:bg-white/10 flex-shrink-0">
+                            {f.avatar ? (
+                              <img src={f.avatar} alt={f.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-500 dark:text-white/50">
+                                {f.name?.[0]?.toUpperCase() ?? '?'}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-gray-900 dark:text-white truncate">{f.name}</p>
+                            {f.is_online && <p className="text-[10px] text-green-400">{t('friends.online')}</p>}
+                          </div>
+                          <button
+                            onClick={() => handleInvite(f.id)}
+                            disabled={invitedIds.includes(f.id)}
+                            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all flex-shrink-0 ${invitedIds.includes(f.id)
+                              ? 'bg-gray-100 text-gray-400 dark:bg-white/5 dark:text-white/30 cursor-not-allowed'
+                              : 'bg-[#00E2C4]/20 border border-[#00E2C4]/40 text-[#00E2C4] hover:bg-[#00E2C4]/30'
+                              }`}
+                          >
+                            {invitedIds.includes(f.id) ? t('wp.sent') : t('wp.invite')}
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
 
@@ -726,6 +788,33 @@ export default function WatchPartyPage() {
             <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-[11px] sm:text-xs font-medium">
               <Crown className="w-3 h-3" />
               {t('wp.youAreHost')}
+            </div>
+          )}
+
+          {/* Громкость для зрителей (у гостей нет нативных контролов) */}
+          {!isHost && activeSource?.type === 'hls' && (
+            <div className="absolute bottom-3 right-3 flex items-center gap-2 rounded-full bg-black/60 px-3 py-1.5 backdrop-blur-md">
+              <button
+                onClick={() => setMuted((m) => !m)}
+                className="text-white/90 transition-colors hover:text-white"
+                title={muted ? 'Включить звук' : 'Выключить звук'}
+              >
+                {muted || volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={muted ? 0 : volume}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  setVolume(v);
+                  setMuted(v === 0);
+                }}
+                className="h-1 w-24 cursor-pointer accent-[#00E2C4]"
+                title="Громкость"
+              />
             </div>
           )}
 
@@ -802,55 +891,6 @@ export default function WatchPartyPage() {
           </div>
         </div>
       </div>
-
-      {/* Friends Dropdown */}
-      <AnimatePresence>
-        {showFriends && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className="fixed top-20 right-3 z-50 w-[calc(100vw-1.5rem)] max-w-72 bg-white dark:bg-[#0d1117] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden sm:top-14 sm:right-4"
-          >
-            <div className="px-4 py-3 border-b border-gray-200 dark:border-white/10">
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('wp.inviteFriends')}</p>
-            </div>
-            <div className="max-h-72 overflow-y-auto">
-              {friends.length === 0 ? (
-                <p className="text-center text-gray-400 dark:text-white/30 text-sm py-6">{t('wp.noFriendsToInvite')}</p>
-              ) : (
-                friends.map((f) => (
-                  <div key={f.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 dark:bg-white/10">
-                      {f.avatar ? (
-                        <img src={f.avatar} alt={f.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-500 dark:text-white/50">
-                          {f.name[0]?.toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900 dark:text-white truncate">{f.name}</p>
-                      {f.is_online && <p className="text-[10px] text-green-400">{t('friends.online')}</p>}
-                    </div>
-                    <button
-                      onClick={() => handleInvite(f.id)}
-                      disabled={invitedIds.includes(f.id)}
-                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${invitedIds.includes(f.id)
-                        ? 'bg-white/5 text-white/30 cursor-not-allowed'
-                        : 'bg-[#00E2C4]/20 border border-[#00E2C4]/40 text-[#00E2C4] hover:bg-[#00E2C4]/30'
-                        }`}
-                    >
-                      {invitedIds.includes(f.id) ? t('wp.sent') : t('wp.invite')}
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
