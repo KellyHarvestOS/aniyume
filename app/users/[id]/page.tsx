@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { FaArrowLeft, FaGlobe } from 'react-icons/fa';
+import { FaArrowLeft, FaGlobe, FaLock } from 'react-icons/fa';
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileCard } from '@/components/profile/ProfileCard';
 import { StatsOverview } from '@/components/profile/StatsOverview';
 import { WatchDynamics } from '@/components/profile/WatchDynamics';
 import { RecentActivity } from '@/components/profile/RecentActivity';
+import UserMediaGrid from '@/components/profile/UserMediaGrid';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 
 export default function UserProfilePage() {
@@ -37,6 +38,37 @@ export default function UserProfilePage() {
     if (me) loadProfile();
   }, [me, loadProfile]);
 
+  // Применяем тему владельца профиля, пока мы на его странице, и возвращаем свою при уходе
+  useEffect(() => {
+    const themeValue: string | undefined = profile?.user?.theme_value;
+    const themeType: string = profile?.user?.theme_type || 'gradient';
+    if (!profile?.user?.is_premium || !themeValue) return;
+
+    const root = document.documentElement;
+    const prevGradient = root.style.getPropertyValue('--brand-gradient');
+    const prevMain = root.style.getPropertyValue('--brand-main');
+
+    if (themeType === 'gradient') {
+      const hex = themeValue.match(/#[a-fA-F0-9]{6}/g);
+      if (hex && hex.length >= 2) {
+        root.style.setProperty('--brand-gradient', `linear-gradient(90deg, ${hex[0]}, ${hex[1]})`);
+        root.style.setProperty('--brand-main', hex[0]);
+      }
+    } else {
+      root.style.setProperty('--brand-gradient', themeValue);
+      root.style.setProperty('--brand-main', themeValue);
+    }
+
+    return () => {
+      if (prevGradient) root.style.setProperty('--brand-gradient', prevGradient);
+      else root.style.removeProperty('--brand-gradient');
+      if (prevMain) root.style.setProperty('--brand-main', prevMain);
+      else root.style.removeProperty('--brand-main');
+      // Просим Header пересинхронизировать тему текущего пользователя
+      window.dispatchEvent(new Event('storage'));
+    };
+  }, [profile]);
+
   if (loading) return <ProfileSkeleton />;
   if (!profile) {
     return (
@@ -55,6 +87,12 @@ export default function UserProfilePage() {
     friends: profile.counts?.friends || 0,
   };
   const socialLinks: string[] = Array.isArray(profile.user?.social_links) ? profile.user.social_links : [];
+  // Бэкенд отдаёт visibility под текущего зрителя; отсутствующее значение трактуем как «скрыто».
+  const visibility = {
+    favorites: profile.visibility?.favorites === 'visible' ? 'visible' : 'hidden',
+    watch_history: profile.visibility?.watch_history === 'visible' ? 'visible' : 'hidden',
+    ratings: profile.visibility?.ratings === 'visible' ? 'visible' : 'hidden',
+  } as const;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#111111] pb-16 transition-colors">
@@ -87,8 +125,24 @@ export default function UserProfilePage() {
 
           <div className="lg:col-span-9 space-y-6">
             <StatsOverview stats={profile.stats || {}} watchTime={profile.watch_time || { days: 0, hours: 0, minutes: 0, total_seconds: 0 }} historyCount={counts.watch_history} />
-            <WatchDynamics dynamics={profile.watch_dynamics || []} />
-            <RecentActivity activity={profile.recently_watched || []} />
+
+            {visibility.watch_history === 'visible' ? (
+              <>
+                <WatchDynamics dynamics={profile.watch_dynamics || []} />
+                <RecentActivity activity={profile.recently_watched || []} />
+              </>
+            ) : (
+              <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-white/5 dark:bg-[#161616]">
+                <p className="mb-4 text-xs font-black uppercase tracking-widest text-slate-400">Активность</p>
+                <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+                  <FaLock className="text-2xl text-slate-300 dark:text-white/10" />
+                  <p className="text-sm font-bold text-slate-400 dark:text-white/30">История просмотров скрыта настройками приватности</p>
+                </div>
+              </div>
+            )}
+
+            <UserMediaGrid userId={params.id} kind="favorites" visibility={visibility.favorites} title="Избранное" />
+            <UserMediaGrid userId={params.id} kind="ratings" visibility={visibility.ratings} title="Оценки" />
           </div>
         </div>
       </main>

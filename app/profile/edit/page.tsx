@@ -16,6 +16,7 @@ import { getAvatarFrameFit } from "@/lib/avatarFrames";
 import { getProfilePreference, setProfilePreference } from "@/lib/profilePreferences";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 import { useI18n } from "@/contexts/I18nContext";
+import PrivacySettings from "@/components/profile/PrivacySettings";
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -354,6 +355,8 @@ export default function EditProfilePage() {
                 </p>
                 <LanguageSwitcher />
               </div>
+
+              <PrivacySettings />
 
               {isPremium && (
                 <div className="md:col-span-2">
