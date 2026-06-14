@@ -14,16 +14,16 @@ type PrivacyState = {
 
 type SectionKey = keyof PrivacyState;
 
-const SECTIONS: { key: SectionKey; label: string; hint: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { key: "favorites", label: "Избранное", hint: "Кто видит ваши лайки аниме", icon: FaHeart },
-  { key: "watch_history", label: "История просмотров", hint: "Кто видит, что вы смотрите", icon: FaHistory },
-  { key: "ratings", label: "Оценки", hint: "Кто видит ваши оценки аниме", icon: FaStar },
+const SECTIONS: { key: SectionKey; labelKey: string; hintKey: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { key: "favorites", labelKey: "privacy.favorites", hintKey: "privacy.favoritesHint", icon: FaHeart },
+  { key: "watch_history", labelKey: "privacy.history", hintKey: "privacy.historyHint", icon: FaHistory },
+  { key: "ratings", labelKey: "privacy.ratings", hintKey: "privacy.ratingsHint", icon: FaStar },
 ];
 
-const OPTIONS: { value: Level; label: string }[] = [
-  { value: "everyone", label: "Все" },
-  { value: "friends", label: "Друзья" },
-  { value: "nobody", label: "Никто" },
+const OPTIONS: { value: Level; labelKey: string }[] = [
+  { value: "everyone", labelKey: "privacy.optEveryone" },
+  { value: "friends", labelKey: "privacy.optFriends" },
+  { value: "nobody", labelKey: "privacy.optNobody" },
 ];
 
 const DEFAULTS: PrivacyState = { favorites: "friends", watch_history: "friends", ratings: "friends" };
@@ -76,7 +76,7 @@ export default function PrivacySettings() {
       setSavedAt(Date.now());
     } catch {
       setPrivacy(previous);
-      setError("Не удалось сохранить настройку приватности");
+      setError(t("privacy.saveError"));
     }
   };
 
@@ -88,16 +88,16 @@ export default function PrivacySettings() {
         </label>
         {savedAt && !error && (
           <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.14em] text-emerald-500">
-            <FaCheck className="text-[10px]" /> Сохранено
+            <FaCheck className="text-[10px]" /> {t("privacy.saved")}
           </span>
         )}
       </div>
       <p className="ml-1 text-xs font-semibold text-slate-400">
-        Выберите, кто может видеть разделы вашего профиля. Изменения сохраняются сразу.
+        {t("privacy.desc")}
       </p>
 
       <div className="space-y-3">
-        {SECTIONS.map(({ key, label, hint, icon: Icon }) => (
+        {SECTIONS.map(({ key, labelKey, hintKey, icon: Icon }) => (
           <div
             key={key}
             className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 dark:border-white/5 dark:bg-[#161616] sm:flex-row sm:items-center sm:justify-between"
@@ -107,8 +107,8 @@ export default function PrivacySettings() {
                 <Icon className="text-lg" />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-black text-slate-900 dark:text-white">{label}</p>
-                <p className="text-[11px] font-semibold text-slate-400">{hint}</p>
+                <p className="text-sm font-black text-slate-900 dark:text-white">{t(labelKey)}</p>
+                <p className="text-[11px] font-semibold text-slate-400">{t(hintKey)}</p>
               </div>
             </div>
 
@@ -127,7 +127,7 @@ export default function PrivacySettings() {
                         : "text-slate-500 hover:text-brand dark:text-gray-400"
                     }`}
                   >
-                    {opt.label}
+                    {t(opt.labelKey)}
                   </button>
                 );
               })}
