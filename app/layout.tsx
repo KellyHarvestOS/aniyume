@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { I18nProvider } from "@/contexts/I18nContext";
 import { FingerprintInit } from "@/components/FingerprintInit";
 import GlobalBroadcastListener from "@/components/GlobalBroadcastListener";
+import Gazan67Listener from "@/components/Gazan67Listener";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <AuthProvider>
               <FingerprintInit />
               <GlobalBroadcastListener />
+              <Gazan67Listener />
               <LayoutClient>
                 {children}
                 <ScrollToTop />
