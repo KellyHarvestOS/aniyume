@@ -6,6 +6,7 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import CookieConsent from '../components/layout/CookieConsent';
 import AuthModal from '@/components/auth/AuthModal';
+import InviteNotifications from '@/components/watch-party/InviteNotifications';
 import { AuthModalProvider } from '@/contexts/AuthModalContext';
 import { getProfilePreference } from '@/lib/profilePreferences';
 
@@ -60,6 +61,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
 
         <CookieConsent />
         <AuthModal />
+        <InviteNotifications />
       </div>
     </AuthModalProvider>
   );

@@ -61,7 +61,6 @@ export function useWatchParty({
   initialParticipants = [],
   onPlayerSync,
   onRoomClosed,
-  onFriendInvite,
   currentUserId,
 }: UseWatchPartyOptions): UseWatchPartyReturn {
   const { t } = useI18n();
@@ -162,22 +161,14 @@ export function useWatchParty({
         console.error('[WatchPartyHook] Channel error:', error);
       });
 
-    // Подписка на приватный канал для инвайтов (если есть currentUserId)
-    if (currentUserId) {
-      echo.private(`user.${currentUserId}`)
-        .listen('.friend.invite', (data: any) => {
-          onFriendInvite?.(data);
-        });
-    }
+    // Приглашения в комнату слушает глобальный <InviteNotifications/>
+    // (подписка на user.{id} приложения-wide), чтобы не дублировать здесь.
 
     return () => {
       if (connection) {
         connection.unbind('state_change', handleStateChange);
       }
       echo.leave(`watch-party.${roomCode}`);
-      if (currentUserId) {
-        echo.leave(`user.${currentUserId}`);
-      }
       echo.disconnect();
       echoRef.current = null;
       setIsConnected(false);
