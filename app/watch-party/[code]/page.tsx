@@ -8,6 +8,7 @@ import {
   Check, Bell, Wifi, WifiOff, ChevronLeft, UserPlus, SkipBack, SkipForward, Volume2, VolumeX
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { getStorageAssetUrl } from '@/lib/storage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/contexts/I18nContext';
 import { useWatchParty, type Participant } from '@/hooks/useWatchParty';
@@ -603,7 +604,7 @@ export default function WatchPartyPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-gray-900 dark:bg-[#111111] dark:text-gray-200 flex flex-col transition-colors">
       {/* Top Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-3 sm:px-4 py-3 border-b border-gray-200 dark:border-white/5 bg-white/90 dark:bg-[#0d0d0d]/90 backdrop-blur-md">
+      <div className="relative z-50 flex flex-wrap items-center justify-between gap-3 px-3 sm:px-4 py-3 border-b border-gray-200 dark:border-white/5 bg-white/90 dark:bg-[#0d0d0d]/90 backdrop-blur-md">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <button
             onClick={handleLeave}
@@ -713,7 +714,7 @@ export default function WatchPartyPage() {
                         <div key={f.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
                           <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 dark:bg-white/10 flex-shrink-0">
                             {f.avatar ? (
-                              <img src={f.avatar} alt={f.name} className="w-full h-full object-cover" />
+                              <img src={getStorageAssetUrl(f.avatar) || f.avatar} alt={f.name} className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-500 dark:text-white/50">
                                 {f.name?.[0]?.toUpperCase() ?? '?'}
