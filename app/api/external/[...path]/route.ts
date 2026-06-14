@@ -80,7 +80,11 @@ export async function handleProxy(
     };
 
     if (req.method !== "GET" && req.method !== "HEAD") {
-      headers["Content-Type"] = "application/json";
+      // Preserve the original Content-Type so non-JSON bodies survive the proxy.
+      // pusher-js sends the broadcasting auth as application/x-www-form-urlencoded;
+      // forcing application/json here made Laravel drop channel_name/socket_id and
+      // return 403, breaking Watch Party presence/chat/player realtime.
+      headers["Content-Type"] = req.headers.get("content-type") || "application/json";
     }
 
     let revalidateTime = 0;
