@@ -28,6 +28,7 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
   const [resumeProgress, setResumeProgress] = useState<number>(0);
   const [playbackProgress, setPlaybackProgress] = useState<number>(0);
   const [hasResumed, setHasResumed] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const hlsRef = React.useRef<Hls | null>(null);
   const completedEpisodeIdsRef = React.useRef<Set<number>>(new Set());
@@ -41,6 +42,7 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
     episodeId: currentEpisode?.id,
     token: token,
     progress: playbackProgress,
+    isPlaying: isPlaying,
   });
 
   const saveProgress = async (progress: number, completed = false, episodeId = currentEpisode?.id) => {
@@ -294,8 +296,8 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
       watchedSecondsRef.current = 0;
       lastPlaybackAtRef.current = null;
       lastVideoTimeRef.current = 0;
+      setIsPlaying(false);
       setCurrentEpisode(ep);
-      saveProgress(0, false, ep.id);
       if (onEpisodeSelect) onEpisodeSelect(ep.episode_number);
     }
   };
@@ -311,6 +313,10 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
       setResumeProgress(0);
       setPlaybackProgress(0);
       setHasResumed(false);
+      watchedSecondsRef.current = 0;
+      lastPlaybackAtRef.current = null;
+      lastVideoTimeRef.current = 0;
+      setIsPlaying(false);
       setCurrentEpisode(next);
       if (onEpisodeSelect) onEpisodeSelect(next.episode_number);
     }
@@ -319,6 +325,15 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
   const getVideoSrc = (url: string | null) => {
     if (!url) return '';
     return url.startsWith('//') ? `https:${url}` : url;
+  };
+
+  // Эпизод засчитывается, только если реально просмотрено не менее 75%.
+  // watchedSecondsRef копит честное время просмотра без перемоток и без 2x.
+  const WATCHED_THRESHOLD = 0.75;
+  const hasWatchedEnough = () => {
+    const video = videoRef.current;
+    if (!video || !Number.isFinite(video.duration) || video.duration <= 0) return false;
+    return watchedSecondsRef.current >= video.duration * WATCHED_THRESHOLD;
   };
 
   const handleTimeUpdate = (event: React.SyntheticEvent<HTMLVideoElement>) => {
@@ -330,11 +345,14 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
 
     if (!video.paused && previousPlaybackAt !== null) {
       const realDelta = Math.max(0, (now - previousPlaybackAt) / 1000);
-      const videoDelta = Math.max(0, progress - previousVideoTime);
-      const maxAllowedDelta = Math.max(0, realDelta * Math.max(video.playbackRate, 1) * 1.75 + 1);
+      const videoDelta = progress - previousVideoTime;
 
-      if (videoDelta > 0 && videoDelta <= maxAllowedDelta) {
-        watchedSecondsRef.current += videoDelta;
+      // Кредит за просмотр = насколько продвинулось видео, но не больше реально
+      // прошедшего времени. Это отсекает перемотки (большой videoDelta при
+      // крошечном realDelta) и не даёт 2x накручивать счётчик быстрее реального
+      // времени. Перемотки назад (videoDelta < 0) не засчитываются.
+      if (videoDelta > 0 && realDelta > 0) {
+        watchedSecondsRef.current += Math.min(videoDelta, realDelta);
       }
     }
 
@@ -343,14 +361,9 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
 
     setPlaybackProgress(progress);
 
-    if (!currentEpisode || !Number.isFinite(video.duration) || video.duration <= 0) return;
+    if (!currentEpisode) return;
 
-    const secondsLeft = video.duration - progress;
-    const minWatchedSeconds = Math.min(video.duration * 0.7, Math.max(300, video.duration - 180));
-    const hasActuallyWatchedEnough = watchedSecondsRef.current >= minWatchedSeconds;
-    const watchedEnough = hasActuallyWatchedEnough && (secondsLeft <= 180 || progress >= video.duration * 0.9);
-
-    if (watchedEnough) {
+    if (hasWatchedEnough()) {
       void markEpisodeWatched(currentEpisode);
     }
   };
@@ -361,14 +374,21 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
   };
 
   const handlePlay = (event: React.SyntheticEvent<HTMLVideoElement>) => {
+    setIsPlaying(true);
     lastPlaybackAtRef.current = performance.now();
     lastVideoTimeRef.current = event.currentTarget.currentTime;
   };
 
   const handlePause = (event: React.SyntheticEvent<HTMLVideoElement>) => {
+    setIsPlaying(false);
     lastPlaybackAtRef.current = null;
     lastVideoTimeRef.current = event.currentTarget.currentTime;
     void saveProgress(event.currentTarget.currentTime);
+  };
+
+  const handleEnded = () => {
+    setIsPlaying(false);
+    if (currentEpisode && hasWatchedEnough()) void markEpisodeWatched(currentEpisode);
   };
 
   return (
@@ -451,7 +471,7 @@ export default function AnimePlayer({ animeId, anime, episodes, onEpisodeSelect 
                 onSeeking={handleSeeking}
                 onSeeked={handleSeeking}
                 onPause={handlePause}
-                onEnded={() => void markEpisodeWatched(currentEpisode)}
+                onEnded={handleEnded}
               />
             ) : (
               <iframe
