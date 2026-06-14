@@ -73,6 +73,7 @@ export default function WatchPartyPage() {
   const token = typeof window !== 'undefined' ? localStorage.getItem('userToken') : null;
   const [playbackProgress, setPlaybackProgress] = useState(0);
   const isSyncingRef = useRef(false);
+  const didInitialSeekRef = useRef(false);
 
   // Virtual time reference for guests to prevent stuttering
   const hostVirtualTimeRef = useRef<{ time: number; lastUpdate: number; isPlaying: boolean; active: boolean }>({
@@ -441,6 +442,48 @@ export default function WatchPartyPage() {
       video.removeEventListener('canplay', applyPendingState);
     };
   }, [activeSource]);
+
+  // Late joiner: подхватить текущую позицию хоста при первом входе.
+  // room.current_time/is_playing хранят последнее состояние, сохранённое хостом
+  // (SyncRoomStateAction пишет их в БД). Гость должен стартовать оттуда же, где хост,
+  // а дальше его держит виртуальные часы + heartbeat хоста (каждые 5 сек).
+  useEffect(() => {
+    if (didInitialSeekRef.current) return;
+    if (!room || !user || !activeSource || activeSource.type !== 'hls') return;
+    // Хост — источник истины, его не перематываем
+    if (room.host.id === user.id) { didInitialSeekRef.current = true; return; }
+
+    const v = videoRef.current;
+    if (!v) return;
+    didInitialSeekRef.current = true;
+
+    const target = room.current_time ?? 0;
+    const playing = room.is_playing ?? false;
+    if (target <= 0 && !playing) return;
+
+    const apply = () => {
+      const video = videoRef.current;
+      if (!video) return;
+      video.currentTime = playing ? target + 0.25 : target;
+      if (playing) {
+        video.play().catch(() => { });
+        setIsVideoPlaying(true);
+      }
+      hostVirtualTimeRef.current = {
+        time: target,
+        lastUpdate: window.performance.now(),
+        isPlaying: playing,
+        active: true,
+      };
+    };
+
+    if (v.readyState >= 1) {
+      apply();
+    } else {
+      v.addEventListener('loadedmetadata', apply, { once: true });
+      v.addEventListener('canplay', apply, { once: true });
+    }
+  }, [room, user, activeSource]);
 
   // Host: sync events
   const handleHostPlay = () => {
