@@ -42,6 +42,14 @@ export default function ChatPage() {
     const [error, setError] = useState('');
     const [hiddenMessageIds, setHiddenMessageIds] = useState<Set<string>>(new Set());
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const shouldAutoScrollRef = useRef(true);
+
+    const handleScroll = () => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+        const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+        shouldAutoScrollRef.current = distanceFromBottom < 120;
+    };
 
     useEffect(() => {
         if (!isLoading && !me) router.push('/login');
@@ -119,7 +127,7 @@ export default function ChatPage() {
     }, [getHiddenMessageIds]);
 
     useEffect(() => {
-        if (scrollContainerRef.current) {
+        if (shouldAutoScrollRef.current && scrollContainerRef.current) {
             scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
         }
     }, [messages]);
@@ -139,6 +147,7 @@ export default function ChatPage() {
             return;
         }
         setError('');
+        shouldAutoScrollRef.current = true;
         localStorage.setItem('lastDirectChatUserId', String(friendId));
         window.dispatchEvent(new Event('direct-chat-updated'));
         setMessages((current) => [...current, mapMessage(result.data)]);
@@ -199,7 +208,8 @@ export default function ChatPage() {
 
                 <main
                     ref={scrollContainerRef}
-                    className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 md:px-8 py-4 flex flex-col gap-2 
+                    onScroll={handleScroll}
+                    className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 md:px-8 py-4 flex flex-col gap-2
                 scrollbar-thin scrollbar-thumb-brand scrollbar-track-transparent
                 [&::-webkit-scrollbar]:w-2
                 [&::-webkit-scrollbar-track]:bg-transparent

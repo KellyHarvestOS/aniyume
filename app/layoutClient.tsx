@@ -17,7 +17,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   const hideLayout = noLayoutPages.includes(pathname);
   const isChatPage = pathname?.startsWith('/profile/friends/chat');
 
-  const hideHeader = hideLayout || isChatPage;
+  const hideHeader = hideLayout;
   const hideFooter = hideLayout || isChatPage;
 
   useEffect(() => {
