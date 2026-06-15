@@ -46,7 +46,7 @@
       <td align="center" width="50%">
         <b>Главная страница</b><br/>
         <img
-          src="https://github.com/user-attachments/assets/cd2ef6cc-af4c-44de-8172-7d21fa3ec617"
+          src="https://github.com/user-attachments/assets/f84bb506-d656-4c14-b078-9c2de5bb7199"
           width="100%"
           alt="Главная страница"
         />
@@ -54,7 +54,7 @@
       <td align="center" width="50%">
         <b>Страница просмотра</b><br/>
         <img
-          src="https://github.com/user-attachments/assets/f5f9edd9-c5e4-4213-9076-036de6ce6741"
+          src="https://github.com/user-attachments/assets/92ac3729-22c5-4f59-9233-ab1a2b0db49e"
           width="100%"
           alt="Страница плеера"
         />
