@@ -10,6 +10,7 @@ import { CgMenuRightAlt, CgMenuRight } from "react-icons/cg";
 import { IoCalendarNumberSharp } from "react-icons/io5";
 import { HiOutlineChatBubbleOvalLeftEllipsis } from "react-icons/hi2";
 import ThemeToggle from './ThemeToggle';
+import HeaderLanguageToggle from './HeaderLanguageToggle';
 import SearchBar from './SearchBar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuthModal } from '@/contexts/AuthModalContext';
@@ -223,6 +224,7 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-3 sm:gap-4 lg:border-l lg:border-gray-200 lg:dark:border-gray-800 lg:pl-6">
+            {isLoggedIn && <HeaderLanguageToggle />}
             {isLoggedIn && (
               <Link
                 href={chatHref}
@@ -279,6 +281,11 @@ export default function Header() {
               </div>
             ) : (
               <div className="flex items-center gap-2">
+                <HeaderLanguageToggle />
+                <span
+                  aria-hidden
+                  className="hidden h-5 w-px bg-gray-200 dark:bg-gray-700 sm:block"
+                />
                 <button
                   type="button"
                   onClick={() => openAuth('login')}
