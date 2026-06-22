@@ -111,7 +111,7 @@ function CatalogContent() {
                 <p className="text-xs text-gray-500">{isLoading ? t('common.loading') : t('catalog.found', { count: totalItems })}</p>
             </div>
           </div>
-          <Link href={`/filter?${searchParams.toString()}`} className="flex items-center gap-2 text-[#21D0B8] font-bold text-sm border-2 border-[#21D0B8] px-4 py-2 rounded-lg transition hover:bg-[#21D0B8] hover:text-white">
+          <Link href={`/filter?${searchParams.toString()}`} className="flex items-center gap-2 text-brand font-bold text-sm border-2 border-brand px-4 py-2 rounded-lg transition hover:bg-brand hover:text-white">
              <FaFilter /> {t('catalog.filters')}
           </Link>
         </div>
@@ -140,13 +140,13 @@ function CatalogContent() {
             {animeData.length === 0 ? (
                 <div className="text-center py-20">
                     <h2 className="text-2xl font-bold text-gray-400">{t('catalog.notFound')}</h2>
-                    <Link href={`/filter?${searchParams.toString()}`} className="mt-6 inline-block bg-[#21D0B8] text-white px-6 py-2 rounded-lg font-bold">{t('catalog.changeFilters')}</Link>
+                    <Link href={`/filter?${searchParams.toString()}`} className="mt-6 inline-block bg-brand text-white px-6 py-2 rounded-lg font-bold">{t('catalog.changeFilters')}</Link>
                 </div>
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-10 gap-x-6 justify-items-center">
                 {animeData.map((anime) => (
                     <Link href={`/anime/${anime.id}`} key={anime.id} className="block group w-full max-w-60">
-                    <div className="relative rounded-xl overflow-hidden  aspect-2/3 transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl border-2 border-transparent group-hover:border-[#21D0B8]">
+                    <div className="relative rounded-xl overflow-hidden  aspect-2/3 transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl border-2 border-transparent group-hover:border-brand">
                         <div className="absolute top-2 left-2 z-20 flex items-center gap-1 bg-black/80 backdrop-blur-md border border-yellow-500/50 px-2 py-1 rounded-lg shadow-lg">
                             <FaStar className="text-yellow-400 text-xs" />
                             <span className="text-yellow-400 font-bold text-xs">{anime.rating || '?'}</span>
@@ -156,13 +156,13 @@ function CatalogContent() {
                             <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
                                 <div className="flex gap-2 mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-300">
                                     {anime.year && <span className="bg-gray-700/80 px-2 py-0.5 rounded">{anime.year}</span>}
-                                    {anime.type && <span className="bg-[#21D0B8]/20 text-[#21D0B8] px-2 py-0.5 rounded">{anime.type}</span>}
+                                    {anime.type && <span className="bg-brand/20 text-brand px-2 py-0.5 rounded">{anime.type}</span>}
                                 </div>
-                                <button className="w-full bg-[#21D0B8] text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2 text-xs"><FaPlay className="text-[10px]" /> {t('card.watch')}</button>
+                                <button className="w-full bg-brand text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2 text-xs"><FaPlay className="text-[10px]" /> {t('card.watch')}</button>
                             </div>
                         </div>
                     </div>
-                    <h3 className="mt-3 text-center font-bold text-gray-800 text-sm truncate group-hover:text-[#21D0B8] transition-colors px-1 dark:text-gray-200">{anime.title}</h3>
+                    <h3 className="mt-3 text-center font-bold text-gray-800 text-sm truncate group-hover:text-brand transition-colors px-1 dark:text-gray-200">{anime.title}</h3>
                     </Link>
                 ))}
                 </div>
